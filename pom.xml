@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.bluetrainsoftware.maven</groupId>
+	<artifactId>openapi-dart-generator</artifactId>
+	<packaging>jar</packaging>
+	<name>openapi-dart-generator</name>
+	<version>1.1-SNAPSHOT</version>
+
+	<description>
+		dart2 generator from openapi 3.x spec files. Changing to openapitools dependencies.
+	</description>
+
+	<url>https://www.bluetrainsoftware.com</url>
+	<developers>
+		<developer>
+			<email>richard@bluetrainsoftware.com</email>
+			<id>rvowles</id>
+			<name>Richard Vowles</name>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>https://opensource.org/licenses/Apache-2.0</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</connection>
+		<developerConnection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</developerConnection>
+		<url>git@github.com:dart-ogurets/dart-openapi-maven.git</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<properties>
+		<openapi-codegen-version>4.0.0</openapi-codegen-version>
+	</properties>
+
+	<prerequisites>
+		<maven>3.5</maven>
+	</prerequisites>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>openapi-generator-core</artifactId>
+			<version>${openapi-codegen-version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>openapi-generator-cli</artifactId>
+			<version>${openapi-codegen-version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>openapi-generator-maven-plugin</artifactId>
+			<version>${openapi-codegen-version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>io.repaint.maven</groupId>
+				<artifactId>tiles-maven-plugin</artifactId>
+				<version>2.13</version>
+				<extensions>true</extensions>
+				<configuration>
+					<filtering>false</filtering>
+					<tiles>
+            <!-- its a good tile -->
+            <tile>cd.connect.tiles:tile-java:[1.2, 2)</tile>
+					</tiles>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -1,0 +1,65 @@
+part of {{pubName}}.api;
+
+class LocalApiClient implements DeserializeDelegate {
+
+  final _regList = RegExp(r'^List<(.*)>$');
+  final _regMap = RegExp(r'^Map<String,(.*)>$');
+
+  dynamic deserialize(dynamic value, String targetType) {
+    try {
+      switch (targetType) {
+        case 'String':
+          return '$value';
+        case 'int':
+          return value is int ? value : int.parse('$value');
+        case 'bool':
+          return value is bool ? value : '$value'.toLowerCase() == 'true';
+        case 'double':
+          return value is double ? value : double.parse('$value');
+        {{#models}}
+          {{#model}}
+        case '{{classname}}':
+            {{#isEnum}}
+              return {{classname}}TypeTransformer.fromJson(value);
+            {{/isEnum}}
+            {{^isEnum}}
+          return {{classname}}.fromJson(value);
+            {{/isEnum}}
+          {{/model}}
+        {{/models}}
+        default:
+          {
+            Match match;
+            if (value is List &&
+                (match = _regList.firstMatch(targetType)) != null) {
+              var newTargetType = match[1];
+              return value.map((v) => deserialize(v, newTargetType)).toList();
+            } else if (value is Map &&
+                (match = _regMap.firstMatch(targetType)) != null) {
+              var newTargetType = match[1];
+              return Map.fromIterables(value.keys,
+                  value.values.map((v) => deserialize(v, newTargetType)));
+            }
+          }
+      }
+    } on Exception catch (e, stack) {
+      throw ApiException.withInner(500, 'Exception during deserialization.', e, stack);
+    }
+    throw ApiException(500, 'Could not find a suitable class for deserialization');
+  }
+
+   /// Format the given parameter object into string.
+  String parameterToString(dynamic value) {
+    {{#models}}
+      {{#model}}
+        {{#isEnum}}
+    if (value is {{classname}}) {
+      return {{classname}}TypeTransformer.toJson(value).toString();
+    }
+        {{/isEnum}}
+      {{/model}}
+    {{/models}}
+
+    return null;
+  }
+}

@@ -1,0 +1,123 @@
+class {{classname}} extends Equatable {
+  {{#vars}}
+  {{#description}}/* {{{description}}} */{{/description}}
+  {{{dataType}}} {{name}} = {{{defaultValue}}};
+  {{#allowableValues}}
+  {{#min}} // range from {{min}} to {{max}}{{/min}}//{{^min}}enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };{{/min}}{
+  {{/allowableValues}}
+  {{/vars}}
+  {{classname}}();
+
+  @override
+  String toString() {
+    return '{{classname}}[{{#vars}}{{name}}=${{name}}, {{/vars}}]';
+  }
+
+  {{classname}}.fromJson(Map<String, dynamic> json) {
+    if (json == null) return;
+  {{#vars}}
+    if (json['{{baseName}}'] == null) {
+      {{name}} = null;
+    } else {
+  {{#allowableValues}}
+    {{#complexType}}
+    {{#isListContainer}}
+    {{name}} = {{complexType}}TypeTransformer.listFromJson(json['{{baseName}}']);
+    {{/isListContainer}}
+    {{^isListContainer}}
+      {{#isMapContainer}}
+    {{name}} = {{complexType}}TypeTransformer.mapFromJson(json['{{baseName}}']);
+      {{/isMapContainer}}
+      {{^isMapContainer}}
+    {{name}} = {{complexType}}TypeTransformer.fromJson(json['{{baseName}}']);
+      {{/isMapContainer}}
+    {{/isListContainer}}
+    {{/complexType}}
+
+  {{/allowableValues}}
+  {{^allowableValues}}
+  {{#isDateTime}}
+      {{name}} = DateTime.parse(json['{{baseName}}']);
+  {{/isDateTime}}
+  {{#isDate}}
+    var formatter = DateFormat('yyyy-MM-dd');
+    {{name}} = formatter.parseStrict(json['{{baseName}}']);
+  {{/isDate}}
+  {{^isDateTime}}
+  {{^isDate}}
+    {{#complexType}}
+      {{#isListContainer}}
+        {{#items.allowableValues}}
+          {{name}} = {{complexType}}TypeTransformer.listFromJson(json['{{baseName}}']);
+        {{/items.allowableValues}}
+        {{^items.allowableValues}}
+          {{name}} = {{complexType}}.listFromJson(json['{{baseName}}']);
+        {{/items.allowableValues}}
+      {{/isListContainer}}
+      {{^isListContainer}}
+      {{#isMapContainer}}
+      {{name}} = {{complexType}}.mapFromJson(json['{{baseName}}']);
+      {{/isMapContainer}}
+      {{^isMapContainer}}
+      {{name}} = {{complexType}}.fromJson(json['{{baseName}}']);
+      {{/isMapContainer}}
+      {{/isListContainer}}
+    {{/complexType}}
+    {{^complexType}}
+      {{#isListContainer}}
+      {{name}} = (json['{{baseName}}'] as List).cast<{{items.datatype}}>();
+      {{/isListContainer}}
+      {{^isListContainer}}
+        {{#isMapContainer}}
+          {{name}} = (json['{{baseName}}'] as Map).cast<String, {{items.datatype}}>();
+        {{/isMapContainer}}
+        {{^isMapContainer}}
+          {{name}} = json['{{baseName}}'];
+        {{/isMapContainer}}
+      {{/isListContainer}}
+    {{/complexType}}
+  {{/isDate}}
+  {{/isDateTime}}
+  {{/allowableValues}}
+    }
+  {{/vars}}
+  }
+
+  Map<String, dynamic> toJson() {
+    Map <String, dynamic> json = {};
+    {{#vars}}
+        {{^isNullable}}
+    if ({{name}} != null)
+        {{/isNullable}}
+        {{#isDateTime}}
+      json['{{baseName}}'] = {{name}} == null ? null : {{name}}.toUtc().toIso8601String();
+      {{/isDateTime}}
+      {{#isDate}}
+      json['{{baseName}}'] = {{name}} == null ? null : {{name}}.toUtc().toIso8601String();
+      {{/isDate}}
+      {{^isDateTime}}
+      {{^isDate}}
+      {{^isEnum}}
+        json['{{baseName}}'] = {{name}};
+      {{/isEnum}}
+      {{#isEnum}}
+        json['{{baseName}}'] = {{complexType}}TypeTransformer.toJson({{name}});
+      {{/isEnum}}
+      {{/isDate}}
+      {{/isDateTime}}
+    {{/vars}}
+    return json;
+  }
+
+  static List<{{classname}}> listFromJson(List<dynamic> json) {
+    return json == null ? List<{{classname}}>() : json.map((value) => {{classname}}.fromJson(value)).toList();
+  }
+
+  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
+    var map = Map<String, {{classname}}>();
+    if (json != null && json.isNotEmpty) {
+      json.forEach((String key, dynamic value) => map[key] = {{classname}}.fromJson(value));
+    }
+    return map;
+  }
+}

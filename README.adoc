@@ -1,0 +1,140 @@
+= Opinionated Dart OpenAPI v3 Plugin
+
+This plugin is designed for use by the OpenAPi v3 Maven Plugin and
+generates Dart code. It differs from the one built in because it does not
+generate a few files which I don't think should be generated (as they will get
+overwritten each time - such as .gitignore, travis.yml, etc), and behaves in a weird
+way with some things (such as enums) which I didn't agree with.
+
+It also significantly splits out all of the client api code into Browser and CLI versions
+so that it can be used with Flutter for Web, or plain Dart/Flutter Mobile (using Dart IO) without
+having to generate two completely different projects. 
+
+It also cleans up a bunch of code around streamed data handling.
+
+This is likely to go through a few more versions as it is used comprehensively.
+
+=== Developers
+
+- _Richard Vowles_, Software Developer (https://www.linkedin.com/in/richard-vowles-72035193/)
+
+=== Feedback provided by
+
+- _Irina Southwell (nee Капрельянц Ирина)_, Principal Engineer (https://www.linkedin.com/in/irina-southwell-9727a422/)
+- _Rob Cleghorn_, Chief of Engineering (https://nz.linkedin.com/in/rob-cleghorn-6693275)
+
+=== Usage
+
+To use it, do something like this:
+
+-----
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>4.0.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.bluetrainsoftware.maven</groupId>
+            <artifactId>openapi-dart-generator</artifactId>
+            <version>1.1</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>mr-api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <output>${project.basedir}</output>
+              <inputSpec>${project.basedir}/target/mrapi/mr-api.yaml</inputSpec>
+              <language>dart2-api</language>
+              <enablePostProcessFile>true</enablePostProcessFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+-----
+
+We use the enablePostProcessFile because if it finds a FLUTTER environment variable, it 
+will run dartfmt on the generated files.
+
+We typically use the Dependency Plugin to copy the actual OpenAPI yaml file from a different
+project - such as in this case "mr-api".
+
+----
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack todo api</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>io.yourapi.mr</groupId>
+                  <artifactId>mr-api</artifactId>
+                  <version>1.1-SNAPSHOT</version>
+                  <type>jar</type>
+                  <outputDirectory>${project.basedir}/target/mrapi/</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+              <includes>
+                **/*.yaml
+              </includes>
+              <overWriteReleases>true</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+----
+
+And we include a custom Clean plugin definition to ensure old artifacts aren't left 
+behind as you generate.
+
+----
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>lib</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>docs</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>test</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>.openapi-generator</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>.openapi-generator</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+----

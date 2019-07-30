@@ -1,0 +1,40 @@
+
+enum {{classname}} {
+  {{#allowableValues}}
+    {{#enumVars}}{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
+  {{/allowableValues}}
+}
+
+class {{classname}}TypeTransformer {
+  static Map<String, {{classname}}> fromJsonMap = {  {{#allowableValues}}
+  {{#enumVars}}"{{{name}}}":{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
+{{/allowableValues}} };
+  static Map<{{classname}}, String> toJsonMap = {  {{#allowableValues}}
+  {{#enumVars}}{{classname}}.{{{name}}}:"{{{name}}}"{{^-last}}, {{/-last}}{{/enumVars}}
+{{/allowableValues}} };
+
+  static {{classname}} fromJson(dynamic data) {
+    var found = fromJsonMap[data];
+    if (found == null) {
+      throw('Unknown enum value to decode: $data');
+    }
+    return found;
+  }
+
+  static dynamic toJson({{classname}} data) {
+    return toJsonMap[data];
+  }
+
+  static List<{{classname}}> listFromJson(List<dynamic> json) {
+    return json == null ? List<{{classname}}>() : json.map((value) => fromJson(value)).toList();
+  }
+
+  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
+    var map = Map<String, {{classname}}>();
+    if (json != null && json.isNotEmpty) {
+      json.forEach((String key, dynamic value) => map[key] = fromJson(value));
+    }
+    return map;
+  }
+}
+

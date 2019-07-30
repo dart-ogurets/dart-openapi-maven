@@ -1,0 +1,13 @@
+library {{pubName}}.api;
+
+import 'dart:async';
+import 'package:http/http.dart';
+import 'package:equatable/equatable.dart';
+import 'package:dart_openapi_common/openapi.dart';
+
+part 'api_client.dart';
+
+{{#apiInfo}}{{#apis}}part 'api/{{classFilename}}.dart';
+{{/apis}}{{/apiInfo}}
+{{#models}}{{#model}}part 'model/{{classFilename}}.dart';
+{{/model}}{{/models}}
