@@ -1,10 +1,12 @@
 package cd.connect.openapi;
 
+import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.DartClientCodegen;
+import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,9 +76,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   // if $FLUTTER is set, format the file.
   @Override
   public void postProcessFile(File file, String fileType) {
-    String flutterDir = System.getenv("FLUTTER ");
+    String flutterDir = System.getenv("FLUTTER");
 
     if (file == null || flutterDir == null) {
+      System.out.println("Cannot post process file");
       return;
     }
 

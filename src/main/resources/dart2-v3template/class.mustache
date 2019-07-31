@@ -1,4 +1,4 @@
-class {{classname}} extends Equatable {
+class {{classname}} {
   {{#vars}}
   {{#description}}/* {{{description}}} */{{/description}}
   {{{dataType}}} {{name}} = {{{defaultValue}}};
@@ -119,5 +119,69 @@ class {{classname}} extends Equatable {
       json.forEach((String key, dynamic value) => map[key] = {{classname}}.fromJson(value));
     }
     return map;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other is {{classname}} && runtimeType == other.runtimeType) {
+  {{#hasVars}}
+    return {{#vars}}
+    {{#complexType}}
+      {{#isListContainer}}
+        const ListEquality().equals(this.{{name}}, other.{{name}}){{#hasMore}} &&
+      {{/hasMore}}
+      {{/isListContainer}}
+      {{^isListContainer}}
+        {{#isMapContainer}}
+          const MapEquality().equals(this.{{name}}, other.{{name}}){{#hasMore}} &&
+        {{/hasMore}}
+        {{/isMapContainer}}
+        {{^isMapContainer}}
+          this.{{name}} == other.{{name}}{{#hasMore}} &&
+        {{/hasMore}}
+        {{/isMapContainer}}
+      {{/isListContainer}}
+    {{/complexType}}{{^complexType}}
+     this.{{name}} == other.{{name}}{{#hasMore}} &&
+  {{/hasMore}}{{/complexType}}{{/vars}}
+    {{#parent}} &&
+    super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
+    return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+    }
+
+    return false;
+  }
+
+  @override
+  int get hashCode {
+    int hashCode = runtimeType.hashCode;
+
+  {{#hasVars}}
+    {{#vars}}
+    {{#complexType}}
+      {{#isListContainer}}
+        hashCode = hashCode ^ const ListEquality().hash(this.{{name}});
+      {{/isListContainer}}
+      {{^isListContainer}}
+        {{#isMapContainer}}
+            hashCode = hashCode ^ const MapEquality().hash(this.{{name}});
+        {{/isMapContainer}}
+        {{^isMapContainer}}
+            if ({{name}} != null) {
+              hashCode = hashCode ^ {{name}}.hashCode;
+            }
+        {{/isMapContainer}}
+      {{/isListContainer}}
+    {{/complexType}}{{^complexType}}
+    if ({{name}} != null) {
+      hashCode = hashCode ^ {{name}}.hashCode;
+    }
+{{/complexType}}{{/vars}}{{/hasVars}}
+
+    return hashCode{{#parent}} ^ super.hashCode{{/parent}};
   }
 }
