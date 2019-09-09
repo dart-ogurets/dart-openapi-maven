@@ -1,9 +1,11 @@
 package cd.connect.openapi;
 
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenConfig;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.DartClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
@@ -58,6 +60,20 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 	  return (isReservedWord(name)) ? name + "_" : name;
   }
 
+  @Override
+  public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
+    return super.postProcessAllModels(objs);
+  }
+
+  @Override
+  public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
+    return super.postProcessOperationsWithModels(objs, allModels);
+  }
+
+  @Override
+  public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
+    super.addOperationToGroup(tag, resourcePath, operation, co, operations);
+  }
 
   // existing one is unpleasant to use.
   @Override
