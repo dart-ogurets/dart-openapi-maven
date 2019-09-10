@@ -51,7 +51,7 @@ class {{classname}} {
     String contentType = contentTypes.isNotEmpty ? contentTypes[0] : null;
     List<String> authNames = [{{#authMethods}}"{{name}}"{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
 
-    if(contentType.startsWith("multipart/form-data")) {
+    if(contentType != null && contentType.startsWith("multipart/form-data")) {
       bool hasFields = false;
       MultipartRequest mp = MultipartRequest(null, null);
       {{#formParams}}

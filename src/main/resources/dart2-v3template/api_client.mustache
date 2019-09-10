@@ -5,6 +5,42 @@ class LocalApiClient implements DeserializeDelegate {
   final _regList = RegExp(r'^List<(.*)>$');
   final _regMap = RegExp(r'^Map<String,(.*)>$');
 
+  dynamic serialize(Object value) {
+    try {
+      if (value == null) {
+        return null;
+      } else if (value is List) {
+        return value.map((v) => serialize(v)).toList();
+      } else if (value is Map) {
+        return Map.fromIterables(value.keys,
+          value.values.map((v) => serialize(v)));
+      } else if (value is String) {
+        return value;
+      } else if (value is bool) {
+        return value;
+      } else if (value is num) {
+        return value;
+      } else if (value is DateTime) {
+        return value.toUtc().toIso8601String();
+      }
+      {{#models}}
+        {{#model}}
+          if (value is {{classname}}) {
+          {{#isEnum}}
+            return {{classname}}TypeTransformer.toJson(value);
+          {{/isEnum}}
+          {{^isEnum}}
+            return value.toJson(this);
+          {{/isEnum}}
+          }
+        {{/model}}
+      {{/models}}
+        return value.toString();
+    } on Exception catch (e, stack) {
+      throw ApiException.withInner(500, 'Exception during deserialization.', e, stack);
+    }
+  }
+
   dynamic deserialize(dynamic value, String targetType) {
     try {
       switch (targetType) {

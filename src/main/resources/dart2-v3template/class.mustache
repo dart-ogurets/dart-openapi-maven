@@ -83,26 +83,21 @@ class {{classname}} {
   {{/vars}}
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson(DeserializeDelegate serializer) {
     Map <String, dynamic> json = {};
     {{#vars}}
         {{^isNullable}}
     if ({{name}} != null)
         {{/isNullable}}
         {{#isDateTime}}
-      json['{{baseName}}'] = {{name}} == null ? null : {{name}}.toUtc().toIso8601String();
+      json['{{baseName}}'] = {{name}}.toUtc().toIso8601String();
       {{/isDateTime}}
       {{#isDate}}
-      json['{{baseName}}'] = {{name}} == null ? null : {{name}}.toUtc().toIso8601String();
+      json['{{baseName}}'] = {{name}}.toUtc().toIso8601String();
       {{/isDate}}
       {{^isDateTime}}
       {{^isDate}}
-      {{^isEnum}}
-        json['{{baseName}}'] = {{name}};
-      {{/isEnum}}
-      {{#isEnum}}
-        json['{{baseName}}'] = {{complexType}}TypeTransformer.toJson({{name}});
-      {{/isEnum}}
+        json['{{baseName}}'] = serializer.serialize({{name}});
       {{/isDate}}
       {{/isDateTime}}
     {{/vars}}
