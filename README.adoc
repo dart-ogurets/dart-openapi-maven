@@ -18,10 +18,14 @@ This is likely to go through a few more versions as it is used comprehensively.
 
 - _Richard Vowles_, Software Developer (https://www.linkedin.com/in/richard-vowles-72035193/)
 
-=== Feedback provided by
+==== Feedback provided by
 
 - _Irina Southwell (nee Капрельянц Ирина)_, Principal Engineer (https://www.linkedin.com/in/irina-southwell-9727a422/)
 - _Rob Cleghorn_, Chief of Engineering (https://nz.linkedin.com/in/rob-cleghorn-6693275)
+
+==== Changelog
+
+1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.
 
 === Usage
 
