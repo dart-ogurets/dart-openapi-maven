@@ -25,7 +25,8 @@ This is likely to go through a few more versions as it is used comprehensively.
 
 ==== Changelog
 
-1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.
+- 1.5 - fixed the pubspec.yaml 
+- 1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.
 
 === Usage
 
