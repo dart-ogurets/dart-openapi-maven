@@ -2,7 +2,6 @@ part of {{pubName}}.api;
 
 {{#operations}}
 
-
 class {{classname}} {
   final ApiClient apiClient;
 
@@ -12,7 +11,7 @@ class {{classname}} {
   /// {{summary}}
   ///
   /// {{notes}}
-  {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future {{/returnType}}{{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{ {{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}) async {
+  {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future {{/returnType}}{{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
     Object postBody{{#bodyParam}} = {{paramName}}{{/bodyParam}};
 
     // verify required params are set
@@ -32,7 +31,6 @@ class {{classname}} {
     Map<String, String> headerParams = {};
     {{#hasProduces}}headerParams['Accept'] = "{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}";{{/hasProduces}}
 
-    Map<String, String> formParams = {};
     {{#queryParams}}
     {{^required}}
     if({{paramName}} != null) {
@@ -52,43 +50,47 @@ class {{classname}} {
     List<String> authNames = [{{#authMethods}}"{{name}}"{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
 
     if(contentType != null && contentType.startsWith("multipart/form-data")) {
-      bool hasFields = false;
-      MultipartRequest mp = MultipartRequest(null, null);
+      Map<String, dynamic> formData = {};
+
       {{#formParams}}
       {{^isFile}}
       if ({{paramName}} != null) {
-        hasFields = true;
-        mp.fields['{{baseName}}'] = parameterToString({{paramName}});
+        formData['{{baseName}}'] = parameterToString({{paramName}});
       }
       {{/isFile}}
       {{#isFile}}
       if ({{paramName}} != null) {
-        hasFields = true;
-        mp.fields['{{baseName}}'] = {{paramName}}.field;
-        mp.files.add({{paramName}});
+        formData['{{baseName}}'] = {{paramName}};
       }
       {{/isFile}}
       {{/formParams}}
-      if(hasFields)
-        postBody = mp;
+      if (formData.length > 0) {
+        postBody = FormData.fromMap(formData);
+      }
+    }{{^bodyParam}} else {
+      {{#hasFormParams}}
+          Map<String, dynamic> formParams = {};
+        {{#formParams}}
+          {{^isFile}}
+              if ({{paramName}} != null)
+              formParams['{{baseName}}'] = parameterToString({{paramName}});
+          {{/isFile}}
+        {{/formParams}}
+          postBody = formParams;
+      {{/hasFormParams}}
+  {{^hasFormParams}}postBody = null;{{/hasFormParams}}
     }
-    else {
-      {{#formParams}}
-      {{^isFile}}
-      if ({{paramName}} != null)
-        formParams['{{baseName}}'] = parameterToString({{paramName}});
-      {{/isFile}}
-      {{/formParams}}
-    }
+    {{/bodyParam}}
+
+    Options opt = options ?? Options();
+    opt.headers = headerParams;
+    opt.method = '{{httpMethod}}';
 
     var response = await apiClient.invokeAPI(path,
-                                             '{{httpMethod}}',
                                              queryParams,
                                              postBody,
                                              headerParams,
-                                             formParams,
-                                             contentType,
-                                             authNames);
+                                             authNames, opt);
 
     if(response.statusCode >= 400) {
       throw ApiException(response.statusCode, await decodeBodyBytes(response));
