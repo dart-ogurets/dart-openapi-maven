@@ -4,7 +4,7 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>2.2-SNAPSHOT</version>
+	<version>2.2</version>
 
 	<description>
 		dart2 generator from openapi 3.x spec files. Changing to openapitools dependencies.
@@ -30,7 +30,7 @@
 		<connection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</connection>
 		<developerConnection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</developerConnection>
 		<url>git@github.com:dart-ogurets/dart-openapi-maven.git</url>
-		<tag>HEAD</tag>
+		<tag>openapi-dart-generator-2.2</tag>
 	</scm>
 
 	<properties>
