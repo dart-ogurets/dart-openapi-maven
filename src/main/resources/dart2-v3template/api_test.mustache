@@ -1,11 +1,12 @@
 import 'package:{{pubName}}/api.dart';
+import 'package:openapi_dart_common/openapi.dart';
 import 'package:test/test.dart';
 
 {{#operations}}
 
 /// tests for {{classname}}
 void main() {
-  var instance = {{classname}}();
+  var instance = {{classname}}(ApiClient(deserializeDelegate: LocalApiClient()));
 
   group('tests for {{classname}}', () {
     {{#operation}}

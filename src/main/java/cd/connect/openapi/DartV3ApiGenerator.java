@@ -49,6 +49,12 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     String libFolder = this.sourceFolder + File.separator + "lib";
     this.supportingFiles.clear();
 
+    // none of these are useful.
+    this.apiTestTemplateFiles.clear();
+    this.apiDocTemplateFiles.clear();
+    this.modelTestTemplateFiles.clear();
+    this.modelDocTemplateFiles.clear();
+
     this.supportingFiles.add(new SupportingFile("pubspec.mustache", "", "pubspec.yaml"));
     this.supportingFiles.add(new SupportingFile("api_client.mustache", libFolder, "api_client.dart"));
     this.supportingFiles.add(new SupportingFile("apilib.mustache", libFolder, "api.dart"));
@@ -109,13 +115,14 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     if ("dart".equals(FilenameUtils.getExtension(file.toString()))) {
       String command = dartPostProcessFile + " " + file.toString();
       try {
+        log.info("Executing: " + command);
         Process p = Runtime.getRuntime().exec(command);
-        int exitValue = p.waitFor();
-        if (exitValue != 0) {
-          log.error("Error running the command ({}). Exit code: {}", command, exitValue);
-        } else {
-          log.info("Successfully executed: " + command);
-        }
+//        int exitValue = p.waitFor();
+//        if (exitValue != 0) {
+//          log.error("Error running the command ({}). Exit code: {}", command, exitValue);
+//        } else {
+//          log.info("Successfully executed: " + command);
+//        }
       } catch (Exception e) {
         log.error("Error running the command ({}). Exception: {}", command, e.getMessage());
       }
