@@ -18,39 +18,39 @@ class {{classname}} {
     {{#allParams}}
       {{#required}}
     if({{paramName}} == null) {
-     throw ApiException(400, "Missing required param: {{paramName}}");
+     throw ApiException(400, 'Missing required param: {{paramName}}');
     }
       {{/required}}
     {{/allParams}}
 
     // create path and map variables
-    String path = "{{{path}}}"{{#pathParams}}.replaceAll("{" + "{{baseName}}" + "}", {{{paramName}}}.toString()){{/pathParams}};
+    final path = '{{{path}}}'{{#pathParams}}.replaceAll('{' + '{{baseName}}' + '}', {{{paramName}}}.toString()){{/pathParams}};
 
     // query params
-    List<QueryParam> queryParams = [];
-    Map<String, String> headerParams = {};
-    {{#hasProduces}}headerParams['Accept'] = "{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}";{{/hasProduces}}
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}';{{/hasProduces}}
 
     {{#queryParams}}
     {{^required}}
     if({{paramName}} != null) {
     {{/required}}
-      queryParams.addAll(convertParametersForCollectionFormat(apiClient.deserializeDelegate, "{{collectionFormat}}", "{{baseName}}", {{paramName}}));
+      queryParams.addAll(convertParametersForCollectionFormat(apiClient.deserializeDelegate, '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
     {{^required}}
     }
     {{/required}}
     {{/queryParams}}
     {{#headerParams}}
-    headerParams["{{baseName}}"] = {{paramName}};
+    headerParams['{{baseName}}'] = {{paramName}};
     {{/headerParams}}
 
-    List<String> contentTypes = [{{#consumes}}"{{{mediaType}}}"{{#hasMore}},{{/hasMore}}{{/consumes}}];
+    final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{#hasMore}},{{/hasMore}}{{/consumes}}];
 
-    String contentType = contentTypes.isNotEmpty ? contentTypes[0] : null;
-    List<String> authNames = [{{#authMethods}}"{{name}}"{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
+    final contentType = contentTypes.isNotEmpty ? contentTypes[0] : null;
+    final authNames = [{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
 
-    if(contentType != null && contentType.startsWith("multipart/form-data")) {
-      Map<String, dynamic> formData = {};
+    if(contentType != null && contentType.startsWith('multipart/form-data')) {
+      final formData = <String, dynamic>{};
 
       {{#formParams}}
       {{^isFile}}
@@ -64,12 +64,12 @@ class {{classname}} {
       }
       {{/isFile}}
       {{/formParams}}
-      if (formData.length > 0) {
+      if (formData.isNotEmpty) {
         postBody = FormData.fromMap(formData);
       }
     }{{^bodyParam}} else {
       {{#hasFormParams}}
-          Map<String, dynamic> formParams = {};
+          final formParams = <String, dynamic>{};
         {{#formParams}}
           {{^isFile}}
               if ({{paramName}} != null)
@@ -82,7 +82,7 @@ class {{classname}} {
     }
     {{/bodyParam}}
 
-    Options opt = options ?? Options();
+    final opt = options ?? Options();
     opt.headers = headerParams;
     opt.method = '{{httpMethod}}';
 

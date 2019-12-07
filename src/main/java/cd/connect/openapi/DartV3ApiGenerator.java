@@ -8,14 +8,12 @@ import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.DartClientCodegen;
-import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConfig {
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
@@ -73,7 +71,20 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
-    return super.postProcessOperationsWithModels(objs, allModels);
+    final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
+    return som;
+  }
+
+
+  @Override
+  public String toDefaultValue(Schema schema) {
+    final String s = super.toDefaultValue(schema);
+
+    if ("null".equals(s)) {
+      return null;
+    }
+
+    return s;
   }
 
   @Override

@@ -1,7 +1,7 @@
 class {{classname}} {
   {{#vars}}
   {{#description}}/* {{{description}}} */{{/description}}
-  {{{dataType}}} {{name}} = {{{defaultValue}}};
+  {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
   {{#allowableValues}}
   {{#min}} // range from {{min}} to {{max}}{{/min}}//{{^min}}enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };{{/min}}{
   {{/allowableValues}}
@@ -84,10 +84,10 @@ class {{classname}} {
   }
 
   Map<String, dynamic> toJson(DeserializeDelegate serializer) {
-    Map <String, dynamic> json = {};
+    final json = <String, dynamic>{};
     {{#vars}}
         {{^isNullable}}
-    if ({{name}} != null)
+    if ({{name}} != null) {
         {{/isNullable}}
         {{#isDateTime}}
       json['{{baseName}}'] = {{name}}.toUtc().toIso8601String();
@@ -100,16 +100,17 @@ class {{classname}} {
         json['{{baseName}}'] = serializer.serialize({{name}});
       {{/isDate}}
       {{/isDateTime}}
+    }
     {{/vars}}
     return json;
   }
 
   static List<{{classname}}> listFromJson(List<dynamic> json) {
-    return json == null ? List<{{classname}}>() : json.map((value) => {{classname}}.fromJson(value)).toList();
+    return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
   }
 
   static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
-    var map = Map<String, {{classname}}>();
+    final map = <String, {{classname}}>{};
     if (json != null && json.isNotEmpty) {
       json.forEach((String key, dynamic value) => map[key] = {{classname}}.fromJson(value));
     }
@@ -127,21 +128,21 @@ class {{classname}} {
     return {{#vars}}
     {{#complexType}}
       {{#isListContainer}}
-        const ListEquality().equals(this.{{name}}, other.{{name}}){{#hasMore}} &&
+        const ListEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
       {{/hasMore}}
       {{/isListContainer}}
       {{^isListContainer}}
         {{#isMapContainer}}
-          const MapEquality().equals(this.{{name}}, other.{{name}}){{#hasMore}} &&
+          const MapEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
         {{/hasMore}}
         {{/isMapContainer}}
         {{^isMapContainer}}
-          this.{{name}} == other.{{name}}{{#hasMore}} &&
+          {{name}} == other.{{name}}{{#hasMore}} &&
         {{/hasMore}}
         {{/isMapContainer}}
       {{/isListContainer}}
     {{/complexType}}{{^complexType}}
-     this.{{name}} == other.{{name}}{{#hasMore}} &&
+     {{name}} == other.{{name}}{{#hasMore}} &&
   {{/hasMore}}{{/complexType}}{{/vars}}
     {{#parent}} &&
     super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
@@ -153,17 +154,17 @@ class {{classname}} {
 
   @override
   int get hashCode {
-    int hashCode = runtimeType.hashCode;
+    var hashCode = runtimeType.hashCode;
 
   {{#hasVars}}
     {{#vars}}
     {{#complexType}}
       {{#isListContainer}}
-        hashCode = hashCode ^ const ListEquality().hash(this.{{name}});
+        hashCode = hashCode ^ const ListEquality().hash({{name}});
       {{/isListContainer}}
       {{^isListContainer}}
         {{#isMapContainer}}
-            hashCode = hashCode ^ const MapEquality().hash(this.{{name}});
+            hashCode = hashCode ^ const MapEquality().hash({{name}});
         {{/isMapContainer}}
         {{^isMapContainer}}
             if ({{name}} != null) {

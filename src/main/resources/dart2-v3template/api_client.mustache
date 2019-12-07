@@ -5,6 +5,7 @@ class LocalApiClient implements DeserializeDelegate {
   final _regList = RegExp(r'^List<(.*)>$');
   final _regMap = RegExp(r'^Map<String,(.*)>$');
 
+  @override
   dynamic serialize(Object value) {
     try {
       if (value == null) {
@@ -41,6 +42,7 @@ class LocalApiClient implements DeserializeDelegate {
     }
   }
 
+  @override
   dynamic deserialize(dynamic value, String targetType) {
     try {
       switch (targetType) {
@@ -85,6 +87,7 @@ class LocalApiClient implements DeserializeDelegate {
   }
 
    /// Format the given parameter object into string.
+  @override
   String parameterToString(dynamic value) {
     {{#models}}
       {{#model}}
