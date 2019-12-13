@@ -47,7 +47,7 @@ class {{classname}} {
     final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{#hasMore}},{{/hasMore}}{{/consumes}}];
 
     final contentType = contentTypes.isNotEmpty ? contentTypes[0] : null;
-    final authNames = [{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
+    final authNames = <String>[{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
 
     if(contentType != null && contentType.startsWith('multipart/form-data')) {
       final formData = <String, dynamic>{};
