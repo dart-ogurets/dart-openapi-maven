@@ -56,7 +56,38 @@ class {{classname}} {
       {{/isListContainer}}
       {{^isListContainer}}
       {{#isMapContainer}}
-      {{name}} = {{complexType}}.mapFromJson(json['{{baseName}}']);
+        {{#items}}
+          {{#items.complexType}}
+            {{#items.isListContainer}}
+              {{name}} = json['{{baseName}}'].map((String key, dynamic value) => MapEntry<String, {{complexType}}>(key, {{items.complexType}}.listFromJson(value)));
+            {{/items.isListContainer}}
+            {{^items.isListContainer}}
+              {{#items.isMapContainer}}
+                // too complex?
+              {{/items.isMapContainer}}
+              {{^items.isMapContainer}}
+                {{name}} = json['{{baseName}}'].map((String key, dynamic value) => MapEntry<String, {{complexType}}>(key, {{items.complexType}}.fromJson(value)));
+              {{/items.isMapContainer}}
+            {{/items.isListContainer}}
+
+          {{/items.complexType}}
+          {{^items.complexType}}
+            {{#items.isListContainer}}
+              {{name}} = json['{{baseName}}'].map((String key, dynamic value) => MapEntry<String, {{items.dataType}}>(key, (json['{{baseName}}'] as List).cast<{{items.dataType}}>()));
+            {{/items.isListContainer}}
+            {{^items.isListContainer}}
+              {{#items.isMapContainer}}
+                // map of maps?
+              {{/items.isMapContainer}}
+              {{^items.isMapContainer}}
+                {{name}} = json['{{baseName}}'].map((String key, dynamic value) => MapEntry<String, {{items.dataType}}>(key, (json['{{baseName}}'] as List).cast<{{items.dataType}}>()));
+              {{/items.isMapContainer}}
+            {{/items.isListContainer}}
+          {{/items.complexType}}
+        {{/items}}
+        {{^items}}
+          {{name}} = {{complexType}}.mapFromJson(json['{{baseName}}']);
+        {{/items}}
       {{/isMapContainer}}
       {{^isMapContainer}}
       {{name}} = {{complexType}}.fromJson(json['{{baseName}}']);
@@ -100,7 +131,9 @@ class {{classname}} {
         json['{{baseName}}'] = serializer.serialize({{name}});
       {{/isDate}}
       {{/isDateTime}}
+        {{^isNullable}}
     }
+        {{/isNullable}}
     {{/vars}}
     return json;
   }

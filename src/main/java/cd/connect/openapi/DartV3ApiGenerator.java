@@ -5,9 +5,11 @@ import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenConfig;
+import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.DartClientCodegen;
+import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,11 +66,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 	  return (isReservedWord(name)) ? name + "_" : name;
   }
 
+  // for debugging inevitable weirdness in the model generated
   @Override
   public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
     return super.postProcessAllModels(objs);
   }
 
+  // for debugging inevitable weirdness in the model generated
   @Override
   public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
@@ -85,6 +89,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
 
     return s;
+  }
+
+  @Override
+  protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
+    //super.addAdditionPropertiesToCodeGenModel(codegenModel, schema);
+    codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(schema));
+    addImport(codegenModel, codegenModel.additionalPropertiesType);
   }
 
   @Override

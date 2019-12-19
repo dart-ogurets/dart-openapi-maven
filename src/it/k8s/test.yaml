@@ -1,0 +1,70 @@
+openapi: 3.0.1
+info:
+  title: test api
+  description: Sample API for test case for k8s
+  version: "1.1.1"
+paths:
+  /hello:
+    get:
+      tags:
+        - TestService
+      responses:
+        "200":
+          description: "Resulting weird api"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddProps1"
+  /hello2:
+    get:
+      tags:
+        - TestService
+      responses:
+        "200":
+          description: "Resulting weird api"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddProps2"
+components:
+  schemas:
+    AddProps1:
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: "used extensively in k8s api and generates weird code"
+        groups:
+          type: array
+          description: "names groups this user is part of"
+          items:
+            type: string
+        name:
+          type: string
+        message:
+          $ref: "#/components/schemas/Messages"
+    AddProps2:
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              code:
+                type: integer
+              text:
+                type: string
+    Messages:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Message'
+    Message:
+      type: object
+      properties:
+        code:
+          type: integer
+        text:
+          type: string

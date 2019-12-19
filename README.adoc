@@ -145,3 +145,6 @@ behind as you generate.
         </configuration>
       </plugin>
 ----
+
+
+      extra = json.map((String key, dynamic value) => MapEntry<key, AddProps2Extra>(key, AddProps2Extra.fromJson(value)));
