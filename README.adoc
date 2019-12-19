@@ -25,6 +25,7 @@ This is likely to go through a few more versions as it is used comprehensively.
 
 ==== Changelog
 
+- 2.5 - fixed a dangling } issue from pedantic, fixed additionalProperties support for k8s api generation, added integration tests
 - 2.4 - fixed an issue if no authNames were being provided, a List<dynamic> was created instead of a List<String>
 - 2.3 - this is a cleanup of the move to Dio based on pedantic feedback
 - 1.5 - fixed the pubspec.yaml 
@@ -146,5 +147,3 @@ behind as you generate.
       </plugin>
 ----
 
-
-      extra = json.map((String key, dynamic value) => MapEntry<key, AddProps2Extra>(key, AddProps2Extra.fromJson(value)));

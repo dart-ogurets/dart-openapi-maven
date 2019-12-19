@@ -37,6 +37,10 @@ components:
               type: string
             type: array
           description: "used extensively in k8s api and generates weird code"
+        dependencies:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AddProps2"
         groups:
           type: array
           description: "names groups this user is part of"
@@ -44,8 +48,12 @@ components:
             type: string
         name:
           type: string
-        message:
+        mess$age:
           $ref: "#/components/schemas/Messages"
+        $justObjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/JSONType"
     AddProps2:
       properties:
         extra:
@@ -57,6 +65,25 @@ components:
                 type: integer
               text:
                 type: string
+    AddProps3:
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/TimeType"
+    AddProps4:
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/TimeType"
+    JSONType:
+      description: "can be anything, no properties"
+    TimeType:
+      type: string
+      format: date-time
     Messages:
       type: object
       additionalProperties:

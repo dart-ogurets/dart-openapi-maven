@@ -66,6 +66,26 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 	  return (isReservedWord(name)) ? name + "_" : name;
   }
 
+  @Override
+  public String toVarName(String name) {
+    name = name.replaceAll("-", "_").replaceAll("\\$", "__");
+
+    if (name.matches("^[A-Z_]*$")) {
+      return name;
+    } else {
+      name = org.openapitools.codegen.utils.StringUtils.camelize(name, true);
+      if (name.matches("^\\d.*")) {
+        name = "n" + name;
+      }
+
+      if (this.isReservedWord(name)) {
+        name = this.escapeReservedWord(name);
+      }
+
+      return name;
+    }
+  }
+
   // for debugging inevitable weirdness in the model generated
   @Override
   public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
