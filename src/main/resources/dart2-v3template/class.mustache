@@ -6,30 +6,43 @@ class {{classname}} {
   {{#min}} // range from {{min}} to {{max}}{{/min}}//{{^min}}enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };{{/min}}{
   {{/allowableValues}}
   {{/vars}}
+{{^hasVars}}
+   dynamic json;
+{{/hasVars}}
   {{classname}}();
 
   @override
   String toString() {
-    return '{{classname}}[{{#vars}}{{name}}=${{name}}, {{/vars}}]';
+    return '{{classname}}[{{#vars}}{{name}}=${{name}}, {{/vars}}{{^hasVars}}json=$json{{/hasVars}}]';
   }
 
+{{^hasVars}}
+  {{classname}}.fromJson(dynamic rawValue) {
+    this.json = rawValue;
+  }
+
+  dynamic toJson(DeserializeDelegate serializer) {
+    return json;
+  }
+{{/hasVars}}
+{{#hasVars}}
   {{classname}}.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
   {{#vars}}
-    if (json[r'{{baseName}}'] == null) {
-      {{name}} = null;
-    } else {
+    {
+      final _jsonData = json[r'{{{baseName}}}'];
+      {{name}} = (_jsonData == null) ? null :
   {{#allowableValues}}
     {{#complexType}}
     {{#isListContainer}}
-    {{name}} = {{complexType}}TypeTransformer.listFromJson(json[r'{{baseName}}']);
+        {{complexType}}TypeTransformer.listFromJson(_jsonData);
     {{/isListContainer}}
     {{^isListContainer}}
       {{#isMapContainer}}
-    {{name}} = {{complexType}}TypeTransformer.mapFromJson(json[r'{{baseName}}']);
+        {{complexType}}TypeTransformer.mapFromJson(_jsonData);
       {{/isMapContainer}}
       {{^isMapContainer}}
-    {{name}} = {{complexType}}TypeTransformer.fromJson(json[r'{{baseName}}']);
+        {{complexType}}TypeTransformer.fromJson(_jsonData);
       {{/isMapContainer}}
     {{/isListContainer}}
     {{/complexType}}
@@ -37,86 +50,118 @@ class {{classname}} {
   {{/allowableValues}}
   {{^allowableValues}}
   {{#isDateTime}}
-      {{name}} = DateTime.parse(json[r'{{baseName}}']);
+        DateTime.parse(_jsonData);
   {{/isDateTime}}
   {{#isDate}}
-    var formatter = DateFormat(r'yyyy-MM-dd');
-    {{name}} = formatter.parseStrict(json[r'{{baseName}}']);
+        DateFormat(r'yyyy-MM-dd').parseStrict(_jsonData);
   {{/isDate}}
   {{^isDateTime}}
   {{^isDate}}
     {{#complexType}}
       {{#isListContainer}}
-        {{#items.allowableValues}}
-          {{name}} = {{complexType}}TypeTransformer.listFromJson(json[r'{{baseName}}']);
-        {{/items.allowableValues}}
-        {{^items.allowableValues}}
-          {{name}} = {{complexType}}.listFromJson(json[r'{{baseName}}']);
-        {{/items.allowableValues}}
+        {{#items}}
+          {{#vendorExtensions.x-dart-dynamic}}
+            (_jsonData as List)?.cast<{{{dataType}}}>();
+          {{/vendorExtensions.x-dart-dynamic}}
+          {{^vendorExtensions.x-dart-dynamic}}
+          {{#complexType}}
+              {{#allowableValues}}
+          {{complexType}}TypeTransformer.listFromJson(_jsonData);
+            {{/allowableValues}}
+            {{^allowableValues}}
+          {{#vendorExtensions.x-dart-datetime}}
+            openApiDateTimeList(_jsonData);
+          {{/vendorExtensions.x-dart-datetime}}
+          {{^vendorExtensions.x-dart-datetime}}
+            {{complexType}}.listFromJson(_jsonData);
+          {{/vendorExtensions.x-dart-datetime}}
+              {{/allowableValues}}
+          {{/complexType}}
+          {{/vendorExtensions.x-dart-dynamic}}
+          {{^complexType}}
+        (_jsonData as List)?.cast<{{{dataType}}}>();
+          {{/complexType}}
+        {{/items}}
       {{/isListContainer}}
       {{^isListContainer}}
       {{#isMapContainer}}
-        {
-        final _jsonFieldName = r'{{{baseName}}}';
-        {{name}} = {{#items}}
+        {{#items}}
           {{#complexType}}
             {{#isListContainer}}
-json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, {{{dataType}}}.listFromJson(value)));
+        (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, {{#items}}
+          {{^vendorExtensions.x-dart-datetime}}
+            {{#vendorExtensions.x-dart-dynamic}}value as List{{/vendorExtensions.x-dart-dynamic}}
+            {{^vendorExtensions.x-dart-dynamic}}{{{complexType}}}.listFromJson(value){{/vendorExtensions.x-dart-dynamic}}
+          {{/vendorExtensions.x-dart-datetime}}
+          {{#vendorExtensions.x-dart-datetime}}openApiDateTimeList(value)
+          {{/vendorExtensions.x-dart-datetime}}
+        {{/items}}));
             {{/isListContainer}}
             {{^isListContainer}}
               {{#isMapContainer}}
-null;                // too complex?
+        null; // too complex?
               {{/isMapContainer}}
               {{^isMapContainer}}
-json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, {{{dataType}}}.fromJson(value)));
+        (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key,
+        {{^vendorExtensions.x-dart-datetime}}
+          {{#vendorExtensions.x-dart-dynamic}}value{{/vendorExtensions.x-dart-dynamic}}
+          {{^vendorExtensions.x-dart-dynamic}}{{{complexType}}}.fromJson(value){{/vendorExtensions.x-dart-dynamic}}
+        {{/vendorExtensions.x-dart-datetime}}
+        {{#vendorExtensions.x-dart-datetime}}openApiDateTimeFromJson(value)
+        {{/vendorExtensions.x-dart-datetime}}));
               {{/isMapContainer}}
             {{/isListContainer}}
           {{/complexType}}
           {{^complexType}}
             {{#isListContainer}}
-json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, json[_jsonFieldName]?.cast<{{{dataType}}}>()));
+        (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key,
+        {{#vendorExtensions.x-dart-dynamic}}value as List{{/vendorExtensions.x-dart-dynamic}}
+        {{^vendorExtensions.x-dart-dynamic}}(value as List)?.cast<{{{items.dataType}}}>(){{/vendorExtensions.x-dart-dynamic}}));
             {{/isListContainer}}
             {{^isListContainer}}
               {{#isMapContainer}}
-null; // map of maps?
+        null; // map of maps?
               {{/isMapContainer}}
               {{^isMapContainer}}
-json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, json[_jsonFieldName]?.cast<{{{dataType}}}>()));
+        (_jsonData as Map).cast<String, dynamic>(); // h2
               {{/isMapContainer}}
             {{/isListContainer}}
           {{/complexType}}
         {{/items}}
         {{^items}}
-{{complexType}}.mapFromJson(json[_jsonFieldName]);
+        {{complexType}}.mapFromJson(_jsonData);
         {{/items}}
-        }
       {{/isMapContainer}}
       {{^isMapContainer}}
-      {{name}} = {{complexType}}.fromJson(json[r'{{baseName}}']);
+      {{complexType}}.fromJson(_jsonData);
       {{/isMapContainer}}
       {{/isListContainer}}
     {{/complexType}}
     {{^complexType}}
       {{#isListContainer}}
-      {{name}} = (json[r'{{baseName}}'] as List)?.cast<{{items.datatype}}>();
+        {{#items}}
+        (_jsonData as List)?.cast<{{datatype}}>();
+        {{/items}}
       {{/isListContainer}}
       {{^isListContainer}}
         {{#isMapContainer}}
-          {{name}} = (json[r'{{baseName}}'] as Map)?.cast<String, {{items.datatype}}>();
+        (_jsonData as Map)?.cast<String, {{items.datatype}}>();
         {{/isMapContainer}}
         {{^isMapContainer}}
-          {{name}} = json[r'{{baseName}}'];
+        _jsonData;
         {{/isMapContainer}}
       {{/isListContainer}}
     {{/complexType}}
   {{/isDate}}
   {{/isDateTime}}
   {{/allowableValues}}
-    }
+    } // _jsonFieldName
   {{/vars}}
   }
 
+
   Map<String, dynamic> toJson(DeserializeDelegate serializer) {
+
     final json = <String, dynamic>{};
     {{#vars}}
         {{^isNullable}}
@@ -139,7 +184,7 @@ json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{data
     {{/vars}}
     return json;
   }
-
+{{/hasVars}}
   static List<{{classname}}> listFromJson(List<dynamic> json) {
     return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
   }
@@ -160,7 +205,7 @@ json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{data
 
     if (other is {{classname}} && runtimeType == other.runtimeType) {
   {{#hasVars}}
-    return {{#vars}}
+    return {{^hasVars}}json?.equals(other.json);{{/hasVars}}{{#vars}}
     {{#complexType}}
       {{#isListContainer}}
         const ListEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
@@ -211,7 +256,7 @@ json[_jsonFieldName].map((String key, dynamic value) => MapEntry<String, {{{data
     if ({{name}} != null) {
       hashCode = hashCode ^ {{name}}.hashCode;
     }
-{{/complexType}}{{/vars}}{{/hasVars}}
+{{/complexType}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
 
     return hashCode{{#parent}} ^ super.hashCode{{/parent}};
   }

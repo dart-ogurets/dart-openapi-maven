@@ -14,7 +14,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AddProps1"
+                $ref: "#/components/schemas/com.bluetrainsoftware.AddProps1"
   /hello2:
     get:
       tags:
@@ -25,10 +25,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AddProps2"
+                $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
 components:
   schemas:
-    AddProps1:
+    "com.bluetrainsoftware.AddProps1":
       properties:
         extra:
           type: object
@@ -40,7 +40,7 @@ components:
         dependencies:
           type: object
           additionalProperties:
-            $ref: "#/components/schemas/AddProps2"
+            $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
         groups:
           type: array
           description: "names groups this user is part of"
@@ -54,7 +54,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/JSONType"
-    AddProps2:
+        myIntegers:
+          type: array
+          items:
+            type: integer
+    "com.bluetrainsoftware.AddProps2":
       properties:
         extra:
           type: object
@@ -73,13 +77,25 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/TimeType"
-    AddProps4:
+        dependencies:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/JSONType"
+        otherDeps:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/SecondJsonType"
+    "com.bluetrain-software.AddProps4":
       properties:
         extra:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/TimeType"
     JSONType:
+      description: "can be anything, no properties"
+    SecondJsonType:
       description: "can be anything, no properties"
     TimeType:
       type: string

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     additionalProperties.put(SUPPORT_DART2, Boolean.TRUE);
 
     super.processOpts();
+
+    // replace Object with dynamic
+    this.typeMapping.put("object", "dynamic");
 
     // override the location
     embeddedTemplateDir = templateDir = DART2_TEMPLATE_FOLDER;
@@ -86,19 +90,61 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
   }
 
-  // for debugging inevitable weirdness in the model generated
   @Override
-  public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
-    return super.postProcessAllModels(objs);
+  public String toModelFilename(String name) {
+	  if (name.contains(".")) {
+	    int lastIndex = name.lastIndexOf(".");
+	    String path = name.substring(0, lastIndex).replace(".", File.separator).replace('-', '_');
+	    String modelName = name.substring(lastIndex+1);
+      return path + File.separator + org.openapitools.codegen.utils.StringUtils.underscore(this.toModelName(modelName));
+    } else {
+      return org.openapitools.codegen.utils.StringUtils.underscore(this.toModelName(name));
+    }
   }
 
   // for debugging inevitable weirdness in the model generated
+  @Override
+  public Map<String, Object> updateAllModels(Map<String, Object> objs) {
+	  objs.values().forEach(o -> {
+	    Map<String, Object> modelData = (Map<String, Object>)o;
+	    List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
+	    if (models != null) {
+	      models.forEach(modelMap -> {
+          CodegenModel cm = (CodegenModel)modelMap.get("model");
+          if (cm != null) {
+            cm.vendorExtensions.put("dartClassName", org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
+          }
+          if (cm != null && cm.vars != null) {
+            cm.vars.forEach(cp -> {
+              if (cp.items != null && "dynamic".equals(cp.items.complexType)) {
+                cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
+              }
+              if (cp.items != null && "DateTime".equals(cp.items.complexType)) {
+                cp.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
+              }
+              if (cp.isMapContainer && cp.items != null && cp.items.items != null) {
+                if ("DateTime".equals(cp.items.items.complexType)) {
+                  cp.items.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
+                }
+                if ("dynamic".equals(cp.items.items.complexType)) {
+                  cp.items.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+    return super.updateAllModels(objs);
+  }
+
+  // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been generated to the file
+  // system
   @Override
   public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
     return som;
   }
-
 
   @Override
   public String toDefaultValue(Schema schema) {
@@ -135,6 +181,40 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       var = "Number" + var;
     }
     return escapeReservedWord(var);
+  }
+
+//  Map<String, String> modelNameCache = new HashMap<>();
+
+  @Override
+  public String toModelName(String modelName) {
+    return ("dynamic".equals(modelName) ? modelName : super.toModelName(modelName));
+//    return modelNameCache.computeIfAbsent(modelName, name -> {
+//      if ("dynamic".equals(name)) {
+//        return name;
+//      }
+//
+//      String prefix = "";
+//      if (name.contains(".")) {
+//        final int endIndex = name.lastIndexOf(".");
+//        prefix = name.substring(0, endIndex).replace('-', '_');
+//        if (prefix.length() > 0) {
+//          prefix = prefix + ".";
+//        }
+//        name = name.substring(endIndex+1);
+//      }
+//
+//      if (this.isReservedWord(name)) {
+//        log.warn(name + " (reserved word) cannot be used as model filename. Renamed to " + org.openapitools.codegen.utils.StringUtils.camelize("model_" + name));
+//        name = "model_" + name;
+//      }
+//
+//      if (name.matches("^\\d.*")) {
+//        log.warn(name + " (model name starts with number) cannot be used as model name. Renamed to " + org.openapitools.codegen.utils.StringUtils.camelize("model_" + name));
+//        name = "model_" + name;
+//      }
+//
+//      return prefix + org.openapitools.codegen.utils.StringUtils.camelize(name);
+//    });
   }
 
   // if $FLUTTER is set, format the file.
