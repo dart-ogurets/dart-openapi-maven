@@ -53,7 +53,7 @@ class {{classname}} {
         DateTime.parse(_jsonData);
   {{/isDateTime}}
   {{#isDate}}
-        DateFormat(r'yyyy-MM-dd').parseStrict(_jsonData);
+        DateTime.parse(_jsonData + 'T00:00:00.000Z');
   {{/isDate}}
   {{^isDateTime}}
   {{^isDate}}
