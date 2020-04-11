@@ -21,6 +21,7 @@ This is likely to go through a few more versions as it is used comprehensively.
 
 ==== Changelog
 
+- 2.6/7 - add in a new copyWith() method that allows you to make deep copies of the model and replace specific parts
 - 2.5 - fixed a dangling } issue from pedantic, fixed additionalProperties support for k8s api generation, added integration tests
 - 2.4 - fixed an issue if no authNames were being provided, a List<dynamic> was created instead of a List<String>
 - 2.3 - this is a cleanup of the move to Dio based on pedantic feedback
