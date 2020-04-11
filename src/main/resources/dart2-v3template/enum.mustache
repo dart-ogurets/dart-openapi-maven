@@ -29,6 +29,10 @@ class {{classname}}TypeTransformer {
     return json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList();
   }
 
+  static {{classname}} copyWith({{classname}} instance) {
+    return instance;
+  }
+
   static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
     final map = <String, {{classname}}>{};
     if (json != null && json.isNotEmpty) {

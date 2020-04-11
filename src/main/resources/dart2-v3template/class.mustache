@@ -260,4 +260,57 @@ class {{classname}} {
 
     return hashCode{{#parent}} ^ super.hashCode{{/parent}};
   }
+
+  {{classname}} copyWith({
+     {{#vars}}
+       {{{dataType}}} {{name}},
+     {{/vars}}
+  }) {
+    {{classname}} copy = {{classname}}();
+  {{#vars}}
+    {{#isListContainer}}
+      {{^complexType}}
+        copy.{{name}} = {{name}} ?? []..addAll(this.{{name}});
+      {{/complexType}}
+      {{#complexType}}
+        {{#items}}
+          {{#enumName}}
+            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => {{enumName}}TypeTransformer.copyWith(e)).toList();
+          {{/enumName}}
+          {{^enumName}}
+            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => e.copyWith()).toList();
+          {{/enumName}}
+        {{/items}}
+      {{/complexType}}
+    {{/isListContainer}}
+    {{#isMapContainer}}
+      {{#isPrimitiveType}}
+        copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : {}.`.addAll(this.{{name}}));
+      {{/isPrimitiveType}}
+      {{^isPrimitiveType}}
+        {{#complexType}}
+          {{#items}}
+            {{#enumName}}
+              copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, {{complexType}}TypeTransformer.copy(y));
+            {{/enumName}}
+            {{^enumName}}
+              copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, y.copyWith());
+            {{/enumName}}
+          {{/items}}
+        {{/complexType}}
+        {{^complexType}}
+          copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, y.copyWith()));
+        {{/complexType}}
+      {{/isPrimitiveType}}
+    {{/isMapContainer}}
+    {{^isContainer}}
+      {{#isFreeFormObject}}
+        copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
+      {{/isFreeFormObject}}
+      {{^isFreeFormObject}}
+        copy.{{name}} = {{name}} ?? this.{{name}};
+      {{/isFreeFormObject}}
+    {{/isContainer}}
+  {{/vars}}
+  }
 }

@@ -116,6 +116,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           }
           if (cm != null && cm.vars != null) {
             cm.vars.forEach(cp -> {
+              if (cp.items != null && cp.items.allowableValues != null && cp.items.allowableValues.get("enumVars") != null) {
+                cp.items.enumName = cp.items.complexType;
+              }
               if (cp.items != null && "dynamic".equals(cp.items.complexType)) {
                 cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
               }
