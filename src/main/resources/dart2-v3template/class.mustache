@@ -275,17 +275,17 @@ class {{classname}} {
       {{#complexType}}
         {{#items}}
           {{#enumName}}
-            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => {{enumName}}TypeTransformer.copyWith(e)).toList();
+            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => {{enumName}}TypeTransformer.copyWith(e))?.toList();
           {{/enumName}}
           {{^enumName}}
-            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => e.copyWith()).toList();
+            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => e.copyWith())?.toList();
           {{/enumName}}
         {{/items}}
       {{/complexType}}
     {{/isListContainer}}
     {{#isMapContainer}}
       {{#isPrimitiveType}}
-        copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : {}.`.addAll(this.{{name}}));
+        copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : {}..addAll(this.{{name}}));
       {{/isPrimitiveType}}
       {{^isPrimitiveType}}
         {{#complexType}}
