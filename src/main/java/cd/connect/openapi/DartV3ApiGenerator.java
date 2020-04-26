@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.DartClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
@@ -14,9 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConfig {
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
@@ -105,19 +108,33 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   // for debugging inevitable weirdness in the model generated
   @Override
   public Map<String, Object> updateAllModels(Map<String, Object> objs) {
+    Map<String, CodegenModel> allModels = new HashMap<>();
 	  objs.values().forEach(o -> {
 	    Map<String, Object> modelData = (Map<String, Object>)o;
 	    List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
 	    if (models != null) {
 	      models.forEach(modelMap -> {
           CodegenModel cm = (CodegenModel)modelMap.get("model");
-          if (cm != null) {
-            cm.vendorExtensions.put("dartClassName", org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
+          if (cm == null) {
+            return;
           }
-          if (cm != null && cm.vars != null) {
+          if (!cm.getName().endsWith("_allOf")) {
+            allModels.put(cm.getName(), cm);
+          }
+          cm.vendorExtensions.put("dartClassName", org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
+          if (cm.vars != null) {
             cm.vars.forEach(cp -> {
               if (cp.items != null && cp.items.allowableValues != null && cp.items.allowableValues.get("enumVars") != null) {
                 cp.items.enumName = cp.items.complexType;
+              }
+              if (cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) {
+                cp.enumName = cp.complexType;
+              }
+              if ("DateTime".equals(cp.complexType)) {
+                cp.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
+              }
+              if ("dynamic".equals(cp.complexType)) {
+                cp.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
               }
               if (cp.items != null && "dynamic".equals(cp.items.complexType)) {
                 cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
@@ -125,6 +142,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
               if (cp.items != null && "DateTime".equals(cp.items.complexType)) {
                 cp.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
               }
+
               if (cp.isMapContainer && cp.items != null && cp.items.items != null) {
                 if ("DateTime".equals(cp.items.items.complexType)) {
                   cp.items.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
@@ -136,9 +154,35 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
             });
           }
         });
+
       }
     });
+
+	  updateModelsWithAllOfInheritance(allModels);
+
     return super.updateAllModels(objs);
+  }
+
+  // TODO: check with multiple levels of hierarchy
+  private void updateModelsWithAllOfInheritance(Map<String, CodegenModel> models) {
+    models.values().forEach(cm -> {
+      if (cm.getParent() != null) {
+        CodegenModel parent = models.get(cm.getParent());
+        if (parent == null) {
+          log.info("Cannot find parent for class {}:{}", cm.getName(), cm.getParent());
+          return;
+        }
+
+        Map<String, CodegenProperty> props = parent.getVars().stream().collect(Collectors.toMap(CodegenProperty::getName, f -> f));
+
+        cm.getVars().forEach((v) -> {
+          CodegenProperty matchingName = props.get(v.getName());
+          if (matchingName != null) {
+            v.vendorExtensions.put("x-dart-inherited", Boolean.TRUE);
+          }
+        });
+      }
+    });
   }
 
   // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been generated to the file

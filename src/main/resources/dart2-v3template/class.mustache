@@ -1,4 +1,4 @@
-class {{classname}} {
+class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#vars}}
   {{#description}}/* {{{description}}} */{{/description}}
   {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
@@ -26,9 +26,11 @@ class {{classname}} {
   }
 {{/hasVars}}
 {{#hasVars}}
-  {{classname}}.fromJson(Map<String, dynamic> json) {
+  fromJson(Map<String, dynamic> json) {
     if (json == null) return;
+  {{#parent}}super.fromJson(json);{{/parent}}
   {{#vars}}
+    {{^vendorExtensions.x-dart-inherited}}
     {
       final _jsonData = json[r'{{{baseName}}}'];
       {{name}} = (_jsonData == null) ? null :
@@ -156,14 +158,18 @@ class {{classname}} {
   {{/isDateTime}}
   {{/allowableValues}}
     } // _jsonFieldName
-  {{/vars}}
+{{/vendorExtensions.x-dart-inherited}}{{/vars}}
   }
 
+  {{classname}}.fromJson(Map<String, dynamic> json) {
+    fromJson(json); // allows child classes to call
+  }
 
   Map<String, dynamic> toJson(DeserializeDelegate serializer) {
 
     final json = <String, dynamic>{};
     {{#vars}}
+      {{^vendorExtensions.x-dart-inherited}}
         {{^isNullable}}
     if ({{name}} != null) {
         {{/isNullable}}
@@ -181,6 +187,7 @@ class {{classname}} {
         {{^isNullable}}
     }
         {{/isNullable}}
+      {{/vendorExtensions.x-dart-inherited}}
     {{/vars}}
     return json;
   }
@@ -205,7 +212,7 @@ class {{classname}} {
 
     if (other is {{classname}} && runtimeType == other.runtimeType) {
   {{#hasVars}}
-    return {{^hasVars}}json?.equals(other.json);{{/hasVars}}{{#vars}}
+    return {{^hasVars}}json?.equals(other.json);{{/hasVars}}{{#vars}}{{^vendorExtensions.x-dart-inherited}}
     {{#complexType}}
       {{#isListContainer}}
         const ListEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
@@ -223,10 +230,10 @@ class {{classname}} {
       {{/isListContainer}}
     {{/complexType}}{{^complexType}}
      {{name}} == other.{{name}}{{#hasMore}} &&
-  {{/hasMore}}{{/complexType}}{{/vars}}
+  {{/hasMore}}{{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}
     {{#parent}} &&
-    super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
-    return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+    super==other{{/parent}};{{/hasVars}}{{^hasVars}}
+    return {{#parent}}super==other{{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
     }
 
     return false;
@@ -237,7 +244,7 @@ class {{classname}} {
     var hashCode = runtimeType.hashCode;
 
   {{#hasVars}}
-    {{#vars}}
+    {{#vars}}{{^vendorExtensions.x-dart-inherited}}
     {{#complexType}}
       {{#isListContainer}}
         hashCode = hashCode ^ const ListEquality().hash({{name}});
@@ -256,7 +263,7 @@ class {{classname}} {
     if ({{name}} != null) {
       hashCode = hashCode ^ {{name}}.hashCode;
     }
-{{/complexType}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
+{{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
 
     return hashCode{{#parent}} ^ super.hashCode{{/parent}};
   }
@@ -264,7 +271,7 @@ class {{classname}} {
   {{classname}} copyWith({
      {{#vars}}
        {{{dataType}}} {{name}},
-     {{/vars}}
+       {{/vars}}
   }) {
     {{classname}} copy = {{classname}}();
   {{#vars}}
@@ -304,12 +311,37 @@ class {{classname}} {
       {{/isPrimitiveType}}
     {{/isMapContainer}}
     {{^isContainer}}
-      {{#isFreeFormObject}}
-        copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
-      {{/isFreeFormObject}}
-      {{^isFreeFormObject}}
-        copy.{{name}} = {{name}} ?? this.{{name}};
-      {{/isFreeFormObject}}
+      {{#complexType}}
+        {{#vendorExtensions.x-dart-dynamic}}
+          copy.{{name}} = {{name}} ?? this.{{name}};
+        {{/vendorExtensions.x-dart-dynamic}}
+        {{^vendorExtensions.x-dart-dynamic}}
+          {{#isDate}}
+            copy.{{name}} = {{name}} ?? this.{{name}};
+          {{/isDate}}
+          {{^isDate}}
+            {{#isDateTime}}
+              copy.{{name}} = {{name}} ?? this.{{name}};
+            {{/isDateTime}}
+            {{^isDateTime}}
+              {{#enumName}}
+                copy.{{name}} = {{name}} ?? this.{{name}};
+              {{/enumName}}
+              {{^enumName}}
+                copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
+              {{/enumName}}
+            {{/isDateTime}}
+          {{/isDate}}
+        {{/vendorExtensions.x-dart-dynamic}}
+      {{/complexType}}
+      {{^complexType}}
+        {{#isFreeFormObject}}
+          copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
+        {{/isFreeFormObject}}
+        {{^isFreeFormObject}}
+          copy.{{name}} = {{name}} ?? this.{{name}};
+        {{/isFreeFormObject}}
+      {{/complexType}}
     {{/isContainer}}
   {{/vars}}
     return copy;

@@ -21,6 +21,8 @@ This is likely to go through a few more versions as it is used comprehensively.
 
 ==== Changelog
 
+- 2.9 - support inheritance using allOf where it exists. If the model from the generator provides a parentClass we modify the
+output to now support the correct code generation to support inheritance.
 - 2.8 - resolves a number of Dart Analysis issues
 - 2.6/7 - add in a new copyWith() method that allows you to make deep copies of the model and replace specific parts
 - 2.5 - fixed a dangling } issue from pedantic, fixed additionalProperties support for k8s api generation, added integration tests
