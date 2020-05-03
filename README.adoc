@@ -14,6 +14,8 @@ It also cleans up a bunch of code around streamed data handling.
 
 This is likely to go through a few more versions as it is used comprehensively.
 
+There is an article on Medium discussing https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[this plugin].
+
 === Developers
 
 - _Irina Southwell (nee Капрельянц Ирина)_, Principal Engineer (https://www.linkedin.com/in/irina-southwell-9727a422/)
