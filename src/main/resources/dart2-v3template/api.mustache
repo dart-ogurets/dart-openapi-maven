@@ -28,8 +28,10 @@ class {{classname}} {
 
     // query params
     final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{}..addAll(options?.headers ?? {});
-    {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}';{{/hasProduces}}
+    final headerParams = <String, String>{}..addAll(options?.headers?.cast<String, String>() ?? {});
+    if(headerParams['Accept'] == null) {
+      {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}';{{/hasProduces}}
+    }
 
     {{#queryParams}}
     {{^required}}
