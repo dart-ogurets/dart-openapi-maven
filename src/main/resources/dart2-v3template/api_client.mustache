@@ -96,6 +96,11 @@ class LocalApiClient implements DeserializeDelegate {
       return {{classname}}TypeTransformer.toJson(value).toString();
     }
         {{/isEnum}}
+        {{^isEnum}}
+    if (value is {{classname}}) {
+      return jsonEncode(value.toJson(this));
+    }
+        {{/isEnum}}
       {{/model}}
     {{/models}}
 

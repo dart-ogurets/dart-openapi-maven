@@ -28,7 +28,7 @@ class {{classname}} {
 
     // query params
     final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
+    final headerParams = <String, String>{}..addAll(options?.headers ?? {});
     {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}';{{/hasProduces}}
 
     {{#queryParams}}
@@ -49,13 +49,16 @@ class {{classname}} {
     final contentType = contentTypes.isNotEmpty ? contentTypes[0] : null;
     final authNames = <String>[{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
 
+  {{#hasFormParams}}
+    final delegate = LocalApiClient();
+  {{/hasFormParams}}
     if(contentType != null && contentType.startsWith('multipart/form-data')) {
       final formData = <String, dynamic>{};
 
       {{#formParams}}
       {{^isFile}}
       if ({{paramName}} != null) {
-        formData['{{baseName}}'] = parameterToString({{paramName}});
+        formData['{{baseName}}'] = parameterToString(delegate, {{paramName}});
       }
       {{/isFile}}
       {{#isFile}}
@@ -73,7 +76,7 @@ class {{classname}} {
         {{#formParams}}
           {{^isFile}}
               if ({{paramName}} != null)
-              formParams['{{baseName}}'] = parameterToString({{paramName}});
+              formParams['{{baseName}}'] = parameterToString(delegate, {{paramName}});
           {{/isFile}}
         {{/formParams}}
           postBody = formParams;
