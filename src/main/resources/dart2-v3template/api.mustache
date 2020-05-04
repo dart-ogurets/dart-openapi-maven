@@ -4,6 +4,7 @@ part of {{pubName}}.api;
 
 class {{classname}} {
   final ApiClient apiClient;
+  final delegate = LocalApiClient();
 
   {{classname}}(this.apiClient) : assert(apiClient != null);
 
@@ -46,48 +47,56 @@ class {{classname}} {
     headerParams['{{baseName}}'] = {{paramName}};
     {{/headerParams}}
 
+    final authNames = <String>[{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
+    final opt = options ?? Options();
+
+  {{#vendorExtensions.x-dart-content-json}}
     final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{#hasMore}},{{/hasMore}}{{/consumes}}];
 
-    final contentType = contentTypes.isNotEmpty ? contentTypes[0] : null;
-    final authNames = <String>[{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
-
-  {{#hasFormParams}}
-    final delegate = LocalApiClient();
-  {{/hasFormParams}}
-    if(contentType != null && contentType.startsWith('multipart/form-data')) {
-      final formData = <String, dynamic>{};
-
-      {{#formParams}}
+    if (contentTypes.isNotEmpty && headerParams['Content-Type'] == null) {
+      headerParams['Content-Type'] = contentTypes[0];
+    }
+    if (postBody != null) {
+      postBody = delegate.serialize(postBody);
+    }
+  {{/vendorExtensions.x-dart-content-json}}
+  {{#vendorExtensions.x-dart-content-form}}
+    if (headerParams['Content-Type'] == null) {
+      headerParams['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
+    final formData = <String, String>{};
+    {{#formParams}}
       {{^isFile}}
-      if ({{paramName}} != null) {
-        formData['{{baseName}}'] = parameterToString(delegate, {{paramName}});
-      }
+    formData['{{baseName}}'] = Uri.encodeFull(parameterToString(delegate, {{paramName}}));
+      {{/isFile}}
+    {{/formParams}}
+    {{#hasFormParams}}
+      postBody = formData.entries.map((me) => me.key + "=" + me.value).join("&");
+    {{/hasFormParams}}
+  {{/vendorExtensions.x-dart-content-form}}
+  {{#vendorExtensions.x-dart-content-multipartform}}
+    if (headerParams['Content-Type'] == null) {
+      headerParams['Content-Type'] = 'multipart/form-data';
+    }
+    final formData = <String, dynamic>{};
+
+    {{#formParams}}
+      {{^isFile}}
+    if ({{paramName}} != null) {
+      formData['{{baseName}}'] = Uri.encodeFull(parameterToString(delegate, {{paramName}}));
+    }
       {{/isFile}}
       {{#isFile}}
-      if ({{paramName}} != null) {
-        formData['{{baseName}}'] = {{paramName}};
-      }
-      {{/isFile}}
-      {{/formParams}}
-      if (formData.isNotEmpty) {
-        postBody = FormData.fromMap(formData);
-      }
-    }{{^bodyParam}} else {
-      {{#hasFormParams}}
-          final formParams = <String, dynamic>{};
-        {{#formParams}}
-          {{^isFile}}
-              if ({{paramName}} != null)
-              formParams['{{baseName}}'] = parameterToString(delegate, {{paramName}});
-          {{/isFile}}
-        {{/formParams}}
-          postBody = formParams;
-      {{/hasFormParams}}
-  {{^hasFormParams}}postBody = null;{{/hasFormParams}}
+    if ({{paramName}} != null) {
+      formData['{{baseName}}'] = {{paramName}};
     }
-    {{/bodyParam}}
+      {{/isFile}}
+    {{/formParams}}
+      if (formData.isNotEmpty) {
+      postBody = FormData.fromMap(formData);
+      }
+  {{/vendorExtensions.x-dart-content-multipartform}}
 
-    final opt = options ?? Options();
     opt.headers = headerParams;
     opt.method = '{{httpMethod}}';
 

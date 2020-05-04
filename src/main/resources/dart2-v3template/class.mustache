@@ -301,12 +301,12 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
               copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, {{complexType}}TypeTransformer.copy(y));
             {{/enumName}}
             {{^enumName}}
-              copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, y.copyWith());
+              copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, v.copyWith());
             {{/enumName}}
           {{/items}}
         {{/complexType}}
         {{^complexType}}
-          copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, y.copyWith()));
+          copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, v.copyWith()));
         {{/complexType}}
       {{/isPrimitiveType}}
     {{/isMapContainer}}

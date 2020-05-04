@@ -214,6 +214,17 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   @Override
   public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
     super.addOperationToGroup(tag, resourcePath, operation, co, operations);
+
+    List<String> lowerCaseContentTypes = co.consumes != null ? co.consumes.stream().map(p -> p.get("mediaType").toLowerCase()).collect(Collectors.toList()) : new ArrayList<>();
+    if (lowerCaseContentTypes.contains("application/json")) {
+      co.vendorExtensions.put("x-dart-content-json", "application/json");
+    } else if (lowerCaseContentTypes.contains("application/x-www-form-urlencoded")) {
+      co.vendorExtensions.put("x-dart-content-form", "application/x-www-form-urlencoded");
+    } else if (lowerCaseContentTypes.contains("multipart/form-data")) {
+      co.vendorExtensions.put("x-dart-content-multipartform", "multipart/form-data");
+    } else {
+      co.vendorExtensions.put("x-dart-content-json", "application/json"); // fallback
+    }
   }
 
   // existing one is unpleasant to use.
