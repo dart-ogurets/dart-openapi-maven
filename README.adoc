@@ -23,6 +23,9 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 3.1 - introduces support for the Kubernetes API in terms of compilation along with a considerable degree of support for the
+complexity of that API. It also reduces the code generated when no forms are used or forms are used but not json. It also supports
+the return of non-json data by just returning the string, allowing you to decode it. 
 - 2.9 - support inheritance using allOf where it exists. If the model from the generator provides a parentClass we modify the
 output to now support the correct code generation to support inheritance. Resolve issue around headers not being merged if passed
 by user. Fix issue with form data generation where fields need to be json encoded. 
@@ -33,6 +36,13 @@ by user. Fix issue with form data generation where fields need to be json encode
 - 2.3 - this is a cleanup of the move to Dio based on pedantic feedback
 - 1.5 - fixed the pubspec.yaml 
 - 1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.
+
+==== Roadmap
+
+- We intend to support the `oneOf` syntax for parameters for request and response types by using optional parameters. This
+won't change method calls when you are only passing one type.
+- We will start investigating how to support `anyOf` syntax. 
+- We intend to be generating server side code for supporting Dart server side applications. 
 
 === Usage
 
