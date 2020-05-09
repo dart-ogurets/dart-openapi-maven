@@ -1,0 +1,11 @@
+{{^isModel}}
+  []..addAll(v)
+{{/isModel}}
+{{#isModel}}
+  {{#enumName}}
+    []..addAll(v)
+  {{/enumName}}
+  {{^enumName}}
+    []..addAll(v.map((y) => y.copyWith()).toList())
+  {{/enumName}}
+{{/isModel}}

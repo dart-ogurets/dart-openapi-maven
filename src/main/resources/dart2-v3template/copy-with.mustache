@@ -1,0 +1,42 @@
+{{#isListContainer}}
+  {{#items}}
+    {{>list-copy-with}}
+  {{/items}}
+  {{^items}}
+    {{>list-copy-with}}
+  {{/items}}
+{{/isListContainer}}
+{{#isMapContainer}}
+  {{#isPrimitiveType}}
+    v == null ? null : {}..addAll(v)
+  {{/isPrimitiveType}}
+  {{^isPrimitiveType}}
+    {{#isContainer}}
+     function(v) {
+      var newVal;
+      final fld = v;
+      {{#items}}
+        {{#enumName}}
+          newVal = v == null ? null : {}..addAll(v);
+        {{/enumName}}
+        {{^enumName}}
+          newVal = v?.map((k, v) => MapEntry(k,{{^items}}{{>copy-with}}{{/items}}{{#items}}{{>copy-with}}{{/items}})); // e1
+        {{/enumName}}
+      {{/items}}
+    {{/isContainer}}
+    {{^isContainer}}
+      newVal = v?.map((k, v) => MapEntry(k, {{^items}}{{>copy-with}}{{/items}}{{#items}}{{>copy-with}}{{/items}}));  // e2
+    {{/isContainer}}
+    return newVal;
+    }(v)
+  {{/isPrimitiveType}}
+{{/isMapContainer}}
+{{^isContainer}}
+  {{#isModel}}
+    v?.copyWith()
+  {{/isModel}}
+  {{^isModel}}
+    v
+  {{/isModel}}
+{{/isContainer}}
+

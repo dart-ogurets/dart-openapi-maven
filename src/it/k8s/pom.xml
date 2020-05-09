@@ -69,8 +69,8 @@
             <configuration>
               <output>${project.basedir}</output>
               <!-- https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json -->
-              <inputSpec>${project.basedir}/test.yaml</inputSpec>
-<!--              <inputSpec>${project.basedir}/swagger.json</inputSpec>-->
+<!--              <inputSpec>${project.basedir}/test.yaml</inputSpec>-->
+              <inputSpec>${project.basedir}/swagger.json</inputSpec>
               <language>dart2-api</language>
               <enablePostProcessFile>true</enablePostProcessFile>
               <additionalProperties>

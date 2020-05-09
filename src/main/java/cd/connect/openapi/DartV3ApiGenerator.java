@@ -150,6 +150,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
                 if ("dynamic".equals(cp.items.items.complexType)) {
                   cp.items.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
                 }
+                if (cp.items.items.allowableValues != null && cp.items.items.allowableValues.size() > 0) {
+                  cp.items.items.vendorExtensions.put("x-dart-isenum", Boolean.TRUE);
+                }
               }
             });
           }
@@ -215,15 +218,25 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
     super.addOperationToGroup(tag, resourcePath, operation, co, operations);
 
-    List<String> lowerCaseContentTypes = co.consumes != null ? co.consumes.stream().map(p -> p.get("mediaType").toLowerCase()).collect(Collectors.toList()) : new ArrayList<>();
+    tagOperationWithExtension(co.consumes, co.vendorExtensions, "consumes");
+    tagOperationWithExtension(co.produces, co.vendorExtensions, "produces");
+  }
+
+  private void tagOperationWithExtension(List<Map<String, String>> mediaTypes, Map<String, Object> extensions, String midfix) {
+    List<String> lowerCaseContentTypes = mediaTypes != null ? mediaTypes.stream().map(p -> p.get("mediaType").toLowerCase()).collect(Collectors.toList()) : new ArrayList<>();
+    String prefix = "x-dart-" + midfix + "-";
     if (lowerCaseContentTypes.contains("application/json")) {
-      co.vendorExtensions.put("x-dart-content-json", "application/json");
+      extensions.put(prefix + "json", "application/json");
     } else if (lowerCaseContentTypes.contains("application/x-www-form-urlencoded")) {
-      co.vendorExtensions.put("x-dart-content-form", "application/x-www-form-urlencoded");
+      extensions.put(prefix + "form", "application/x-www-form-urlencoded");
     } else if (lowerCaseContentTypes.contains("multipart/form-data")) {
-      co.vendorExtensions.put("x-dart-content-multipartform", "multipart/form-data");
+      extensions.put(prefix + "multipartform", "multipart/form-data");
+    } else if (lowerCaseContentTypes.contains("application/xml")) {
+      extensions.put(prefix + "xml", "application/xml");
+    } else if (lowerCaseContentTypes.contains("application/yaml")) {
+      extensions.put(prefix + "yaml", "application/yaml");
     } else {
-      co.vendorExtensions.put("x-dart-content-json", "application/json"); // fallback
+      extensions.put(prefix + "json", "application/json"); // fallback
     }
   }
 

@@ -1,3 +1,4 @@
+// {{name}}
 class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#vars}}
   {{#description}}/* {{{description}}} */{{/description}}
@@ -21,7 +22,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     this.json = rawValue;
   }
 
-  dynamic toJson(DeserializeDelegate serializer) {
+  dynamic toJson(LocalApiClient serializer) {
     return json;
   }
 {{/hasVars}}
@@ -93,7 +94,14 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, {{#items}}
           {{^vendorExtensions.x-dart-datetime}}
             {{#vendorExtensions.x-dart-dynamic}}value as List{{/vendorExtensions.x-dart-dynamic}}
-            {{^vendorExtensions.x-dart-dynamic}}{{{complexType}}}.listFromJson(value){{/vendorExtensions.x-dart-dynamic}}
+            {{^vendorExtensions.x-dart-dynamic}}
+              {{#vendorExtensions.x-dart-isenum}}
+                {{{complexType}}}TypeTransformer.listFromJson(value)
+              {{/vendorExtensions.x-dart-isenum}}
+              {{^vendorExtensions.x-dart-isenum}}
+                {{{complexType}}}.listFromJson(value)
+              {{/vendorExtensions.x-dart-isenum}}
+              {{/vendorExtensions.x-dart-dynamic}}
           {{/vendorExtensions.x-dart-datetime}}
           {{#vendorExtensions.x-dart-datetime}}openApiDateTimeList(value)
           {{/vendorExtensions.x-dart-datetime}}
@@ -165,7 +173,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     fromJson(json); // allows child classes to call
   }
 
-  Map<String, dynamic> toJson(DeserializeDelegate serializer) {
+  Map<String, dynamic> toJson(LocalApiClient serializer) {
 
     final json = <String, dynamic>{};
     {{#vars}}
@@ -268,11 +276,11 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     return hashCode{{#parent}} ^ super.hashCode{{/parent}};
   }
 
-  {{classname}} copyWith({
+  {{classname}} copyWith({{#hasVars}}{
      {{#vars}}
        {{{dataType}}} {{name}},
        {{/vars}}
-  }) {
+    }{{/hasVars}}) {
     {{classname}} copy = {{classname}}();
   {{#vars}}
     {{#isListContainer}}
@@ -280,14 +288,19 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         copy.{{name}} = {{name}} ?? []..addAll(this.{{name}});
       {{/complexType}}
       {{#complexType}}
+        {
+        var newVal;
+        final fld = this.{{name}};
         {{#items}}
           {{#enumName}}
-            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => {{enumName}}TypeTransformer.copyWith(e))?.toList();
+            newVal = fld?.map((e) => {{enumName}}TypeTransformer.copyWith(e))?.toList();
           {{/enumName}}
           {{^enumName}}
-            copy.{{name}} = {{name}} ?? this.{{name}}?.map((e) => e.copyWith())?.toList();
+            newVal = fld?.map((e) => e.copyWith())?.toList();
           {{/enumName}}
         {{/items}}
+        copy.{{name}} = newVal;
+        }
       {{/complexType}}
     {{/isListContainer}}
     {{#isMapContainer}}
@@ -295,53 +308,33 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : {}..addAll(this.{{name}}));
       {{/isPrimitiveType}}
       {{^isPrimitiveType}}
-        {{#complexType}}
+        {{#isContainer}}
+          {
+          var newVal;
+          final fld = this.{{name}};
           {{#items}}
             {{#enumName}}
-              copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, {{complexType}}TypeTransformer.copy(y));
+              newVal = fld?.map((k, v) => MapEntry(k, v));
             {{/enumName}}
             {{^enumName}}
-              copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, v.copyWith());
+              newVal = fld?.map((k, v) => MapEntry(k, {{>copy-with}} )); // e1
             {{/enumName}}
           {{/items}}
-        {{/complexType}}
-        {{^complexType}}
-          copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : this.{{name}}.map((k, v) => MapEntry(k, v.copyWith()));
-        {{/complexType}}
+        {{/isContainer}}
+        {{^isContainer}}
+          newVal = fld?.map((k, v) => MapEntry(k, {{>copy-with}}));  // e2
+        {{/isContainer}}
+        copy.{{name}} = newVal;
+        }
       {{/isPrimitiveType}}
     {{/isMapContainer}}
     {{^isContainer}}
-      {{#complexType}}
-        {{#vendorExtensions.x-dart-dynamic}}
-          copy.{{name}} = {{name}} ?? this.{{name}};
-        {{/vendorExtensions.x-dart-dynamic}}
-        {{^vendorExtensions.x-dart-dynamic}}
-          {{#isDate}}
-            copy.{{name}} = {{name}} ?? this.{{name}};
-          {{/isDate}}
-          {{^isDate}}
-            {{#isDateTime}}
-              copy.{{name}} = {{name}} ?? this.{{name}};
-            {{/isDateTime}}
-            {{^isDateTime}}
-              {{#enumName}}
-                copy.{{name}} = {{name}} ?? this.{{name}};
-              {{/enumName}}
-              {{^enumName}}
-                copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
-              {{/enumName}}
-            {{/isDateTime}}
-          {{/isDate}}
-        {{/vendorExtensions.x-dart-dynamic}}
-      {{/complexType}}
-      {{^complexType}}
-        {{#isFreeFormObject}}
-          copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
-        {{/isFreeFormObject}}
-        {{^isFreeFormObject}}
-          copy.{{name}} = {{name}} ?? this.{{name}};
-        {{/isFreeFormObject}}
-      {{/complexType}}
+      {{#isModel}}
+        copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();
+      {{/isModel}}
+      {{^isModel}}
+        copy.{{name}} = {{name}} ?? this.{{name}};
+      {{/isModel}}
     {{/isContainer}}
   {{/vars}}
     return copy;

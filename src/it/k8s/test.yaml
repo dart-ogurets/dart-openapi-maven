@@ -4,6 +4,56 @@ info:
   description: Sample API for test case for k8s
   version: "1.1.1"
 paths:
+  /event/upcoming:
+    post:
+      tags:
+        - ControlService
+      description: "Get the list of upcoming events"
+      operationId: upcomingEvents
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                secret:
+                  type: string
+                params:
+                  $ref: '#/components/schemas/EventRequest'
+            encoding:
+              params:
+                contentType: application/json
+      responses:
+        "200":
+          description: "upcoming events"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventResponse"
+#  /event/upcoming2:
+#    post:
+#      tags:
+#        - ControlService
+#      description: "Get the list of upcoming events"
+#      operationId: upcomingEvents2
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              oneOf:
+#                - $ref: '#/components/schemas/EventRequest'
+#                - $ref: '#/components/schemas/EventResponse'
+#      responses:
+#        "200":
+#          description: "upcoming events"
+#          content:
+#            application/yaml:
+#              schema:
+#                $ref: "#/components/schemas/EventResponse"
   /hello:
     get:
       tags:
@@ -28,6 +78,44 @@ paths:
                 $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
 components:
   schemas:
+    EventRequest:
+      properties:
+        user_id:
+          type: string
+        enable_to_watch:
+          type: integer
+    EventResponse:
+      properties:
+        error:
+          type: integer
+        error_msg:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+    Event:
+      properties:
+        status:
+          $ref: "#/components/schemas/EventStatus"
+        id:
+          type: string
+        title:
+          type: string
+        img:
+          type: string
+        imageUrl:
+          type: string
+    EventStatus:
+      type: string
+      enum:
+        - STREAMING
+        - ALLOCATING
+        - ALLOCATED
+        - CLOSING
+        - CLOSED
+        - PENDING
+        - ARCHIVING
     "com.bluetrainsoftware.AddProps1":
       properties:
         extra:
@@ -37,6 +125,12 @@ components:
               type: string
             type: array
           description: "used extensively in k8s api and generates weird code"
+        yet_other_things:
+          type: object
+          additionalProperties:
+            items:
+              type: integer
+            type: array
         dependencies:
           type: object
           additionalProperties:
@@ -87,6 +181,24 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/SecondJsonType"
+        yetMoreAdditional:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        mapWithComplexObject:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/Event"
+        mapWithEnums:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/EventStatus"
     "com.bluetrain-software.AddProps4":
       properties:
         extra:

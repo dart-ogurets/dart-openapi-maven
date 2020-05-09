@@ -1,11 +1,12 @@
 part of {{pubName}}.api;
 
-class LocalApiClient implements DeserializeDelegate {
+
+
+class LocalApiClient implements QueryParamHelper {
 
   final _regList = RegExp(r'^List<(.*)>$');
   final _regMap = RegExp(r'^Map<String,(.*)>$');
 
-  @override
   dynamic serialize(Object value) {
     try {
       if (value == null) {
@@ -42,8 +43,22 @@ class LocalApiClient implements DeserializeDelegate {
     }
   }
 
-  @override
+  dynamic deserializeFromString(String json, String targetType) {
+    if (json == null) { // HTTP Code 204
+      return null;
+    }
+
+    // Remove all spaces.  Necessary for reg expressions as well.
+    targetType = targetType.replaceAll(' ', '');
+
+    if (targetType == 'String') return json;
+
+    var decodedJson = jsonDecode(json);
+    return deserialize(decodedJson, targetType);
+  }
+
   dynamic deserialize(dynamic value, String targetType) {
+    if (value == null) return null; // 204
     try {
       switch (targetType) {
         case 'String':
@@ -86,9 +101,16 @@ class LocalApiClient implements DeserializeDelegate {
     throw ApiException(500, 'Could not find a suitable class for deserialization');
   }
 
+
    /// Format the given parameter object into string.
   @override
   String parameterToString(dynamic value) {
+    if (value == null) {
+      return '';
+    } else if (value is DateTime) {
+      return value.toUtc().toIso8601String();
+    }
+
     {{#models}}
       {{#model}}
         {{#isEnum}}
@@ -104,6 +126,6 @@ class LocalApiClient implements DeserializeDelegate {
       {{/model}}
     {{/models}}
 
-    return null;
+    return value.toString();
   }
 }
