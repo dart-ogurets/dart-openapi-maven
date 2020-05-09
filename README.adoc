@@ -52,12 +52,12 @@ To use it, do something like this:
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>4.0.0</version>
+        <version>4.3.0</version>
         <dependencies>
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>2.8</version>
+            <version>3.1</version>
           </dependency>
         </dependencies>
         <executions>
@@ -70,7 +70,7 @@ To use it, do something like this:
             <configuration>
               <output>${project.basedir}</output>
               <inputSpec>${project.basedir}/target/mrapi/mr-api.yaml</inputSpec>
-              <language>dart2-api</language>
+              <generatorName>dart2-api</generatorName>
               <enablePostProcessFile>true</enablePostProcessFile>
             </configuration>
           </execution>
