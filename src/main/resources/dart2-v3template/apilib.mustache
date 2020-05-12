@@ -6,9 +6,17 @@ import 'package:dio/dio.dart';
 import 'package:openapi_dart_common/openapi.dart';
 import 'package:collection/collection.dart';
 
+{{#x-dart-imports}}
+import '{{{.}}}';
+{{/x-dart-imports}}
+
 part 'api_client.dart';
 
 {{#apiInfo}}{{#apis}}part 'api/{{classFilename}}.dart';
 {{/apis}}{{/apiInfo}}
 {{#models}}{{#model}}part 'model/{{classFilename}}.dart';
 {{/model}}{{/models}}
+
+{{#x-dart-parts}}
+part '{{{.}}}';
+{{/x-dart-parts}}

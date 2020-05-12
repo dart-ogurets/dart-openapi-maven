@@ -71,11 +71,19 @@
               <!-- https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json -->
               <inputSpec>${project.basedir}/test.yaml</inputSpec>
 <!--              <inputSpec>${project.basedir}/swagger.json</inputSpec>-->
-              <language>dart2-api</language>
+              <generatorName>dart2-api</generatorName>
+              <typeMappings>int-or-string=IntOrString</typeMappings>
+              <importMappings>IntOrString=./int_or_string.dart</importMappings>
               <enablePostProcessFile>true</enablePostProcessFile>
               <additionalProperties>
                 <additionalProperty>
                   pubName=k8s_api
+                </additionalProperty>
+                <additionalProperty><![CDATA[
+                  pubspec-dependencies=path: '>=1.7.0 <2.0.0',rxdart: 0.24.0]]>
+                </additionalProperty>
+                <additionalProperty>
+                  pubspec-dev-dependencies=uuid: 2.0.4
                 </additionalProperty>
               </additionalProperties>
             </configuration>

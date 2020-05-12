@@ -290,14 +290,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{#complexType}}
         {
         var newVal;
-        final fld = this.{{name}};
+        final v = this.{{name}};
         {{#items}}
-          {{#enumName}}
-            newVal = fld?.map((e) => {{enumName}}TypeTransformer.copyWith(e))?.toList();
-          {{/enumName}}
-          {{^enumName}}
-            newVal = fld?.map((e) => e.copyWith())?.toList();
-          {{/enumName}}
+          newVal = {{>list-copy-with}};
         {{/items}}
         copy.{{name}} = newVal;
         }

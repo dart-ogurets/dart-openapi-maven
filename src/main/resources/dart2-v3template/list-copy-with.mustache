@@ -6,6 +6,16 @@
     []..addAll(v)
   {{/enumName}}
   {{^enumName}}
-    []..addAll(v.map((y) => y.copyWith()).toList())
+    {{#isDateTime}}
+      []..addAll(v)
+    {{/isDateTime}}
+    {{^isDateTime}}
+      {{#isDate}}
+        []..addAll(v)
+      {{/isDate}}
+      {{^isDate}}
+        []..addAll(v.map((y) => y.copyWith()).toList())
+      {{/isDate}}
+    {{/isDateTime}}
   {{/enumName}}
 {{/isModel}}

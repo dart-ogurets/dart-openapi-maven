@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +67,43 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     this.supportingFiles.add(new SupportingFile("pubspec.mustache", "", "pubspec.yaml"));
     this.supportingFiles.add(new SupportingFile("api_client.mustache", libFolder, "api_client.dart"));
     this.supportingFiles.add(new SupportingFile("apilib.mustache", libFolder, "api.dart"));
+  }
+
+  /**
+   * People because they are able to include custom mappings, may need to include 3rd party libraries in their pubspec.
+   */
+  private void processPubspecMappings() {
+    deps("pubspec-dependencies", "x-dart-deps");
+    deps("pubspec-dev-dependencies", "x-dart-devdeps");
+  }
+
+  private void deps(String addnPropertiesTag, String vendorPrefix) {
+    String depsKey = (String)additionalProperties.get(addnPropertiesTag);
+    List<String> deps = new ArrayList<>();
+    additionalProperties.put(vendorPrefix, deps);
+    if (depsKey != null) {
+      Arrays.stream(depsKey.split(",")).map(String::trim).filter(s -> !s.isEmpty()).forEach(deps::add);
+    }
+  }
+
+  /**
+   * Because Dart is generating a library, some of the files may be included in the Maven project to be local libs and
+   * thus need to have a "part" reference. Others will need to be imported.
+   */
+  private void processImportMappings() {
+    List<String> partImports = new ArrayList<>(); // if they have included them locally, no "package" names
+    List<String> dartImports = new ArrayList<>();
+
+    additionalProperties.put("x-dart-imports", dartImports);
+    additionalProperties.put("x-dart-parts", partImports);
+
+    importMapping.forEach((key, value) -> {
+      if (!value.startsWith("package:")) {
+        partImports.add(value);
+      } else {
+        dartImports.add(value);
+      }
+    });
   }
 
   // don't just add stuff to the end of the name willy nilly, check it is a reserved word first
@@ -192,6 +231,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   // system
   @Override
   public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
+    processImportMappings();
+    processPubspecMappings();
+
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
     return som;
   }

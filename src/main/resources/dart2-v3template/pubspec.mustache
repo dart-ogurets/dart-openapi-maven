@@ -6,6 +6,12 @@ environment:
 dependencies:
   dio: '>=3.0.3 <4.0.0'
   openapi_dart_common: ^3.0.1
+  {{#x-dart-deps}}
+  {{{.}}}
+  {{/x-dart-deps}}
 collection: ^1.14.11
 dev_dependencies:
   test: ^1.3.0
+{{#x-dart-devdeps}}
+  {{{.}}}
+{{/x-dart-devdeps}}

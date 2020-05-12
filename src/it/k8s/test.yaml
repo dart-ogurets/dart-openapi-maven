@@ -90,6 +90,33 @@ components:
           type: integer
         error_msg:
           type: string
+        listofNumbers:
+          type: array
+          items:
+            type: number
+        listOfIntegers:
+          type: array
+          items:
+            type: integer
+        listOfIntString:
+          type: array
+          items:
+            type: string
+            format: int-or-string
+        dateEventsHappen:
+          type: array
+          items:
+            type: string
+            format: date
+        whenEventsHappen:
+          type: array
+          items:
+            type: string
+            format: date-time
+        eventStatuses:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventStatus"
         events:
           type: array
           items:
