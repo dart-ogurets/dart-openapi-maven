@@ -58,7 +58,7 @@ To use it, do something like this:
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>3.1</version>
+            <version>3.2</version>
           </dependency>
         </dependencies>
         <executions>
@@ -127,6 +127,15 @@ definition. For example
 This will note anything that has `format: int-or-string` and map this to the class IntOrString and there will be an
 extra `part` import for it added to the library main. You must write this class to have the expected criteria from
 the rest of the library but it does allow you to support custom types. Again, an example of this is in `src/it`.
+
+If you use something like this instead:
+----
+<typeMappings>int-or-string=IntOrString</typeMappings>
+<importMappings>IntOrString=package:k8s-dart/int_or_string.dart</importMappings>
+----
+
+Then it will add it to the `import` section of your library allowing
+you to use external libraries.
 
 ==== Using dependencies to pull in apis from other artifacts
 
