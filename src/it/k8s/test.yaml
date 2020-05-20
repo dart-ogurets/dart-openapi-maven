@@ -33,6 +33,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventResponse"
+  /event/getstatus:
+    post:
+      tags:
+        - ControlService
+      description: "get individual event"
+      operationId: getEvent
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                secret:
+                  type: string
+                params:
+                  $ref: '#/components/schemas/UniqueEventRequest'
+            encoding:
+              params:
+                contentType: application/json
+      responses:
+        "200":
+          description: "individual event status"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
 #  /event/upcoming2:
 #    post:
 #      tags:
@@ -249,4 +278,13 @@ components:
         code:
           type: integer
         text:
+          type: string
+    UniqueEventRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/UniqueEvent"
+    UniqueEvent:
+      type: object
+      properties:
+        unique_url:
           type: string

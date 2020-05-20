@@ -22,7 +22,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     this.json = rawValue;
   }
 
-  dynamic toJson(LocalApiClient serializer) {
+  dynamic toJson() {
     return json;
   }
 {{/hasVars}}
@@ -173,7 +173,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     fromJson(json); // allows child classes to call
   }
 
-  Map<String, dynamic> toJson(LocalApiClient serializer) {
+  Map<String, dynamic> toJson() {
 
     final json = <String, dynamic>{};
     {{#vars}}
@@ -189,7 +189,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isDate}}
       {{^isDateTime}}
       {{^isDate}}
-        json[r'{{baseName}}'] = serializer.serialize({{name}});
+        json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
       {{/isDate}}
       {{/isDateTime}}
         {{^isNullable}}

@@ -2,12 +2,12 @@ part of {{pubName}}.api;
 
 
 
-class LocalApiClient implements QueryParamHelper {
+class LocalApiClient {
 
-  final _regList = RegExp(r'^List<(.*)>$');
-  final _regMap = RegExp(r'^Map<String,(.*)>$');
+  static final _regList = RegExp(r'^List<(.*)>$');
+  static final _regMap = RegExp(r'^Map<String,(.*)>$');
 
-  dynamic serialize(Object value) {
+  static dynamic serialize(Object value) {
     try {
       if (value == null) {
         return null;
@@ -32,7 +32,7 @@ class LocalApiClient implements QueryParamHelper {
             return {{classname}}TypeTransformer.toJson(value);
           {{/isEnum}}
           {{^isEnum}}
-            return value.toJson(this);
+            return value.toJson();
           {{/isEnum}}
           }
         {{/model}}
@@ -43,7 +43,7 @@ class LocalApiClient implements QueryParamHelper {
     }
   }
 
-  dynamic deserializeFromString(String json, String targetType) {
+  static dynamic deserializeFromString(String json, String targetType) {
     if (json == null) { // HTTP Code 204
       return null;
     }
@@ -57,7 +57,7 @@ class LocalApiClient implements QueryParamHelper {
     return deserialize(decodedJson, targetType);
   }
 
-  dynamic deserialize(dynamic value, String targetType) {
+  static dynamic deserialize(dynamic value, String targetType) {
     if (value == null) return null; // 204
     try {
       switch (targetType) {
@@ -103,12 +103,13 @@ class LocalApiClient implements QueryParamHelper {
 
 
    /// Format the given parameter object into string.
-  @override
-  String parameterToString(dynamic value) {
+  static String parameterToString(dynamic value) {
     if (value == null) {
       return '';
     } else if (value is DateTime) {
       return value.toUtc().toIso8601String();
+    } else if (value is String) {
+      return value.toString();
     }
 
     {{#models}}
@@ -118,14 +119,9 @@ class LocalApiClient implements QueryParamHelper {
       return {{classname}}TypeTransformer.toJson(value).toString();
     }
         {{/isEnum}}
-        {{^isEnum}}
-    if (value is {{classname}}) {
-      return jsonEncode(value.toJson(this));
-    }
-        {{/isEnum}}
       {{/model}}
     {{/models}}
 
-    return value.toString();
+    return jsonEncode(value);
   }
 }
