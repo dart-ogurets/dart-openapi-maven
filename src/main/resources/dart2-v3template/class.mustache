@@ -290,9 +290,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{#complexType}}
         {
         var newVal;
-        final v = this.{{name}};
+        final v = {{name}} ?? this.{{name}};
         {{#items}}
-          newVal = {{>list-copy-with}};
+          newVal = <{{{complexType}}}>{{>list-copy-with}};
         {{/items}}
         copy.{{name}} = newVal;
         }
@@ -306,7 +306,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{#isContainer}}
           {
           var newVal;
-          final fld = this.{{name}};
+          final fld = {{name}} ?? this.{{name}};
           {{#items}}
             {{#enumName}}
               newVal = fld?.map((k, v) => MapEntry(k, v));

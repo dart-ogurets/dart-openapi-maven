@@ -10,6 +10,7 @@ paths:
         - ControlService
       description: "Get the list of upcoming events"
       operationId: upcomingEvents
+      x-dart-rich-operationId: upcomingEventsTest
       requestBody:
         required: true
         content:
@@ -87,6 +88,7 @@ paths:
     get:
       tags:
         - TestService
+      operationId: helloOp
       responses:
         "200":
           description: "Resulting weird api"
@@ -98,6 +100,8 @@ paths:
     get:
       tags:
         - TestService
+      operationId: helloOp2
+      x-dart-rich-operationId: helloOp2Extended
       responses:
         "200":
           description: "Resulting weird api"

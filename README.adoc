@@ -23,6 +23,12 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 3.3 - introduces feedback from Jpi & Brian Janssen around making all the LocalApi serializer calls static, so `toJson()`
+can be called by jsonEncode without introducing non-Dart-like complexity. Further, we introduce an experimental vendor
+extension on an operation called `x-dart-rich-operationId` - this has to be another operation id, not the same as `operationId:`
+as Dart cannot have two functions with different return types. It will give you the same method signature, but return the
+deserialized object, the headers and the status code. It does not intefere with the existing code generation and was introduced
+to allow situations where session data is being returned outside of the body. It will be documented further once accepted.
 - 3.2 - introduces support for extra elements in the pubspec, import support, arbitrary part support and a fix for arrays of date times and dates
 - 3.1 - introduces support for the Kubernetes API in terms of compilation along with a considerable degree of support for the
 complexity of that API. It also reduces the code generated when no forms are used or forms are used but not json. It also supports
@@ -58,7 +64,7 @@ To use it, do something like this:
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>3.2</version>
+            <version>3.3</version>
           </dependency>
         </dependencies>
         <executions>
