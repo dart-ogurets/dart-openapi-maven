@@ -73,7 +73,7 @@
 					<filtering>false</filtering>
 					<tiles>
             <!-- its a good tile -->
-            <tile>cd.connect.tiles:tile-java:[1.2, 2)</tile>
+            <tile>cd.connect.tiles:tile-java:[1.3, 2)</tile>
 					</tiles>
 				</configuration>
 			</plugin>
