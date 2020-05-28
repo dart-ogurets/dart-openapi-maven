@@ -143,7 +143,8 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{/items}}
       {{/isMapContainer}}
       {{^isMapContainer}}
-      {{complexType}}.fromJson(_jsonData);
+        {{#vendorExtensions.x-dart-dynamic}}_jsonData;{{/vendorExtensions.x-dart-dynamic}}
+        {{^vendorExtensions.x-dart-dynamic}}{{complexType}}.fromJson(_jsonData);{{/vendorExtensions.x-dart-dynamic}}
       {{/isMapContainer}}
       {{/isListContainer}}
     {{/complexType}}
@@ -292,7 +293,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         var newVal;
         final v = {{name}} ?? this.{{name}};
         {{#items}}
-          newVal = <{{{complexType}}}>{{>list-copy-with}};
+          newVal = <{{^vendorExtensions.x-dart-dynamic}}{{{complexType}}}{{/vendorExtensions.x-dart-dynamic}}{{#vendorExtensions.x-dart-dynamic}}dynamic{{/vendorExtensions.x-dart-dynamic}}>{{>list-copy-with}};
         {{/items}}
         copy.{{name}} = newVal;
         }

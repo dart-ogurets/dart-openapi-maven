@@ -292,3 +292,35 @@ components:
       properties:
         unique_url:
           type: string
+    EnumsTest:
+      type: array
+      items:
+        $ref: "#/components/schemas/JSONType"
+    SampleObject:
+      type: object
+      properties:
+        enums:
+          $ref: "#/components/schemas/EnumsTest"
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps":
+      description: "JSONSchemaProps is a JSON-Schema following Specification Draft 4 (http://json-schema.org/)."
+      properties:
+        "$ref":
+          type: string
+        "$schema":
+          type: string
+        default:
+          $ref: "#/components/schemas/JSONType"
+        enum:
+          items:
+            $ref: "#/components/schemas/JSONType"
+          type: array
+        example:
+          $ref: "#/components/schemas/JSONType"
+    EnumsObjectTest:
+      type: object
+      properties:
+        enums:
+          type: array
+          items:
+            $ref: "#/components/schemas/JSONType"
+

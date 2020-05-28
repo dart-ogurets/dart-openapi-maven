@@ -193,6 +193,28 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
                   cp.items.items.vendorExtensions.put("x-dart-isenum", Boolean.TRUE);
                 }
               }
+
+              if (cp.isListContainer && cp.getComplexType() != null) {
+                if ("dynamic".equals(cp.complexType)) {
+                  cp.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
+                  if (cp.items != null) {
+                    // it seems to have a bug in the openapi parser where it doesn't put it at the right level (dynamic)
+                    cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
+                  }
+                }
+              }
+
+              if (cp.isListContainer && cp.items != null) {
+                if ("dynamic".equals(cp.items.complexType)) {
+                  cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
+                }
+                if (cp.items.allowableValues != null && cp.items.allowableValues.size() > 0) {
+                  cp.items.vendorExtensions.put("x-dart-isenum", Boolean.TRUE);
+                }
+                if ("DateTime".equals(cp.items.complexType)) {
+                  cp.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
+                }
+              }
             });
           }
         });

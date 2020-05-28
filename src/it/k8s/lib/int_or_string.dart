@@ -9,4 +9,8 @@ class IntOrString {
         .map((e) => IntOrString()..value = e.toString())
         .toList();
   }
+
+  static IntOrString fromJson(dynamic json) {
+    return IntOrString()..value = json != null ? json.toString() : null;
+  }
 }
