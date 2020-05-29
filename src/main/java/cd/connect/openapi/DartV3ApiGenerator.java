@@ -257,6 +257,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     processPubspecMappings();
 
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
+    final List<CodegenOperation> ops = (List<CodegenOperation>) ((Map<String, Object>) objs.get("operations")).get("operation");
+    for(CodegenOperation co : ops) {
+      final Object richOp = co.vendorExtensions.get("x-dart-rich-operationId");
+      if (richOp != null) {
+        co.vendorExtensions.put("x-dart-extension-name", toVarName(richOp.toString()));
+      }
+    }
     return som;
   }
 

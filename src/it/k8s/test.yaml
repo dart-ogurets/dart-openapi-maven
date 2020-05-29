@@ -9,8 +9,8 @@ paths:
       tags:
         - ControlService
       description: "Get the list of upcoming events"
-      operationId: upcomingEvents
-      x-dart-rich-operationId: upcomingEventsTest
+      operationId: upcoming-events
+      x-dart-rich-operationId: upcoming-events-test
       requestBody:
         required: true
         content:
