@@ -1,20 +1,20 @@
 {{^isModel}}
-  []..addAll(v)
+  []..addAll((v ?? []))
 {{/isModel}}
 {{#isModel}}
   {{#enumName}}
-    []..addAll(v)
+    []..addAll((v ?? []))
   {{/enumName}}
   {{^enumName}}
     {{#isDateTime}}
-      []..addAll(v)
+      []..addAll((v ?? []))
     {{/isDateTime}}
     {{^isDateTime}}
       {{#isDate}}
-        []..addAll(v)
+        []..addAll((v ?? []))
       {{/isDate}}
       {{^isDate}}
-        []..addAll(v.map((y) => y.copyWith()).toList())
+        []..addAll((v ?? []).map((y) => y.copyWith()).toList())
       {{/isDate}}
     {{/isDateTime}}
   {{/enumName}}
