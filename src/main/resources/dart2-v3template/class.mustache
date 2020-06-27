@@ -1,11 +1,13 @@
 // {{name}}
 class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#vars}}
-  {{#description}}/* {{{description}}} */{{/description}}
-  {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
-  {{#allowableValues}}
-  {{#min}} // range from {{min}} to {{max}}{{/min}}//{{^min}}enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };{{/min}}{
-  {{/allowableValues}}
+   {{^vendorExtensions.x-dart-inherited}}
+     {{#description}}/* {{{description}}} */{{/description}}
+     {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+     {{#allowableValues}}
+       {{#min}} // range from {{min}} to {{max}}{{/min}}//{{^min}}enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };{{/min}}{
+     {{/allowableValues}}
+   {{/vendorExtensions.x-dart-inherited}}
   {{/vars}}
 {{^hasVars}}
    dynamic json;

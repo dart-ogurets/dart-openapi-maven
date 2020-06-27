@@ -279,7 +279,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   @Override
-  protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
+    protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
     //super.addAdditionPropertiesToCodeGenModel(codegenModel, schema);
     codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(schema));
     addImport(codegenModel, codegenModel.additionalPropertiesType);
