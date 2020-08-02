@@ -1,15 +1,21 @@
 name: {{pubName}}
 version: {{pubVersion}}
 description: {{pubDescription}}
+{{#pubRepository}}
+repository: {{{.}}}
+{{/pubRepository}}
+{{#pubHomepage}}
+homepage: {{{.}}}
+{{/pubHomepage}}
 environment:
   sdk: '>=2.7.0 <3.0.0'
 dependencies:
   dio: '>=3.0.3 <4.0.0'
   openapi_dart_common: ^3.1.0
+  collection: ^1.14.11
   {{#x-dart-deps}}
   {{{.}}}
   {{/x-dart-deps}}
-collection: ^1.14.11
 dev_dependencies:
   test: ^1.3.0
 {{#x-dart-devdeps}}
