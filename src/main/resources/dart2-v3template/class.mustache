@@ -413,7 +413,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
             {{/allowableValues}} };
 
             String toJson() => toMap[this];
-            static InlineEnum_opType_Enum fromJson(String key) => fromMap[key];
+            static {{classname}}_{{name}}_Enum fromJson(String key) => fromMap[key];
           }
         {{/allowableValues}}
       {{/min}}
