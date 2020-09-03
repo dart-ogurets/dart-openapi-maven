@@ -334,12 +334,12 @@ components:
         opType:
           type: string
           enum:
+          - less_or_equal
+          - greater^equal
+          - not=equal
+          - greater-than
           - lessThan
-          - greaterThan
-          - lessOrEqual
-          - greaterOrEqual
           - equal
-          - notEqual
           - matches
       uniqueItems: false
 

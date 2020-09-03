@@ -182,7 +182,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{^complexType}}
       {{#allowableValues}}
         {{^min}}
-          {{classname}}_{{name}}_EnumExtension.fromString(_jsonData);
+          {{classname}}_{{name}}_EnumExtension.fromJson(_jsonData);
         {{/min}}
       {{/allowableValues}}
     {{/complexType}}
@@ -214,7 +214,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{^complexType}}
           {{#allowableValues}}
             {{^min}}
-              json[r'{{baseName}}'] = LocalApiClient.serialize({{name}}.toValue());
+              json[r'{{baseName}}'] = LocalApiClient.serialize({{name}}.toJson());
             {{/min}}
             {{#min}}
               json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
@@ -396,21 +396,27 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#vars}}
   {{^vendorExtensions.x-dart-inherited}}
     {{^complexType}}
-      {{#allowableValues}}
-        {{^min}}
-// Inline used enum: {{classname}} {{name}}
-enum {{classname}}_{{name}}_Enum { {{#values}} {{.}}, {{/values}} }
+      {{^min}}
+        {{#allowableValues}}
+           // Inline used enum: {{classname}} {{name}}
+          enum {{classname}}_{{name}}_Enum { {{#enumVars}}{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}} }
 
-extension {{classname}}_{{name}}_EnumExtension on {{classname}}_{{name}}_Enum {
-  String toValue() => this.toString().split('.').last;
+          extension {{classname}}_{{name}}_EnumExtension on {{classname}}_{{name}}_Enum {
 
-  static {{classname}}_{{name}}_Enum fromString(String key) => {{classname}}_{{name}}_Enum.values.firstWhere(
-    (v) => v != null && key == v.toValue(),
-    orElse: () => null,
-  );
-}
-        {{/min}}
-      {{/allowableValues}}
+            static Map<String, {{classname}}_{{name}}_Enum> fromMap = {
+            {{#allowableValues}}
+              {{#enumVars}}{{{value}}}:{{#vars}}{{#allowableValues}}{{classname}}_{{{name}}}{{/allowableValues}}{{/vars}}_Enum.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
+            {{/allowableValues}} };
+            static Map<{{classname}}_{{name}}_Enum, String> toMap = {
+            {{#allowableValues}}
+              {{#enumVars}}{{#vars}}{{#allowableValues}}{{classname}}_{{{name}}}{{/allowableValues}}{{/vars}}_Enum.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
+            {{/allowableValues}} };
+
+            String toJson() => toMap[this];
+            static InlineEnum_opType_Enum fromJson(String key) => fromMap[key];
+          }
+        {{/allowableValues}}
+      {{/min}}
     {{/complexType}}
   {{/vendorExtensions.x-dart-inherited}}
 {{/vars}}

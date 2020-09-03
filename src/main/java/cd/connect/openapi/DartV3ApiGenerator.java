@@ -114,7 +114,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public String toVarName(String name) {
-    name = name.replaceAll("-", "_").replaceAll("\\$", "__");
+    name = name.replaceAll("-", "_")
+      .replaceAll("\\$", "__")
+      .replaceAll("\\^", "__")
+      .replaceAll("\\=", "__");
 
     if (name.matches("^[A-Z_]*$")) {
       return name;
@@ -322,7 +325,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       "int".equalsIgnoreCase(datatype)) {
       var = "Number" + var;
     }
-    return escapeReservedWord(var);
+    return toVarName(escapeReservedWord(var));
   }
 
 //  Map<String, String> modelNameCache = new HashMap<>();
