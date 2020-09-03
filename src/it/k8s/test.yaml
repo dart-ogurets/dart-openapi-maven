@@ -327,6 +327,7 @@ components:
       type: object
       required:
         - opType
+        - operation
         - value
       properties:
         value:
@@ -334,13 +335,18 @@ components:
         opType:
           type: string
           enum:
-          - less_or_equal
-          - greater^equal
-          - not=equal
-          - greater-than
-          - lessThan
-          - equal
-          - matches
+            - less_or_equal
+            - greater^equal
+            - not=equal
+            - greater-than
+            - lessThan
+            - equal
+            - matches
+        comparison:
+          type: string
+          enum:
+            - square
+            - logarithmic
       uniqueItems: false
 
 

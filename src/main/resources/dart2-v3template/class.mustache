@@ -11,7 +11,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{#min}} // range from {{min}} to {{max}}
           {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
         {{/min}}
-        {{classname}}_{{name}}_Enum {{name}}{{#defaultValue}} = {{classname}}_{{name}}_Enum.{{{defaultValue}}}{{/defaultValue}};
+        {{classname}}{{nameInCamelCase}}Enum {{name}}{{#defaultValue}} = {{classname}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
       {{/complexType}}
       {{#complexType}}
         {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
@@ -182,7 +182,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{^complexType}}
       {{#allowableValues}}
         {{^min}}
-          {{classname}}_{{name}}_EnumExtension.fromJson(_jsonData);
+          {{classname}}{{nameInCamelCase}}EnumExtension.fromJson(_jsonData);
         {{/min}}
       {{/allowableValues}}
     {{/complexType}}
@@ -319,7 +319,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
          {{^complexType}}
            {{#allowableValues}}
              {{^min}}
-               {{classname}}_{{name}}_Enum {{name}},
+               {{classname}}{{nameInCamelCase}}Enum {{name}},
              {{/min}}
              {{#min}}
                {{{dataType}}} {{name}},
@@ -399,21 +399,21 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{^min}}
         {{#allowableValues}}
            // Inline used enum: {{classname}} {{name}}
-          enum {{classname}}_{{name}}_Enum { {{#enumVars}}{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}} }
+          enum {{classname}}{{nameInCamelCase}}Enum { {{#enumVars}}{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}} }
 
-          extension {{classname}}_{{name}}_EnumExtension on {{classname}}_{{name}}_Enum {
+          extension {{classname}}{{nameInCamelCase}}EnumExtension on {{classname}}{{nameInCamelCase}}Enum {
 
-            static Map<String, {{classname}}_{{name}}_Enum> fromMap = {
+            static Map<String, {{classname}}{{nameInCamelCase}}Enum> fromMap = {
             {{#allowableValues}}
-              {{#enumVars}}{{{value}}}:{{#vars}}{{#allowableValues}}{{classname}}_{{{name}}}{{/allowableValues}}{{/vars}}_Enum.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
+              {{#enumVars}}{{{value}}}:{{classname}}{{{nameInCamelCase}}}Enum.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
             {{/allowableValues}} };
-            static Map<{{classname}}_{{name}}_Enum, String> toMap = {
+            static Map<{{classname}}{{nameInCamelCase}}Enum, String> toMap = {
             {{#allowableValues}}
-              {{#enumVars}}{{#vars}}{{#allowableValues}}{{classname}}_{{{name}}}{{/allowableValues}}{{/vars}}_Enum.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
+              {{#enumVars}}{{classname}}{{{nameInCamelCase}}}Enum.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
             {{/allowableValues}} };
 
             String toJson() => toMap[this];
-            static {{classname}}_{{name}}_Enum fromJson(String key) => fromMap[key];
+            static {{classname}}{{nameInCamelCase}}Enum fromJson(String key) => fromMap[key];
           }
         {{/allowableValues}}
       {{/min}}
