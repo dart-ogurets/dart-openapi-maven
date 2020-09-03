@@ -178,22 +178,15 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{/isDate}}
   {{/isDateTime}}
   {{/allowableValues}}
-    {{^vendorExtensions.x-dart-inherited}}
-      {{^complexType}}
-        {{#allowableValues}}
-          {{^min}}
-            null;
-            if (_jsonData != null) {
-              for ({{classname}}_{{name}}_Enum element in {{classname}}_{{name}}_Enum.values) {
-                if (element.toString() == _jsonData) {
-                  {{name}} = element;
-                }
-              }
-            }
-          {{/min}}
-        {{/allowableValues}}
-      {{/complexType}}
-    {{/vendorExtensions.x-dart-inherited}}
+  {{^vendorExtensions.x-dart-inherited}}
+    {{^complexType}}
+      {{#allowableValues}}
+        {{^min}}
+          {{classname}}_{{name}}_EnumExtension.fromString(_jsonData);
+        {{/min}}
+      {{/allowableValues}}
+    {{/complexType}}
+  {{/vendorExtensions.x-dart-inherited}}
     } // _jsonFieldName
 {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   }
@@ -218,7 +211,16 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isDate}}
       {{^isDateTime}}
       {{^isDate}}
-        json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+        {{^complexType}}
+          {{#allowableValues}}
+            {{^min}}
+              json[r'{{baseName}}'] = LocalApiClient.serialize({{name}}.toValue());
+            {{/min}}
+          {{/allowableValues}}
+          {{^allowableValues}}
+            json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+          {{/allowableValues}}
+        {{/complexType}}
       {{/isDate}}
       {{/isDateTime}}
         {{^isNullable}}
@@ -390,8 +392,17 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{^complexType}}
       {{#allowableValues}}
         {{^min}}
+// Inline used enum: {{classname}} {{name}}
+enum {{classname}}_{{name}}_Enum { {{#values}} {{.}}, {{/values}} }
 
-          enum {{classname}}_{{name}}_Enum { {{#values}} {{.}}, {{/values}} }
+extension {{classname}}_{{name}}_EnumExtension on {{classname}}_{{name}}_Enum {
+  String toValue() => this.toString().split('.').last;
+
+  static {{classname}}_{{name}}_Enum fromString(String key) => {{classname}}_{{name}}_Enum.values.firstWhere(
+    (v) => v != null && key == v.toValue(),
+    orElse: () => null,
+  );
+}
         {{/min}}
       {{/allowableValues}}
     {{/complexType}}
