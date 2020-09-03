@@ -216,10 +216,16 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
             {{^min}}
               json[r'{{baseName}}'] = LocalApiClient.serialize({{name}}.toValue());
             {{/min}}
+            {{#min}}
+              json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+            {{/min}}
           {{/allowableValues}}
           {{^allowableValues}}
             json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
           {{/allowableValues}}
+        {{/complexType}}
+        {{#complexType}}
+          json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
         {{/complexType}}
       {{/isDate}}
       {{/isDateTime}}
