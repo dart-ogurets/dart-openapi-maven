@@ -1,18 +1,28 @@
 // {{name}}
 class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
-  {{#vars}}
-   {{^vendorExtensions.x-dart-inherited}}
-     {{#description}}/* {{{description}}} */{{/description}}
-     {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
-     {{#allowableValues}}
-       {{#min}} // range from {{min}} to {{max}}{{/min}}//{{^min}}enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };{{/min}}{
-     {{/allowableValues}}
-   {{/vendorExtensions.x-dart-inherited}}
-  {{/vars}}
+{{#vars}}
+  {{^vendorExtensions.x-dart-inherited}}
+    {{#description}}/* {{{description}}} */{{/description}}
+    {{^allowableValues}}
+      {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+    {{/allowableValues}}
+    {{#allowableValues}}
+      {{^complexType}}
+        {{#min}} // range from {{min}} to {{max}}
+          {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+        {{/min}}
+        {{classname}}{{nameInCamelCase}}Enum {{name}}{{#defaultValue}} = {{classname}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
+      {{/complexType}}
+      {{#complexType}}
+        {{{dataType}}} {{name}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+      {{/complexType}}
+    {{/allowableValues}}
+  {{/vendorExtensions.x-dart-inherited}}
+{{/vars}}
 {{^hasVars}}
-   dynamic json;
+  dynamic json;
 {{/hasVars}}
-  {{classname}}();
+{{classname}}();
 
   @override
   String toString() {
@@ -168,6 +178,15 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{/isDate}}
   {{/isDateTime}}
   {{/allowableValues}}
+  {{^vendorExtensions.x-dart-inherited}}
+    {{^complexType}}
+      {{#allowableValues}}
+        {{^min}}
+          {{classname}}{{nameInCamelCase}}EnumExtension.fromJson(_jsonData);
+        {{/min}}
+      {{/allowableValues}}
+    {{/complexType}}
+  {{/vendorExtensions.x-dart-inherited}}
     } // _jsonFieldName
 {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   }
@@ -192,7 +211,22 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isDate}}
       {{^isDateTime}}
       {{^isDate}}
-        json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+        {{^complexType}}
+          {{#allowableValues}}
+            {{^min}}
+              json[r'{{baseName}}'] = LocalApiClient.serialize({{name}}.toJson());
+            {{/min}}
+            {{#min}}
+              json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+            {{/min}}
+          {{/allowableValues}}
+          {{^allowableValues}}
+            json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+          {{/allowableValues}}
+        {{/complexType}}
+        {{#complexType}}
+          json[r'{{baseName}}'] = LocalApiClient.serialize({{name}});
+        {{/complexType}}
       {{/isDate}}
       {{/isDateTime}}
         {{^isNullable}}
@@ -281,8 +315,28 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
   {{classname}} copyWith({{#hasVars}}{
      {{#vars}}
-       {{{dataType}}} {{name}},
-       {{/vars}}
+       {{^vendorExtensions.x-dart-inherited}}
+         {{^complexType}}
+           {{#allowableValues}}
+             {{^min}}
+               {{classname}}{{nameInCamelCase}}Enum {{name}},
+             {{/min}}
+             {{#min}}
+               {{{dataType}}} {{name}},
+             {{/min}}
+           {{/allowableValues}}
+           {{^allowableValues}}
+             {{{dataType}}} {{name}},
+           {{/allowableValues}}
+         {{/complexType}}
+         {{#complexType}}
+           {{{dataType}}} {{name}},
+         {{/complexType}}
+       {{/vendorExtensions.x-dart-inherited}}
+       {{#vendorExtensions.x-dart-inherited}}
+         {{{dataType}}} {{name}},
+       {{/vendorExtensions.x-dart-inherited}}
+     {{/vars}}
     }{{/hasVars}}) {
     {{classname}} copy = {{classname}}();
   {{#vars}}
@@ -338,3 +392,31 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     return copy;
   }
 }
+
+  {{#vars}}
+  {{^vendorExtensions.x-dart-inherited}}
+    {{^complexType}}
+      {{^min}}
+        {{#allowableValues}}
+           // Inline used enum: {{classname}} {{name}}
+          enum {{classname}}{{nameInCamelCase}}Enum { {{#enumVars}}{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}} }
+
+          extension {{classname}}{{nameInCamelCase}}EnumExtension on {{classname}}{{nameInCamelCase}}Enum {
+
+            static Map<String, {{classname}}{{nameInCamelCase}}Enum> fromMap = {
+            {{#allowableValues}}
+              {{#enumVars}}{{{value}}}:{{classname}}{{{nameInCamelCase}}}Enum.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
+            {{/allowableValues}} };
+            static Map<{{classname}}{{nameInCamelCase}}Enum, String> toMap = {
+            {{#allowableValues}}
+              {{#enumVars}}{{classname}}{{{nameInCamelCase}}}Enum.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
+            {{/allowableValues}} };
+
+            String toJson() => toMap[this];
+            static {{classname}}{{nameInCamelCase}}Enum fromJson(String key) => fromMap[key];
+          }
+        {{/allowableValues}}
+      {{/min}}
+    {{/complexType}}
+  {{/vendorExtensions.x-dart-inherited}}
+{{/vars}}

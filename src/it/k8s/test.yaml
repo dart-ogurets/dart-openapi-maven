@@ -323,4 +323,30 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/JSONType"
+    InlineEnum:
+      type: object
+      required:
+        - opType
+        - operation
+        - value
+      properties:
+        value:
+          type: string
+        opType:
+          type: string
+          enum:
+            - less_or_equal
+            - greater^equal
+            - not=equal
+            - greater-than
+            - lessThan
+            - equal
+            - matches
+        comparison:
+          type: string
+          enum:
+            - square
+            - logarithmic
+      uniqueItems: false
+
 
