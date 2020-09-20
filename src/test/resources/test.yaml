@@ -1,0 +1,352 @@
+openapi: 3.0.1
+info:
+  title: test api
+  description: Sample API for test case for k8s
+  version: "1.1.1"
+paths:
+  /event/upcoming:
+    post:
+      tags:
+        - ControlService
+      description: "Get the list of upcoming events"
+      operationId: upcoming-events
+      x-dart-rich-operationId: upcoming-events-test
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                secret:
+                  type: string
+                params:
+                  $ref: '#/components/schemas/EventRequest'
+            encoding:
+              params:
+                contentType: application/json
+      responses:
+        "200":
+          description: "upcoming events"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventResponse"
+  /event/getstatus:
+    post:
+      tags:
+        - ControlService
+      description: "get individual event"
+      operationId: getEvent
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                secret:
+                  type: string
+                params:
+                  $ref: '#/components/schemas/UniqueEventRequest'
+            encoding:
+              params:
+                contentType: application/json
+      responses:
+        "200":
+          description: "individual event status"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+#  /event/upcoming2:
+#    post:
+#      tags:
+#        - ControlService
+#      description: "Get the list of upcoming events"
+#      operationId: upcomingEvents2
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              oneOf:
+#                - $ref: '#/components/schemas/EventRequest'
+#                - $ref: '#/components/schemas/EventResponse'
+#      responses:
+#        "200":
+#          description: "upcoming events"
+#          content:
+#            application/yaml:
+#              schema:
+#                $ref: "#/components/schemas/EventResponse"
+  /hello:
+    get:
+      tags:
+        - TestService
+      operationId: helloOp
+      responses:
+        "200":
+          description: "Resulting weird api"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/com.bluetrainsoftware.AddProps1"
+  /hello2:
+    get:
+      tags:
+        - TestService
+      operationId: helloOp2
+      x-dart-rich-operationId: helloOp2Extended
+      responses:
+        "200":
+          description: "Resulting weird api"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
+components:
+  schemas:
+    EventRequest:
+      properties:
+        user_id:
+          type: string
+        enable_to_watch:
+          type: integer
+    EventResponse:
+      properties:
+        error:
+          type: integer
+        error_msg:
+          type: string
+        listofNumbers:
+          type: array
+          items:
+            type: number
+        listOfIntegers:
+          type: array
+          items:
+            type: integer
+        listOfIntString:
+          type: array
+          items:
+            type: string
+            format: int-or-string
+        dateEventsHappen:
+          type: array
+          items:
+            type: string
+            format: date
+        whenEventsHappen:
+          type: array
+          items:
+            type: string
+            format: date-time
+        eventStatuses:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventStatus"
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+    Event:
+      properties:
+        status:
+          $ref: "#/components/schemas/EventStatus"
+        id:
+          type: string
+        title:
+          type: string
+        img:
+          type: string
+        imageUrl:
+          type: string
+    EventStatus:
+      type: string
+      enum:
+        - STREAMING
+        - ALLOCATING
+        - ALLOCATED
+        - CLOSING
+        - CLOSED
+        - PENDING
+        - ARCHIVING
+    "com.bluetrainsoftware.AddProps1":
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: "used extensively in k8s api and generates weird code"
+        yet_other_things:
+          type: object
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+        dependencies:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
+        groups:
+          type: array
+          description: "names groups this user is part of"
+          items:
+            type: string
+        name:
+          type: string
+        mess$age:
+          $ref: "#/components/schemas/Messages"
+        $justObjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/JSONType"
+        myIntegers:
+          type: array
+          items:
+            type: integer
+    "com.bluetrainsoftware.AddProps2":
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              code:
+                type: integer
+              text:
+                type: string
+    AddProps3:
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/TimeType"
+        dependencies:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/JSONType"
+        otherDeps:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/SecondJsonType"
+        yetMoreAdditional:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        mapWithComplexObject:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/Event"
+        mapWithEnums:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/EventStatus"
+    "com.bluetrain-software.AddProps4":
+      properties:
+        extra:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/TimeType"
+    JSONType:
+      description: "can be anything, no properties"
+    SecondJsonType:
+      description: "can be anything, no properties"
+    TimeType:
+      type: string
+      format: date-time
+    Messages:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Message'
+    Message:
+      type: object
+      properties:
+        code:
+          type: integer
+        text:
+          type: string
+    UniqueEventRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/UniqueEvent"
+    UniqueEvent:
+      type: object
+      properties:
+        unique_url:
+          type: string
+    EnumsTest:
+      type: array
+      items:
+        $ref: "#/components/schemas/JSONType"
+    SampleObject:
+      type: object
+      properties:
+        enums:
+          $ref: "#/components/schemas/EnumsTest"
+    "io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps":
+      description: "JSONSchemaProps is a JSON-Schema following Specification Draft 4 (http://json-schema.org/)."
+      properties:
+        "$ref":
+          type: string
+        "$schema":
+          type: string
+        default:
+          $ref: "#/components/schemas/JSONType"
+        enum:
+          items:
+            $ref: "#/components/schemas/JSONType"
+          type: array
+        example:
+          $ref: "#/components/schemas/JSONType"
+    EnumsObjectTest:
+      type: object
+      properties:
+        enums:
+          type: array
+          items:
+            $ref: "#/components/schemas/JSONType"
+    InlineEnum:
+      type: object
+      required:
+        - opType
+        - operation
+        - value
+      properties:
+        value:
+          type: string
+        opType:
+          type: string
+          enum:
+            - less_or_equal
+            - greater^equal
+            - not=equal
+            - greater-than
+            - lessThan
+            - equal
+            - matches
+        comparison:
+          type: string
+          enum:
+            - square
+            - logarithmic
+      uniqueItems: false
+
+

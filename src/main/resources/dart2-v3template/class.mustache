@@ -269,13 +269,20 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{/hasMore}}
         {{/isMapContainer}}
         {{^isMapContainer}}
-          {{name}} == other.{{name}}{{#hasMore}} &&
+          {{name}} == other.{{name}}{{#hasMore}} && // other
         {{/hasMore}}
         {{/isMapContainer}}
       {{/isListContainer}}
     {{/complexType}}{{^complexType}}
+    {{#isListContainer}}
+      const ListEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
+    {{/hasMore}}
+    {{/isListContainer}}
+    {{^isListContainer}}
      {{name}} == other.{{name}}{{#hasMore}} &&
-  {{/hasMore}}{{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}
+    {{/hasMore}}
+    {{/isListContainer}}
+  {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}
     {{#parent}} &&
     super==other{{/parent}};{{/hasVars}}{{^hasVars}}
     return {{#parent}}super==other{{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
@@ -306,7 +313,12 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isListContainer}}
     {{/complexType}}{{^complexType}}
     if ({{name}} != null) {
+      {{#isListContainer}}
+        hashCode = hashCode ^ const ListEquality().hash({{name}});
+      {{/isListContainer}}
+      {{^isListContainer}}
       hashCode = hashCode ^ {{name}}.hashCode;
+      {{/isListContainer}}
     }
 {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
 
