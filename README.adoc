@@ -12,6 +12,7 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 3.9 - support for reserved words mappings in variable names
 - 3.8 - non complex lists were not being compared in equals or hash functions correctly
 - 3.7 - resolved an issue with inline enums - thanks to Robert of https://github.com/BlackBeltTechnology
 - 3.5 - resolved an issue where class level variables were being duplicated from the parent, causing equals to fail
@@ -59,7 +60,7 @@ To use it, do something like this:
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>3.8</version>
+            <version>3.9</version>
           </dependency>
         </dependencies>
         <executions>
@@ -95,7 +96,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:3.7"
+		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:3.9"
 	}
 }
 ----
