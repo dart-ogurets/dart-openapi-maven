@@ -114,6 +114,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public String toVarName(String name) {
+    if (reservedWordsMappings.containsKey(name)) {
+      return reservedWordsMappings().get(name);
+    }
+
     name = name.replaceAll("-", "_")
       .replaceAll("\\$", "__")
       .replaceAll("\\^", "__")

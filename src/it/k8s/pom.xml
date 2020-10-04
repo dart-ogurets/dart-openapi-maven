@@ -73,6 +73,7 @@
 <!--              <inputSpec>${project.basedir}/swagger.json</inputSpec>-->
               <generatorName>dart2-api</generatorName>
               <typeMappings>int-or-string=IntOrString</typeMappings>
+              <reservedWordsMappings>user_id=myUserId</reservedWordsMappings>
               <importMappings>IntOrString=./int_or_string.dart</importMappings>
               <enablePostProcessFile>true</enablePostProcessFile>
               <additionalProperties>
