@@ -5,6 +5,17 @@ enum {{classname}} {
   {{/allowableValues}}
 }
 
+extension {{classname}}Extension on {{classname}} {
+  String get name {
+    return {{classname}}TypeTransformer.toJsonMap[this];
+  }
+
+  // you have to call this extension class to use this as this is not yet supported
+  static {{classname}} type(String name) {
+    return {{classname}}TypeTransformer.fromJsonMap[name];
+  }
+}
+
 class {{classname}}TypeTransformer {
   static Map<String, {{classname}}> fromJsonMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}

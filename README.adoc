@@ -12,6 +12,7 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 3.10 - support extension methods for mapping between enum names and types
 - 3.9 - support for reserved words mappings in variable names
 - 3.8 - non complex lists were not being compared in equals or hash functions correctly
 - 3.7 - resolved an issue with inline enums - thanks to Robert of https://github.com/BlackBeltTechnology
