@@ -67,12 +67,12 @@ To use it, do something like this:
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>4.3.0</version>
+        <version>5.0.0</version>
         <dependencies>
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>3.9</version>
+            <version>4.1</version>
           </dependency>
         </dependencies>
         <executions>
@@ -109,7 +109,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:3.9"
+		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:4.1"
 	}
 }
 ----
