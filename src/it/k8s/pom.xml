@@ -51,7 +51,7 @@
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>4.2.2</version>
+        <version>5.0.0</version>
         <dependencies>
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
@@ -87,6 +87,9 @@
                   pubspec-dev-dependencies=uuid: 2.0.4
                 </additionalProperty>
               </additionalProperties>
+              <globalProperties>
+                <skipFormModel>false</skipFormModel>
+              </globalProperties>
             </configuration>
           </execution>
         </executions>

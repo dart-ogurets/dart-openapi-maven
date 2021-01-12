@@ -12,7 +12,17 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
-- 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart.
+- 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart. Please note that
+  with the move to 4.1, form models are by default NOT generated, so your parameters for methods calling forms won't
+  work. You need to set a global property called `skipFormModels` to false. In Maven this is in the configuration
+
+[source,xml]
+----
+  <globalProperties>
+    <skipFormModels>false</skipFormModels>
+  </globalProperties>
+----
+
 - 3.10 - support extension methods for mapping between enum names and types
 - 3.9 - support for reserved words mappings in variable names
 - 3.8 - non complex lists were not being compared in equals or hash functions correctly
@@ -42,7 +52,6 @@ by user. Fix issue with form data generation where fields need to be json encode
 
 ==== Roadmap
 
-- Once 5.0 comes out we will support it with a new major revision. It has _breaking API changes_ and will *not* work now.
 - We intend to support the `oneOf` syntax for parameters for request and response types by using optional parameters. This
 won't change method calls when you are only passing one type.
 - We will start investigating how to support `anyOf` syntax. 
@@ -53,6 +62,7 @@ won't change method calls when you are only passing one type.
 
 To use it, do something like this:
 
+[source,xml]
 -----
       <plugin>
         <groupId>org.openapitools</groupId>
@@ -91,6 +101,7 @@ will run dartfmt on the generated files.
 In Gradle, you have to make this extra library available to the buildscript, so at the top of your file before
 your plugin declaration you need a section similar to:
 
+[source,groovy]
 ----
 buildscript {
 	repositories {
@@ -105,6 +116,7 @@ buildscript {
 
 from there in your openApiGenerator definitions, you specify the server format in additional properties:
 
+[source,groovy]
 ----
 openApiGenerate {
     generatorName = "dart2-api"
@@ -162,6 +174,7 @@ You may need to use additional files - just add them to the project or add them 
 `importMappings` section of the configuration to bring in any packages (internal or external) into the library
 definition. For example
 
+[source,xml]
 ----
 <typeMappings>int-or-string=IntOrString</typeMappings>
 <importMappings>IntOrString=./int_or_string.dart</importMappings>
@@ -172,6 +185,8 @@ extra `part` import for it added to the library main. You must write this class 
 the rest of the library but it does allow you to support custom types. Again, an example of this is in `src/it`.
 
 If you use something like this instead:
+
+[source,xml]
 ----
 <typeMappings>int-or-string=IntOrString</typeMappings>
 <importMappings>IntOrString=package:k8s-dart/int_or_string.dart</importMappings>
@@ -186,8 +201,9 @@ We typically use the Dependency Plugin to copy the actual OpenAPI yaml file from
 project - such as in this case "mr-api".
 
 NOTE: you can also customise this using my https://github.com/ClearPointNZ/connect-java/tree/master/maven-plugins/merge-yaml-plugin[MergeYaml plugin] if you wish to merge apis together. If often do this
-for testing purposes. 
+for testing purposes.
 
+[source,xml]
 ----
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -223,6 +239,7 @@ for testing purposes.
 And we include a custom Clean plugin definition to ensure old artifacts aren't left 
 behind as you generate.
 
+[source,xml]
 ----
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
