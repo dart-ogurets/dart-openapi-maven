@@ -12,6 +12,7 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart.
 - 3.10 - support extension methods for mapping between enum names and types
 - 3.9 - support for reserved words mappings in variable names
 - 3.8 - non complex lists were not being compared in equals or hash functions correctly

@@ -1,12 +1,12 @@
-{{#isListContainer}}
+{{#isArray}}
   {{#items}}
     {{>list-copy-with}}
   {{/items}}
   {{^items}}
     {{>list-copy-with}}
   {{/items}}
-{{/isListContainer}}
-{{#isMapContainer}}
+{{/isArray}}
+{{#isMap}}
   {{#isPrimitiveType}}
     v == null ? null : {}..addAll(v)
   {{/isPrimitiveType}}
@@ -30,7 +30,7 @@
     return newVal;
     }(v)
   {{/isPrimitiveType}}
-{{/isMapContainer}}
+{{/isMap}}
 {{^isContainer}}
   {{#isModel}}
     v?.copyWith()

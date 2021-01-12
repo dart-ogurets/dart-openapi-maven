@@ -225,6 +225,13 @@ components:
                 type: string
     AddProps3:
       properties:
+        discrim:
+          type: string
+        readings:
+          type: object
+          additionalProperties:
+            type: number
+            format: decimal
         extra:
           type: object
           additionalProperties:

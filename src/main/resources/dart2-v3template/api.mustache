@@ -17,9 +17,9 @@ class {{classname}} {
   {{^vendorExtensions.x-dart-produces-json}}
     {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future {{/returnType}}
   {{/vendorExtensions.x-dart-produces-json}}
-  {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
+  {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
 
-    final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
+    final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
     if(response.statusCode >= 400) {
       throw ApiException(response.statusCode, await decodeBodyBytes(response));
@@ -38,9 +38,9 @@ class {{classname}} {
     {{^vendorExtensions.x-dart-produces-json}}
         Future<ApiResponse>
     {{/vendorExtensions.x-dart-produces-json}}
-  {{vendorExtensions.x-dart-extension-name}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
+  {{vendorExtensions.x-dart-extension-name}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
 
-    final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
+    final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
     {{#vendorExtensions.x-dart-produces-json}}
       return ApiResponse()
@@ -64,7 +64,7 @@ class {{classname}} {
 
 {{#operation}}
     Future<ApiResponse>
-  {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
+  {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options options}{{/hasOptionalParams}}) async {
     Object postBody{{#bodyParam}} = {{paramName}}{{/bodyParam}};
 
     // verify required params are set
@@ -88,7 +88,7 @@ class {{classname}} {
       headerParams['Accept'] = 'application/json';
   {{/vendorExtensions.x-dart-produces-json}}
   {{^vendorExtensions.x-dart-produces-json}}
-    {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{#hasMore}},{{/hasMore}}{{/produces}}';{{/hasProduces}}
+    {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{^-last}},{{/-last}}{{/produces}}';{{/hasProduces}}
   {{/vendorExtensions.x-dart-produces-json}}
     }
 
@@ -105,11 +105,11 @@ class {{classname}} {
       headerParams['{{baseName}}'] = {{paramName}};
   {{/headerParams}}
 
-    final authNames = <String>[{{#authMethods}}'{{name}}'{{#hasMore}}, {{/hasMore}}{{/authMethods}}];
+    final authNames = <String>[{{#authMethods}}'{{name}}'{{^-last}}, {{/-last}}{{/authMethods}}];
     final opt = options ?? Options();
 
   {{#vendorExtensions.x-dart-consumes-json}}
-      final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{#hasMore}},{{/hasMore}}{{/consumes}}];
+      final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{^-last}},{{/-last}}{{/consumes}}];
 
       if (contentTypes.isNotEmpty && headerParams['Content-Type'] == null) {
       headerParams['Content-Type'] = contentTypes[0];
@@ -170,23 +170,23 @@ class {{classname}} {
   {{nickname}}_decode(ApiResponse response) async {
     if(response.body != null) {
   {{#vendorExtensions.x-dart-produces-json}}
-    {{#isListContainer}}
+    {{#isArray}}
       {{#returnType}}
           return (LocalApiClient.deserializeFromString(await decodeBodyBytes(response), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
       {{/returnType}}
-    {{/isListContainer}}
-    {{^isListContainer}}
-      {{#isMapContainer}}
+    {{/isArray}}
+    {{^isArray}}
+      {{#isMap}}
         {{#returnType}}
             return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await decodeBodyBytes(response), '{{{returnType}}}'));
         {{/returnType}};
-      {{/isMapContainer}}
-      {{^isMapContainer}}
+      {{/isMap}}
+      {{^isMap}}
         {{#returnType}}
             return LocalApiClient.deserializeFromString(await decodeBodyBytes(response), '{{{returnType}}}') as {{{returnType}}};
         {{/returnType}}
-      {{/isMapContainer}}
-    {{/isListContainer}}
+      {{/isMap}}
+    {{/isArray}}
   {{/vendorExtensions.x-dart-produces-json}}
   {{^vendorExtensions.x-dart-produces-json}}
       return await decodeBodyBytes(response);

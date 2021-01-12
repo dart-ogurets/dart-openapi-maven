@@ -49,17 +49,17 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{name}} = (_jsonData == null) ? null :
   {{#allowableValues}}
     {{#complexType}}
-    {{#isListContainer}}
+    {{#isArray}}
         {{complexType}}TypeTransformer.listFromJson(_jsonData);
-    {{/isListContainer}}
-    {{^isListContainer}}
-      {{#isMapContainer}}
+    {{/isArray}}
+    {{^isArray}}
+      {{#isMap}}
         {{complexType}}TypeTransformer.mapFromJson(_jsonData);
-      {{/isMapContainer}}
-      {{^isMapContainer}}
+      {{/isMap}}
+      {{^isMap}}
         {{complexType}}TypeTransformer.fromJson(_jsonData);
-      {{/isMapContainer}}
-    {{/isListContainer}}
+      {{/isMap}}
+    {{/isArray}}
     {{/complexType}}
 
   {{/allowableValues}}
@@ -73,7 +73,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^isDateTime}}
   {{^isDate}}
     {{#complexType}}
-      {{#isListContainer}}
+      {{#isArray}}
         {{#items}}
           {{#vendorExtensions.x-dart-dynamic}}
             (_jsonData as List)?.cast<{{{dataType}}}>();
@@ -97,12 +97,12 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         (_jsonData as List)?.cast<{{{dataType}}}>();
           {{/complexType}}
         {{/items}}
-      {{/isListContainer}}
-      {{^isListContainer}}
-      {{#isMapContainer}}
+      {{/isArray}}
+      {{^isArray}}
+      {{#isMap}}
         {{#items}}
           {{#complexType}}
-            {{#isListContainer}}
+            {{#isArray}}
         (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key, {{#items}}
           {{^vendorExtensions.x-dart-datetime}}
             {{#vendorExtensions.x-dart-dynamic}}value as List{{/vendorExtensions.x-dart-dynamic}}
@@ -118,12 +118,12 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
           {{#vendorExtensions.x-dart-datetime}}openApiDateTimeList(value)
           {{/vendorExtensions.x-dart-datetime}}
         {{/items}}));
-            {{/isListContainer}}
-            {{^isListContainer}}
-              {{#isMapContainer}}
+            {{/isArray}}
+            {{^isArray}}
+              {{#isMap}}
         null; // too complex?
-              {{/isMapContainer}}
-              {{^isMapContainer}}
+              {{/isMap}}
+              {{^isMap}}
         (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key,
         {{^vendorExtensions.x-dart-datetime}}
           {{#vendorExtensions.x-dart-dynamic}}value{{/vendorExtensions.x-dart-dynamic}}
@@ -131,49 +131,49 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{/vendorExtensions.x-dart-datetime}}
         {{#vendorExtensions.x-dart-datetime}}openApiDateTimeFromJson(value)
         {{/vendorExtensions.x-dart-datetime}}));
-              {{/isMapContainer}}
-            {{/isListContainer}}
+              {{/isMap}}
+            {{/isArray}}
           {{/complexType}}
           {{^complexType}}
-            {{#isListContainer}}
+            {{#isArray}}
         (_jsonData as Map).cast<String, dynamic>().map((String key, dynamic value) => MapEntry<String, {{{dataType}}}>(key,
         {{#vendorExtensions.x-dart-dynamic}}value as List{{/vendorExtensions.x-dart-dynamic}}
         {{^vendorExtensions.x-dart-dynamic}}(value as List)?.cast<{{{items.dataType}}}>(){{/vendorExtensions.x-dart-dynamic}}));
-            {{/isListContainer}}
-            {{^isListContainer}}
-              {{#isMapContainer}}
+            {{/isArray}}
+            {{^isArray}}
+              {{#isMap}}
         null; // map of maps?
-              {{/isMapContainer}}
-              {{^isMapContainer}}
+              {{/isMap}}
+              {{^isMap}}
         (_jsonData as Map).cast<String, dynamic>(); // h2
-              {{/isMapContainer}}
-            {{/isListContainer}}
+              {{/isMap}}
+            {{/isArray}}
           {{/complexType}}
         {{/items}}
         {{^items}}
         {{complexType}}.mapFromJson(_jsonData);
         {{/items}}
-      {{/isMapContainer}}
-      {{^isMapContainer}}
+      {{/isMap}}
+      {{^isMap}}
         {{#vendorExtensions.x-dart-dynamic}}_jsonData;{{/vendorExtensions.x-dart-dynamic}}
         {{^vendorExtensions.x-dart-dynamic}}{{complexType}}.fromJson(_jsonData);{{/vendorExtensions.x-dart-dynamic}}
-      {{/isMapContainer}}
-      {{/isListContainer}}
+      {{/isMap}}
+      {{/isArray}}
     {{/complexType}}
     {{^complexType}}
-      {{#isListContainer}}
+      {{#isArray}}
         {{#items}}
         (_jsonData as List)?.cast<{{datatype}}>();
         {{/items}}
-      {{/isListContainer}}
-      {{^isListContainer}}
-        {{#isMapContainer}}
+      {{/isArray}}
+      {{^isArray}}
+        {{#isMap}}
         (_jsonData as Map)?.cast<String, {{items.datatype}}>();
-        {{/isMapContainer}}
-        {{^isMapContainer}}
+        {{/isMap}}
+        {{^isMap}}
         _jsonData;
-        {{/isMapContainer}}
-      {{/isListContainer}}
+        {{/isMap}}
+      {{/isArray}}
     {{/complexType}}
   {{/isDate}}
   {{/isDateTime}}
@@ -259,29 +259,29 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#hasVars}}
     return {{^hasVars}}json?.equals(other.json);{{/hasVars}}{{#vars}}{{^vendorExtensions.x-dart-inherited}}
     {{#complexType}}
-      {{#isListContainer}}
-        const ListEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
-      {{/hasMore}}
-      {{/isListContainer}}
-      {{^isListContainer}}
-        {{#isMapContainer}}
-          const MapEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
-        {{/hasMore}}
-        {{/isMapContainer}}
-        {{^isMapContainer}}
-          {{name}} == other.{{name}}{{#hasMore}} && // other
-        {{/hasMore}}
-        {{/isMapContainer}}
-      {{/isListContainer}}
+      {{#isArray}}
+        const ListEquality().equals({{name}}, other.{{name}}){{^-last}} &&
+      {{/-last}}
+      {{/isArray}}
+      {{^isArray}}
+        {{#isMap}}
+          const MapEquality().equals({{name}}, other.{{name}}){{^-last}} &&
+        {{/-last}}
+        {{/isMap}}
+        {{^isMap}}
+          {{name}} == other.{{name}}{{^-last}} && // other
+        {{/-last}}
+        {{/isMap}}
+      {{/isArray}}
     {{/complexType}}{{^complexType}}
-    {{#isListContainer}}
-      const ListEquality().equals({{name}}, other.{{name}}){{#hasMore}} &&
-    {{/hasMore}}
-    {{/isListContainer}}
-    {{^isListContainer}}
-     {{name}} == other.{{name}}{{#hasMore}} &&
-    {{/hasMore}}
-    {{/isListContainer}}
+    {{#isArray}}
+      const ListEquality().equals({{name}}, other.{{name}}){{^-last}} &&
+    {{/-last}}
+    {{/isArray}}
+    {{^isArray}}
+     {{name}} == other.{{name}}{{^-last}} &&
+    {{/-last}}
+    {{/isArray}}
   {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}
     {{#parent}} &&
     super==other{{/parent}};{{/hasVars}}{{^hasVars}}
@@ -298,27 +298,27 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#hasVars}}
     {{#vars}}{{^vendorExtensions.x-dart-inherited}}
     {{#complexType}}
-      {{#isListContainer}}
+      {{#isArray}}
         hashCode = hashCode ^ const ListEquality().hash({{name}});
-      {{/isListContainer}}
-      {{^isListContainer}}
-        {{#isMapContainer}}
+      {{/isArray}}
+      {{^isArray}}
+        {{#isMap}}
             hashCode = hashCode ^ const MapEquality().hash({{name}});
-        {{/isMapContainer}}
-        {{^isMapContainer}}
+        {{/isMap}}
+        {{^isMap}}
             if ({{name}} != null) {
               hashCode = hashCode ^ {{name}}.hashCode;
             }
-        {{/isMapContainer}}
-      {{/isListContainer}}
+        {{/isMap}}
+      {{/isArray}}
     {{/complexType}}{{^complexType}}
     if ({{name}} != null) {
-      {{#isListContainer}}
+      {{#isArray}}
         hashCode = hashCode ^ const ListEquality().hash({{name}});
-      {{/isListContainer}}
-      {{^isListContainer}}
+      {{/isArray}}
+      {{^isArray}}
       hashCode = hashCode ^ {{name}}.hashCode;
-      {{/isListContainer}}
+      {{/isArray}}
     }
 {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
 
@@ -352,7 +352,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     }{{/hasVars}}) {
     {{classname}} copy = {{classname}}();
   {{#vars}}
-    {{#isListContainer}}
+    {{#isArray}}
       {{^complexType}}
         copy.{{name}} = {{name}} ?? []..addAll(this.{{name}});
       {{/complexType}}
@@ -361,14 +361,15 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         var newVal;
         final v = {{name}} ?? this.{{name}};
         {{#items}}
+          // here >> {{complexType}} <<
           newVal = <{{^vendorExtensions.x-dart-dynamic}}{{{complexType}}}{{/vendorExtensions.x-dart-dynamic}}{{#vendorExtensions.x-dart-dynamic}}dynamic{{/vendorExtensions.x-dart-dynamic}}>{{>list-copy-with}};
         {{/items}}
         copy.{{name}} = newVal;
         }
       {{/complexType}}
-    {{/isListContainer}}
-    {{#isMapContainer}}
-      {{#isPrimitiveType}}
+    {{/isArray}}
+    {{#isMap}}
+      {{^isPrimitiveType}}
         copy.{{name}} = {{name}} ?? (this.{{name}} == null ? {} : {}..addAll(this.{{name}}));
       {{/isPrimitiveType}}
       {{^isPrimitiveType}}
@@ -391,7 +392,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         copy.{{name}} = newVal;
         }
       {{/isPrimitiveType}}
-    {{/isMapContainer}}
+    {{/isMap}}
     {{^isContainer}}
       {{#isModel}}
         copy.{{name}} = {{name}} ?? this.{{name}}?.copyWith();

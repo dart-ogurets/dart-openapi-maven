@@ -16,4 +16,15 @@ public class SampleRunner {
       "--output", "target/" + getClass().getSimpleName())
       .toArray(new String[0]));
   }
+
+//  @Test
+//  public void runFH() {
+//    String location = "/Users/richard/projects/fh/featurehub/admin-frontend/app_mr_layer/final.yaml";
+//    OpenAPIGenerator.main(Arrays.asList("generate",
+//      "--input-spec", location,
+//      "--generator-name", "dart2-api",
+//      "--additional-properties", "pubName=mrapi",
+//      "--output", "/Users/richard/projects/fh/featurehub/admin-frontend/app_mr_layer")
+//      .toArray(new String[0]));
+//  }
 }

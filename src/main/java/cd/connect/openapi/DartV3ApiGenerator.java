@@ -45,12 +45,11 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public void processOpts() {
-    additionalProperties.put(SUPPORT_DART2, Boolean.TRUE);
-
     super.processOpts();
 
     // replace Object with dynamic
     this.typeMapping.put("object", "dynamic");
+    this.typeMapping.put("AnyType", "dynamic");
 
     // override the location
     embeddedTemplateDir = templateDir = DART2_TEMPLATE_FOLDER;
@@ -189,7 +188,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
                 cp.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
               }
 
-              if (cp.isMapContainer && cp.items != null && cp.items.items != null) {
+              if (cp.isMap && cp.items != null && cp.items.items != null) {
                 if ("DateTime".equals(cp.items.items.complexType)) {
                   cp.items.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
                 }
@@ -201,7 +200,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
                 }
               }
 
-              if (cp.isListContainer && cp.getComplexType() != null) {
+              if (cp.isArray && cp.getComplexType() != null) {
                 if ("dynamic".equals(cp.complexType)) {
                   cp.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
                   if (cp.items != null) {
@@ -211,7 +210,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
                 }
               }
 
-              if (cp.isListContainer && cp.items != null) {
+              if (cp.isArray && cp.items != null) {
                 if ("dynamic".equals(cp.items.complexType)) {
                   cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
                 }
@@ -288,7 +287,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   @Override
     protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
     //super.addAdditionPropertiesToCodeGenModel(codegenModel, schema);
-    codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(schema));
+    codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(openAPI, schema));
     addImport(codegenModel, codegenModel.additionalPropertiesType);
   }
 
