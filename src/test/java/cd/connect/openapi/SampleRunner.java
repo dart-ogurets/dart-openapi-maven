@@ -13,6 +13,7 @@ public class SampleRunner {
       "--input-spec", location,
       "--generator-name", "dart2-api",
       "--additional-properties", "pubName=sample_app",
+      "--global-property", "skipFormModel=false",
       "--output", "target/" + getClass().getSimpleName())
       .toArray(new String[0]));
   }
