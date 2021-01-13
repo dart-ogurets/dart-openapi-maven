@@ -51,6 +51,9 @@ paths:
                   type: string
                 secret:
                   type: string
+                date:
+                  type: string
+                  format: date
                 params:
                   $ref: '#/components/schemas/UniqueEventRequest'
             encoding:

@@ -207,7 +207,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       json[r'{{baseName}}'] = {{name}}.toUtc().toIso8601String();
       {{/isDateTime}}
       {{#isDate}}
-      json[r'{{baseName}}'] = {{name}}.toUtc().toIso8601String();
+      {{=<% %>=}}
+      json[r'<%baseName%>'] = "${<%name%>.year.toString()}-${<%name%>.month.toString().padLeft(2,'0')}-${<%name%>.day.toString().padLeft(2,'0')}";
+      <%={{ }}=%>
       {{/isDate}}
       {{^isDateTime}}
       {{^isDate}}
