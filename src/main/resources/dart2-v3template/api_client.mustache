@@ -29,7 +29,7 @@ class LocalApiClient {
         {{#model}}
           if (value is {{classname}}) {
           {{#isEnum}}
-            return {{classname}}TypeTransformer.toJson(value);
+            return {{classname}}.toJson(value);
           {{/isEnum}}
           {{^isEnum}}
             return value.toJson();
@@ -73,7 +73,7 @@ class LocalApiClient {
           {{#model}}
         case '{{classname}}':
             {{#isEnum}}
-              return {{classname}}TypeTransformer.fromJson(value);
+              return {{classname}}.fromJson(value);
             {{/isEnum}}
             {{^isEnum}}
           return {{classname}}.fromJson(value);
@@ -116,7 +116,7 @@ class LocalApiClient {
       {{#model}}
         {{#isEnum}}
     if (value is {{classname}}) {
-      return {{classname}}TypeTransformer.toJson(value).toString();
+      return {{classname}}.toJson(value).toString();
     }
         {{/isEnum}}
       {{/model}}

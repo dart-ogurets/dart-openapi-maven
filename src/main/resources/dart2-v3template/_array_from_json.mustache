@@ -1,0 +1,24 @@
+{{#items}}
+  {{#isArray}}
+    (data as List<dynamic>).map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
+  {{/isArray}}
+  {{#isMap}}
+    (data as List<dynamic>).map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
+  {{/isMap}}
+  {{^items}}
+    {{#isEnum}}
+      {{enumName}}Extension.listFromJson(data)
+    {{/isEnum}}
+    {{#isDateTime}}
+    {{/isDateTime}}
+    {{#isDate}}
+      openApiDateTimeList(data)
+    {{/isDate}}
+    {{#isModel}}
+      {{complexType}}.listFromJson(data)
+    {{/isModel}}
+    {{#isPrimitiveType}}
+      (data as List)?.cast<List<{{{dataType}}}>>()
+    {{/isPrimitiveType}}
+  {{/items}}
+{{/items}}

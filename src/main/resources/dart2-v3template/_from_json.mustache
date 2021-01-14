@@ -1,0 +1,23 @@
+{{#isArray}}
+  {{>_array_from_json}}
+{{/isArray}}
+{{#isMap}}
+  {{>_map_from_json}}
+{{/isMap}}
+{{^items}}
+  {{#isEnum}}
+    {{enumName}}Extension.fromJson(data)
+  {{/isEnum}}
+  {{#isDateTime}}
+    DateTime.parse(data)
+  {{/isDateTime}}
+  {{#isDate}}
+    DateTime.parse(data + 'T00:00:00.000Z')
+  {{/isDate}}
+  {{#isModel}}
+    {{{complexType}}}.fromJson(data)
+  {{/isModel}}
+  {{#isPrimitiveType}}
+    data as {{{dataType}}}
+  {{/isPrimitiveType}}
+{{/items}}

@@ -7,20 +7,18 @@ enum {{classname}} {
 
 extension {{classname}}Extension on {{classname}} {
   String get name {
-    return {{classname}}TypeTransformer.toJsonMap[this];
+    return toMap[this];
   }
 
   // you have to call this extension class to use this as this is not yet supported
   static {{classname}} type(String name) {
-    return {{classname}}TypeTransformer.fromJsonMap[name];
+    return fromMap[name];
   }
-}
 
-class {{classname}}TypeTransformer {
-  static Map<String, {{classname}}> fromJsonMap = {  {{#allowableValues}}
+  static Map<String, {{classname}}> fromMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
-  static Map<{{classname}}, String> toJsonMap = {  {{#allowableValues}}
+  static Map<{{classname}}, String> toMap = {  {{#allowableValues}}
   {{#enumVars}}{{classname}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
 
@@ -52,4 +50,5 @@ class {{classname}}TypeTransformer {
     return map;
   }
 }
+
 

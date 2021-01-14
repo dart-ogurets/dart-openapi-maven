@@ -1,0 +1,47 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "FooBar"
+  },
+  "host": "foo.bar.com",
+  "basePath": "/dev",
+  "tags": [
+
+  ],
+  "paths": {
+  },
+  "securityDefinitions": {
+  },
+  "definitions": {
+    "GeocodedWaypoint": {
+      "type": "object",
+      "properties": {
+        "geocoderStatus": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "ZERO_RESULTS"
+          ]
+        },
+        "partialMatch": {
+          "type": "boolean"
+        },
+        "placeId": {
+          "type": "string"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "STREET_ADDRESS",
+              "STREET_NUMBER"
+            ]
+          }
+        }
+      },
+      "title": "GeocodedWaypoint"
+    }
+  }
+}

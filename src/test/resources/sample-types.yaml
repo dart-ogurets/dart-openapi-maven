@@ -1,0 +1,162 @@
+openapi: 3.0.1
+info:
+  title: test api
+  description: Sample API for test case for k8s
+  version: "1.1.1"
+paths:
+  /hello:
+    get:
+      tags:
+        - TestService
+      operationId: helloOp
+      responses:
+        "200":
+          description: "Resulting weird api"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SampleTypes"
+components:
+  schemas:
+    ExternalEnum:
+      type: string
+      enum:
+        - enum1
+        - enum2
+    SimpleModel:
+      type: object
+      properties:
+        id:
+          type: string
+    SampleTypes:
+      type: object
+      properties:
+        numberField:
+          type: number
+        numerArrayField:
+          type: array
+          items:
+            type: number
+        numerArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+        dateField:
+          type: string
+          format: date
+        dateArrayField:
+          type: array
+          items:
+            type: date
+        dateArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              type: date
+        dateTimeField:
+          type: string
+          format: date-time
+        dateTimeArrayField:
+          type: array
+          items:
+            type: date-time
+        dateTimeArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              type: date-time
+        embeddedEnumField:
+          type: string
+          enum:
+            - enum1
+            - enum2
+        embeddedEnumArrayField:
+          type: array
+          items:
+            type: string
+            enum:
+              - enum1
+              - enum2
+        embeddedEnumArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+              enum:
+                - enum1
+                - enum2
+        externalEnumField:
+          $ref: "#/components/schemas/ExternalEnum"
+        externalEnumArrayField:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExternalEnum"
+        externalEnumArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/ExternalEnum"
+        stringField:
+          type: string
+        stringArrayField:
+          type: array
+          items:
+            type: string
+        stringArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        modelField:
+          $ref: "#/components/schemas/SimpleModel"
+        modelArrayField:
+          type: array
+          items:
+            $ref: "#/components/schemas/SimpleModel"
+        modelArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/SimpleModel"
+        anyField:
+          description: "field"
+        anyArrayField:
+          type: array
+          items:
+            description: "desc"
+        anyArrayArrayField:
+          type: array
+          items:
+            type: array
+            items:
+              description: "any array array"
+        mapOfArraysOfStrings:
+          type: object
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: "used extensively in k8s api and generates weird code"
+        fieldThatIsOnlyMap:
+          $ref: "#/components/schemas/ObjectThatIsOnlyMap"
+    ObjectThatIsOnlyMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ObjectTargetOfMap'
+    ObjectTargetOfMap:
+      type: object
+      properties:
+        code:
+          type: integer
+        text:
+          type: string
+
+

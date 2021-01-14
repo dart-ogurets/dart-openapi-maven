@@ -150,10 +150,41 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
   }
 
+  private void correctInternals(CodegenModel model, CodegenProperty cp) {
+    if ("DateTime".equals(cp.complexType)) {
+      cp.isDateTime = true;
+      cp.isDate = false;
+    }
+
+    if ("Date".equals(cp.complexType)) {
+      cp.isDate = true;
+      cp.isDateTime = false;
+    }
+
+    if ("dynamic".equals(cp.complexType)) {
+      cp.isAnyType = true;
+      cp.isPrimitiveType = true;
+    }
+
+    if (cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) {
+      // "internal" enums
+      if (cp.getMin() == null && cp.complexType == null) {
+        cp.enumName = model.classname + cp.nameInCamelCase + "Enum";
+      } else {
+        cp.enumName = cp.complexType;
+      }
+      cp.isEnum = true;
+      cp.isPrimitiveType = false;
+    }
+  }
+
   // for debugging inevitable weirdness in the model generated
   @Override
   public Map<String, Object> updateAllModels(Map<String, Object> objs) {
+    super.updateAllModels(objs);
+
     Map<String, CodegenModel> allModels = new HashMap<>();
+
 	  objs.values().forEach(o -> {
 	    Map<String, Object> modelData = (Map<String, Object>)o;
 	    List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
@@ -169,57 +200,11 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           cm.vendorExtensions.put("dartClassName", org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
           if (cm.vars != null) {
             cm.vars.forEach(cp -> {
-              if (cp.items != null && cp.items.allowableValues != null && cp.items.allowableValues.get("enumVars") != null) {
-                cp.items.enumName = cp.items.complexType;
-              }
-              if (cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) {
-                cp.enumName = cp.complexType;
-              }
-              if ("DateTime".equals(cp.complexType)) {
-                cp.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
-              }
-              if ("dynamic".equals(cp.complexType)) {
-                cp.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
-              }
-              if (cp.items != null && "dynamic".equals(cp.items.complexType)) {
-                cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
-              }
-              if (cp.items != null && "DateTime".equals(cp.items.complexType)) {
-                cp.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
-              }
+              CodegenProperty correctingSettings = cp;
 
-              if (cp.isMap && cp.items != null && cp.items.items != null) {
-                if ("DateTime".equals(cp.items.items.complexType)) {
-                  cp.items.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
-                }
-                if ("dynamic".equals(cp.items.items.complexType)) {
-                  cp.items.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
-                }
-                if (cp.items.items.allowableValues != null && cp.items.items.allowableValues.size() > 0) {
-                  cp.items.items.vendorExtensions.put("x-dart-isenum", Boolean.TRUE);
-                }
-              }
-
-              if (cp.isArray && cp.getComplexType() != null) {
-                if ("dynamic".equals(cp.complexType)) {
-                  cp.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
-                  if (cp.items != null) {
-                    // it seems to have a bug in the openapi parser where it doesn't put it at the right level (dynamic)
-                    cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
-                  }
-                }
-              }
-
-              if (cp.isArray && cp.items != null) {
-                if ("dynamic".equals(cp.items.complexType)) {
-                  cp.items.vendorExtensions.put("x-dart-dynamic", Boolean.TRUE);
-                }
-                if (cp.items.allowableValues != null && cp.items.allowableValues.size() > 0) {
-                  cp.items.vendorExtensions.put("x-dart-isenum", Boolean.TRUE);
-                }
-                if ("DateTime".equals(cp.items.complexType)) {
-                  cp.items.vendorExtensions.put("x-dart-datetime", Boolean.TRUE);
-                }
+              while (correctingSettings != null) {
+                correctInternals(cm, correctingSettings);
+                correctingSettings = correctingSettings.items;
               }
             });
           }
@@ -230,7 +215,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
 	  updateModelsWithAllOfInheritance(allModels);
 
-    return super.updateAllModels(objs);
+    return objs;
   }
 
   // TODO: check with multiple levels of hierarchy
