@@ -232,7 +232,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isDate}}
       {{/isDateTime}}
         {{^isNullable}}
-    }
+    } {{#vendorExtensions.generateNullValuesToJson}}else {
+          json[r'{{baseName}}'] = null;
+    }{{/vendorExtensions.generateNullValuesToJson}}
         {{/isNullable}}
       {{/vendorExtensions.x-dart-inherited}}
     {{/vars}}

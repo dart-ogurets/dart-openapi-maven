@@ -169,6 +169,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           cm.vendorExtensions.put("dartClassName", org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
           if (cm.vars != null) {
             cm.vars.forEach(cp -> {
+              cp.vendorExtensions.put("generateNullValuesToJson", Boolean.parseBoolean((String) additionalProperties.get("generateNullValuesToJson")));
               if (cp.items != null && cp.items.allowableValues != null && cp.items.allowableValues.get("enumVars") != null) {
                 cp.items.enumName = cp.items.complexType;
               }
