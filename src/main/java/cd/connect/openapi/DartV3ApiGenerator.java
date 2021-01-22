@@ -170,6 +170,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       // "internal" enums
       if (cp.getMin() == null && cp.complexType == null) {
         cp.enumName = model.classname + cp.nameInCamelCase + "Enum";
+        if (cp.isArray) {
+          cp.dataType = "List<" + cp.enumName + ">";
+        } else if (cp.isMap) {
+          cp.dataType = "Map<String, " + cp.enumName + ">";
+        } else {
+          cp.dataType = cp.enumName;
+        }
       } else {
         cp.enumName = cp.complexType;
       }

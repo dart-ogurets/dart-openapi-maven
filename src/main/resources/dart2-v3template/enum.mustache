@@ -6,14 +6,10 @@ enum {{classname}} {
 }
 
 extension {{classname}}Extension on {{classname}} {
-  String get name {
-    return toMap[this];
-  }
+  String get name => toMap[this];
 
   // you have to call this extension class to use this as this is not yet supported
-  static {{classname}} type(String name) {
-    return fromMap[name];
-  }
+  static {{classname}} type(String name) => fromMap[name];
 
   static Map<String, {{classname}}> fromMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
@@ -22,26 +18,14 @@ extension {{classname}}Extension on {{classname}} {
   {{#enumVars}}{{classname}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
 
-  static {{classname}} fromJson(dynamic data) {
-    if (data == null) return null;
-    var found = fromJsonMap[data];
-    if (found == null) {
-      throw('Unknown enum value to decode: $data');
-    }
-    return found;
-  }
+  static {{classname}} fromJson(dynamic data) => data == null ? null : fromMap[data];
 
-  static dynamic toJson({{classname}} data) {
-    return toJsonMap[data];
-  }
+  dynamic toJson() => toMap[this];
 
-  static List<{{classname}}> listFromJson(List<dynamic> json) {
-    return json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList();
-  }
+  static List<{{classname}}> listFromJson(List<dynamic> json) =>
+    json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList();
 
-  static {{classname}} copyWith({{classname}} instance) {
-    return instance;
-  }
+  static {{classname}} copyWith({{classname}} instance) => instance;
 
   static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
     final map = <String, {{classname}}>{};

@@ -19,7 +19,7 @@
       {{complexType}}.listFromJson(data)
     {{/isModel}}
     {{#isPrimitiveType}}
-      (data as List)?.cast<List<{{{dataType}}}>>()
+      data?.cast<List<{{{dataType}}}>>()
     {{/isPrimitiveType}}
   {{/items}}
 {{/items}}

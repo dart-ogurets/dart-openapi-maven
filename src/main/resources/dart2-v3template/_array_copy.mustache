@@ -19,7 +19,7 @@
      (data as List<{{complexType}}>).map((data) => data.copyWith()).toList()
     {{/isModel}}
     {{#isPrimitiveType}}
-      (data as List<{{{dataType}}}).toList()
+      (data as List<{{{dataType}}}>).toList()
     {{/isPrimitiveType}}
   {{/items}}
 {{/items}}

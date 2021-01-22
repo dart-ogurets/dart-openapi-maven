@@ -28,12 +28,7 @@ class LocalApiClient {
       {{#models}}
         {{#model}}
           if (value is {{classname}}) {
-          {{#isEnum}}
-            return {{classname}}.toJson(value);
-          {{/isEnum}}
-          {{^isEnum}}
             return value.toJson();
-          {{/isEnum}}
           }
         {{/model}}
       {{/models}}
@@ -73,7 +68,7 @@ class LocalApiClient {
           {{#model}}
         case '{{classname}}':
             {{#isEnum}}
-              return {{classname}}.fromJson(value);
+              return {{classname}}Extension.fromJson(value);
             {{/isEnum}}
             {{^isEnum}}
           return {{classname}}.fromJson(value);
@@ -116,7 +111,7 @@ class LocalApiClient {
       {{#model}}
         {{#isEnum}}
     if (value is {{classname}}) {
-      return {{classname}}.toJson(value).toString();
+      return (value as {{classname}}).toJson().toString();
     }
         {{/isEnum}}
       {{/model}}

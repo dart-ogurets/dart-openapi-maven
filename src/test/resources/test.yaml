@@ -111,6 +111,26 @@ paths:
                 $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
 components:
   schemas:
+    GeocodedWaypoint:
+      type: object
+      description: GeocodedWaypoint
+      properties:
+        geocoderStatus:
+          type: string
+          enum:
+            - OK
+            - ZERO_RESULTS
+        partialMatch:
+          type: boolean
+        placeId:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+            enum:
+              - STREET_ADDRESS
+              - STREET_NUMBER
     EventRequest:
       properties:
         user_id:
