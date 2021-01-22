@@ -63,27 +63,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Event"
-#  /event/upcoming2:
-#    post:
-#      tags:
-#        - ControlService
-#      description: "Get the list of upcoming events"
-#      operationId: upcomingEvents2
-#      requestBody:
-#        required: true
-#        content:
-#          application/json:
-#            schema:
-#              oneOf:
-#                - $ref: '#/components/schemas/EventRequest'
-#                - $ref: '#/components/schemas/EventResponse'
-#      responses:
-#        "200":
-#          description: "upcoming events"
-#          content:
-#            application/yaml:
-#              schema:
-#                $ref: "#/components/schemas/EventResponse"
+  #  /event/upcoming2:
+  #    post:
+  #      tags:
+  #        - ControlService
+  #      description: "Get the list of upcoming events"
+  #      operationId: upcomingEvents2
+  #      requestBody:
+  #        required: true
+  #        content:
+  #          application/json:
+  #            schema:
+  #              oneOf:
+  #                - $ref: '#/components/schemas/EventRequest'
+  #                - $ref: '#/components/schemas/EventResponse'
+  #      responses:
+  #        "200":
+  #          description: "upcoming events"
+  #          content:
+  #            application/yaml:
+  #              schema:
+  #                $ref: "#/components/schemas/EventResponse"
   /hello:
     get:
       tags:
@@ -111,6 +111,32 @@ paths:
                 $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
 components:
   schemas:
+    GeocodedWaypoint:
+      type: object
+      description: GeocodedWaypoint
+      properties:
+        geocoderStatus:
+          type: string
+          enum:
+            - OK
+            - ZERO_RESULTS
+        partialMatch:
+          type: boolean
+        placeId:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+            enum:
+              - STREET_ADDRESS
+              - STREET_NUMBER
+    HashTest:
+      properties:
+        fieldOne:
+          type: boolean
+        fieldTwo:
+          type: boolean
     EventRequest:
       properties:
         user_id:
@@ -225,6 +251,13 @@ components:
                 type: string
     AddProps3:
       properties:
+        discrim:
+          type: string
+        readings:
+          type: object
+          additionalProperties:
+            type: number
+            format: decimal
         extra:
           type: object
           additionalProperties:

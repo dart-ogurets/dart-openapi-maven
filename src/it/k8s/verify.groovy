@@ -28,5 +28,6 @@ def runCommand = { strList ->
 
 runCommand("pub get")
 runCommand("dartanalyzer lib")
+runCommand("pub run test test/api_tests.dart")
 
 //System.exit(0)
