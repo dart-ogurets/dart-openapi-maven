@@ -44,4 +44,58 @@ main() {
           ..fieldTwo = false;
         expect(false, ht.hashCode == ht1.hashCode);
       });
+
+  test('additional properties mappings', () {
+    const addProp = {
+      'discrim': 'fred',
+      'readings': {'one': 1, 'two': 2.3},
+      'dependencies': {
+        'deps1': ['a', 34.2, true],
+        'deps2': [17.8, false, 'b']
+      },
+      'otherDeps': {
+        'name': ['tom', 'dick', 'harry'],
+        'height': [1.7, 1.3, 1.4],
+        'info': 'this is top secret'
+      },
+      'yetMoreAdditional': {
+        'sList': ['a', 'b', 'c']
+      },
+      'mapWithComplexObject': {
+        'c1': [
+          {
+            'status': 'STREAMING',
+            'id': 'xx',
+            'title': 'Scully',
+            'img': 'img',
+            'imageUrl': 'http://blah'
+          }
+        ]
+      },
+      'mapWithEnums': {
+        "statuses": ['STREAMING', 'CLOSED']
+      },
+    };
+
+    var ap = AddProps3.fromJson(addProp);
+    expect(ap.discrim, 'fred');
+    expect(ap.readings.length, 2);
+    expect(ap.readings['one'], 1);
+    expect(ap.readings['two'], 2.3);
+    expect(ap.dependencies['deps1'], ['a', 34.2, true]);
+    expect(ap.dependencies['deps2'], [17.8, false, 'b']);
+    expect(ap.otherDeps['name'], ['tom', 'dick', 'harry']);
+    expect(ap.otherDeps['height'], [1.7, 1.3, 1.4]);
+    expect(ap.otherDeps['info'], 'this is top secret');
+    expect(ap.yetMoreAdditional['sList'], ['a', 'b', 'c']);
+    expect(
+        ap.mapWithComplexObject['c1'][0],
+        Event()
+          ..status = EventStatus.STREAMING
+          ..id = 'xx'
+          ..title = 'Scully'
+          ..img = 'img'
+          ..imageUrl = 'http://blah');
+    expect(ap.mapWithEnums['statuses'], [EventStatus.STREAMING, EventStatus.CLOSED]);
+  });
 }
