@@ -43,6 +43,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 		return "dart2 api generator. generates all classes and interfaces with jax-rs annotations with jersey2 extensions as necessary";
 	}
 
+	// we keep track of this for the serialiser/deserialiser
+	List<CodegenProperty> extraInternalEnumProperties = new ArrayList<>();
+
   @Override
   public void processOpts() {
     super.processOpts();
@@ -66,6 +69,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     this.supportingFiles.add(new SupportingFile("pubspec.mustache", "", "pubspec.yaml"));
     this.supportingFiles.add(new SupportingFile("api_client.mustache", libFolder, "api_client.dart"));
     this.supportingFiles.add(new SupportingFile("apilib.mustache", libFolder, "api.dart"));
+
+    this.additionalProperties.put("x-internal-enums", extraInternalEnumProperties);
   }
 
   /**
@@ -176,6 +181,11 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           cp.dataType = "Map<String, " + cp.enumName + ">";
         } else {
           cp.dataType = cp.enumName;
+        }
+
+        // we need to add this to the serialiser otherwise it will not correctly serialize
+        if (extraInternalEnumProperties.stream().noneMatch(p -> p.enumName.equals(cp.enumName))) {
+          extraInternalEnumProperties.add(cp);
         }
       } else {
         cp.enumName = cp.complexType;

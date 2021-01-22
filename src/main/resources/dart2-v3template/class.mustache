@@ -156,31 +156,18 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
   {{#hasVars}}
     {{#vars}}{{^vendorExtensions.x-dart-inherited}}
-      hashCode = hashCode ^ '{{{name}}}'.hashCode; // avoid order issues
-    {{#complexType}}
+      if ({{{name}}} != null) {
       {{#isArray}}
-        hashCode = hashCode ^ const ListEquality().hash({{{name}}});
+        hashCode = hashCode * 31 + const ListEquality().hash({{{name}}});
       {{/isArray}}
-      {{^isArray}}
-        {{#isMap}}
-            hashCode = hashCode ^ const MapEquality().hash({{{name}}});
-        {{/isMap}}
-        {{^isMap}}
-            if ({{{name}}} != null) {
-              hashCode = hashCode ^ {{{name}}}.hashCode;
-            }
-        {{/isMap}}
-      {{/isArray}}
-    {{/complexType}}{{^complexType}}
-    if ({{{name}}} != null) {
-      {{#isArray}}
-        hashCode = hashCode ^ const ListEquality().hash({{{name}}});
-      {{/isArray}}
-      {{^isArray}}
-      hashCode = hashCode ^ {{{name}}}.hashCode;
-      {{/isArray}}
+      {{#isMap}}
+        hashCode = hashCode * 31 + MapEquality().hash({{{name}}});
+      {{/isMap}}
+      {{^items}}
+        hashCode = hashCode * 31 + {{{name}}}.hashCode;
+      {{/items}}
     }
-{{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
+{{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
 
     return hashCode{{#parent}} ^ super.hashCode{{/parent}};
   }

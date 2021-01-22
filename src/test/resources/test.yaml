@@ -131,6 +131,12 @@ components:
             enum:
               - STREET_ADDRESS
               - STREET_NUMBER
+    HashTest:
+      properties:
+        fieldOne:
+          type: boolean
+        fieldTwo:
+          type: boolean
     EventRequest:
       properties:
         user_id:

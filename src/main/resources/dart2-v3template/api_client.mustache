@@ -32,7 +32,13 @@ class LocalApiClient {
           }
         {{/model}}
       {{/models}}
-        return value.toString();
+      {{#x-internal-enums}}
+        if (value is {{{enumName}}}) {
+           return value.toJson();
+        }
+      {{/x-internal-enums}}
+
+return value.toString();
     } on Exception catch (e, stack) {
       throw ApiException.withInner(500, 'Exception during deserialization.', e, stack);
     }
@@ -75,6 +81,10 @@ class LocalApiClient {
             {{/isEnum}}
           {{/model}}
         {{/models}}
+        {{#x-internal-enums}}
+          case '{{{enumName}}}':
+            return {{{enumName}}}Extension.fromJson(value);
+        {{/x-internal-enums}}
         default:
           {
             Match match;
@@ -111,7 +121,7 @@ class LocalApiClient {
       {{#model}}
         {{#isEnum}}
     if (value is {{classname}}) {
-      return (value as {{classname}}).toJson().toString();
+      return value.toJson().toString();
     }
         {{/isEnum}}
       {{/model}}
