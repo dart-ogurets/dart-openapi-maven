@@ -1,0 +1,25 @@
+{{#items}}
+  {{#isArray}}
+    (data as List).map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+  {{/isArray}}
+  {{#isMap}}
+      (data as List).map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+  {{/isMap}}
+  {{^items}}
+    {{#isEnum}}
+      (data as List<{{enumName}}>).toList()
+    {{/isEnum}}
+    {{#isDateTime}}
+      (data as List<DateTime>).toList()
+    {{/isDateTime}}
+    {{#isDate}}
+      (data as List<DateTime>).toList()
+    {{/isDate}}
+    {{#isModel}}
+     (data as List<{{complexType}}>).map((data) => data.copyWith()).toList()
+    {{/isModel}}
+    {{#isPrimitiveType}}
+      (data as List<{{{dataType}}}).toList()
+    {{/isPrimitiveType}}
+  {{/items}}
+{{/items}}

@@ -1,0 +1,15 @@
+{{#isEnum}}
+  this.{{{name}}}
+{{/isEnum}}
+{{#isDateTime}}
+ {{{name}}} == null ? {{{name}}}.add(Duration())
+{{/isDateTime}}
+{{#isDate}}
+ {{{name}}} == null ? {{{name}}}.add(Duration())
+{{/isDate}}
+{{#isModel}}
+  {{{name}}}?.copyWith()
+{{/isModel}}
+{{#isPrimitiveType}}
+  {{{name}}}
+{{/isPrimitiveType}}

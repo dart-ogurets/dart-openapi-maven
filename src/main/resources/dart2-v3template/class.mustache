@@ -186,80 +186,48 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
   {{classname}} copyWith({{#hasVars}}{
      {{#vars}}
+       {{#isArray}}
+         List<
+       {{/isArray}}
+       {{#isMap}}
+         Map<String,
+       {{/isMap}}
        {{^vendorExtensions.x-dart-inherited}}
          {{^complexType}}
            {{#allowableValues}}
              {{^min}}
-               {{classname}}{{nameInCamelCase}}Enum {{{name}}},
+               {{classname}}{{nameInCamelCase}}Enum
              {{/min}}
              {{#min}}
-               {{{dataType}}} {{{name}}},
+               {{{dataType}}}
              {{/min}}
            {{/allowableValues}}
            {{^allowableValues}}
-             {{{dataType}}} {{{name}}},
+             {{{dataType}}}
            {{/allowableValues}}
          {{/complexType}}
          {{#complexType}}
-           {{{dataType}}} {{{name}}},
+           {{{dataType}}}
          {{/complexType}}
        {{/vendorExtensions.x-dart-inherited}}
        {{#vendorExtensions.x-dart-inherited}}
-         {{{dataType}}} {{{name}}},
+         {{{dataType}}}
        {{/vendorExtensions.x-dart-inherited}}
+       {{#isArray}}
+         >
+       {{/isArray}}
+       {{#isMap}}
+         >
+       {{/isMap}}  {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
     {{classname}} copy = {{classname}}();
+  {{#vars}}{{^vendorExtensions.x-dart-inherited}}{{{name}}} ??= this.{{{name}}};
+  {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   {{#vars}}
-    {{#isArray}}
-      {{#items.isPrimitiveType}}
-        copy.{{{name}}} = {{{name}}} ?? []..addAll(this.{{{name}}});
-      {{/items.isPrimitiveType}}
-      {{^items.isPrimitiveType}}
-        {
-        var newVal;
-        final v = {{{name}}} ?? this.{{{name}}};
-        {{#items}}
-          newVal = <{{^vendorExtensions.x-dart-dynamic}}{{{complexType}}}{{/vendorExtensions.x-dart-dynamic}}{{#vendorExtensions.x-dart-dynamic}}dynamic{{/vendorExtensions.x-dart-dynamic}}>{{>list-copy-with}};
-        {{/items}}
-        copy.{{{name}}} = newVal;
-        }
-      {{/items.isPrimitiveType}}
-    {{/isArray}}
-    {{#isMap}}
-      {{^isPrimitiveType}}
-        copy.{{{name}}} = {{{name}}} ?? (this.{{{name}}} == null ? {} : {}..addAll(this.{{{name}}}));
-      {{/isPrimitiveType}}
-      {{^isPrimitiveType}}
-        {{#isContainer}}
-          {
-          var newVal;
-          final fld = {{{name}}} ?? this.{{{name}}};
-          {{#items}}
-            {{#enumName}}
-              newVal = fld?.map((k, v) => MapEntry(k, v));
-            {{/enumName}}
-            {{^enumName}}
-              newVal = fld?.map((k, v) => MapEntry(k, {{>copy-with}} )); // e1
-            {{/enumName}}
-          {{/items}}
-        {{/isContainer}}
-        {{^isContainer}}
-          newVal = fld?.map((k, v) => MapEntry(k, {{>copy-with}}));  // e2
-        {{/isContainer}}
-        copy.{{{name}}} = newVal;
-        }
-      {{/isPrimitiveType}}
-    {{/isMap}}
-    {{^isContainer}}
-      {{#isModel}}
-        copy.{{{name}}} = {{{name}}} ?? this.{{{name}}}?.copyWith();
-      {{/isModel}}
-      {{^isModel}}
-        copy.{{{name}}} = {{{name}}} ?? this.{{{name}}};
-      {{/isModel}}
-    {{/isContainer}}
-  {{/vars}}
+    {{^vendorExtensions.x-dart-inherited}}
+      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}copy.{{{name}}} = this.{{{name}}} = {{>_simple_copy}};{{/items}}
+    {{/vendorExtensions.x-dart-inherited}}{{/vars}}
     return copy;
   }
 }
@@ -284,7 +252,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
             {{/allowableValues}} };
 
             String toJson() => toMap[this];
-            static {{{enumName}}} fromJson(String key) => fromMap[key];
+            static {{{enumName}}} fromJson(String key) => key == null ? null : fromMap[key];
 
             static List<{{{enumName}}}> listFromJson(List<dynamic> json) {
               return json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList();

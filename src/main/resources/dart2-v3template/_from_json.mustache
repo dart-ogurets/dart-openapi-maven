@@ -9,13 +9,13 @@
     {{enumName}}Extension.fromJson(data)
   {{/isEnum}}
   {{#isDateTime}}
-    DateTime.parse(data)
+    data == null ? data : DateTime.parse(data)
   {{/isDateTime}}
   {{#isDate}}
-    DateTime.parse(data + 'T00:00:00.000Z')
+    data == null ? DateTime.parse(data + 'T00:00:00.000Z')
   {{/isDate}}
   {{#isModel}}
-    {{{complexType}}}.fromJson(data)
+    data == null ? null : {{{complexType}}}.fromJson(data)
   {{/isModel}}
   {{#isPrimitiveType}}
     data as {{{dataType}}}

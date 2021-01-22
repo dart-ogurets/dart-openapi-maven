@@ -1,0 +1,23 @@
+{{#isArray}}
+  {{>_array_copy}}
+{{/isArray}}
+{{#isMap}}
+  {{>_map_copy}}
+{{/isMap}}
+{{^items}}
+  {{#isEnum}}
+data
+  {{/isEnum}}
+  {{#isDateTime}}
+data == null ? null : data.add(Duration())
+  {{/isDateTime}}
+  {{#isDate}}
+data == null ? null : data.add(Duration())
+  {{/isDate}}
+  {{#isModel}}
+data == null ? null : data.copyWith()
+  {{/isModel}}
+  {{#isPrimitiveType}}
+data
+  {{/isPrimitiveType}}
+{{/items}}

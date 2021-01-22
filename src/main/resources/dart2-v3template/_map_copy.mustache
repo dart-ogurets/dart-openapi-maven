@@ -1,0 +1,25 @@
+{{#items}}
+  {{#isMap}}
+    (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
+  {{/isMap}}
+  {{#isArray}}
+    (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
+  {{/isArray}}
+  {{^items}}
+    {{#isEnum}}
+      (data as Map).cast<String, dynamic>().map((String key, {{{enumName}}} data) => MapEntry<String, {{{enumName}}}>(key, {{>_copy}} ))
+    {{/isEnum}}
+    {{#isDateTime}}
+      (data as Map).cast<String, dynamic>().map((String key, {{{complexType}}} data) => MapEntry<String, {{{complexType}}}>(key, {{>_copy}} ))
+    {{/isDateTime}}
+    {{#isDate}}
+      (data as Map).cast<String, dynamic>().map((String key, {{{complexType}}} data) => MapEntry<String, {{{complexType}}}>(key, {{>_copy}} ))
+    {{/isDate}}
+    {{#isModel}}
+      (data as Map).cast<String, dynamic>().map((String key, {{{complexType}}} data) => MapEntry<String, {{{complexType}}}>(key, {{>_copy}} ))
+    {{/isModel}}
+    {{#isPrimitiveType}}
+      (data as Map).cast<String, {{{dataType}}}>().map((String key, {{{dataType}}} data) => MapEntry<String, {{{dataType}}}>(key, data))
+    {{/isPrimitiveType}}
+  {{/items}}
+{{/items}}

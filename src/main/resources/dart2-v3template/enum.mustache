@@ -23,6 +23,7 @@ extension {{classname}}Extension on {{classname}} {
 {{/allowableValues}} };
 
   static {{classname}} fromJson(dynamic data) {
+    if (data == null) return null;
     var found = fromJsonMap[data];
     if (found == null) {
       throw('Unknown enum value to decode: $data');
