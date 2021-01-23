@@ -182,7 +182,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   {{#vars}}
     {{^vendorExtensions.x-dart-inherited}}
-      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}copy.{{{name}}} = this.{{{name}}} = {{>_simple_copy}};{{/items}}
+      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}copy.{{{name}}} = {{>_simple_copy}};{{/items}}
     {{/vendorExtensions.x-dart-inherited}}{{/vars}}
     return copy;
   }

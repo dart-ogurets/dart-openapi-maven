@@ -1,11 +1,11 @@
 {{#isEnum}}
-  this.{{{name}}}
+  {{{name}}}
 {{/isEnum}}
 {{#isDateTime}}
- {{{name}}} == null ? {{{name}}}.add(Duration())
+ {{{name}}}
 {{/isDateTime}}
 {{#isDate}}
- {{{name}}} == null ? {{{name}}}.add(Duration())
+ {{{name}}}
 {{/isDate}}
 {{#isModel}}
   {{{name}}}?.copyWith()

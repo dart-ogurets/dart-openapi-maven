@@ -277,13 +277,18 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public String toDefaultValue(Schema schema) {
-    final String s = super.toDefaultValue(schema);
-
-    if ("null".equals(s)) {
+    // default inherited one uses const, and we can't use that anymore as they are inmodifiable
+    if (ModelUtils.isMapSchema(schema)) {
+      return "{}";
+    } else if (ModelUtils.isArraySchema(schema)) {
+      return "[]";
+    } else if (schema.getDefault() != null) {
+      String s = ModelUtils.isStringSchema(schema) ? "'" + schema.getDefault().toString().replace("'", "\\'") + "'" :
+        schema.getDefault().toString();
+      return ("null".equals(s)) ? null : s;
+    } else {
       return null;
     }
-
-    return s;
   }
 
   @Override
