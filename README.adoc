@@ -12,6 +12,10 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 4.2 - if you directly use the Type Transformers for enums, this is a breaking change. They have changed to extensions
+and have been slightly remodeled based on Robert's inlining work. The whole deserialisation mechanism has changed particluarly
+for lists and maps because it wasn't able to cope more than one level deep with lists and maps (issue #19). The date
+format now serialises directly properly, but not in lists. 
 - 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart. Please note that
   with the move to 4.1, form models are by default NOT generated, so your parameters for methods calling forms won't
   work. You need to set a global property called `skipFormModels` to false. In Maven this is in the configuration
@@ -72,7 +76,7 @@ To use it, do something like this:
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>4.1</version>
+            <version>4.2</version>
           </dependency>
         </dependencies>
         <executions>
@@ -109,7 +113,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:4.1"
+		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:4.2"
 	}
 }
 ----
