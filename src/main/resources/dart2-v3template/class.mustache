@@ -76,7 +76,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
           json[r'{{baseName}}'] = {{{name}}}.toUtc().toIso8601String();
         {{/isDateTime}}
         {{#isDate}}
-          json[r'{{baseName}}'] = {{{name}}}.toUtc().toIso8601String();
+          json[r'{{baseName}}'] = {{{name}}}.toDateString();
         {{/isDate}}
         {{#isEnum}}
           json[r'{{baseName}}'] = {{{name}}}.toJson();
@@ -89,7 +89,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{/isPrimitiveType}}
       {{/items}}
       {{^isNullable}}
-    }
+    } {{#generateNullValuesToJson}}else {
+    json[r'{{baseName}}'] = null;
+    }{{/generateNullValuesToJson}}
         {{/isNullable}}
       {{/vendorExtensions.x-dart-inherited}}
     {{/vars}}

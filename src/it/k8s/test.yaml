@@ -143,6 +143,9 @@ components:
           type: string
         enable_to_watch:
           type: integer
+        dateField:
+          type: string
+          format: date
     EventResponse:
       properties:
         error:

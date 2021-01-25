@@ -156,14 +156,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   private void correctInternals(CodegenModel model, CodegenProperty cp) {
-    if ("DateTime".equals(cp.complexType)) {
-      cp.isDateTime = true;
-      cp.isDate = false;
-    }
-
-    if ("Date".equals(cp.complexType)) {
-      cp.isDate = true;
-      cp.isDateTime = false;
+    if ("DateTime".equals(cp.complexType) || "Date".equals(cp.complexType)) {
+      cp.isDateTime = "date-time".equals(cp.getDataFormat());
+      cp.isDate = "date".equals(cp.getDataFormat());
     }
 
     if ("dynamic".equals(cp.complexType)) {
