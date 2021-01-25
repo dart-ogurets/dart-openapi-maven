@@ -18,41 +18,41 @@ public class SampleRunner {
       .toArray(new String[0]));
   }
 
-  @Test
-  public void runExpedia() {
-    String location = getClass().getResource("/expedia.yaml").getFile();
-    OpenAPIGenerator.main(Arrays.asList("generate",
-      "--input-spec", location,
-      "--generator-name", "dart2-api",
-      "--additional-properties", "pubName=sample_app",
-      "--global-property", "skipFormModel=false",
-      "--output", "target/" + getClass().getSimpleName())
-      .toArray(new String[0]));
-  }
-
-  @Test
-  public void runIssue19() {
-    String location = getClass().getResource("/issue-19.json").getFile();
-    OpenAPIGenerator.main(Arrays.asList("generate",
-      "--input-spec", location,
-      "--generator-name", "dart2-api",
-      "--additional-properties", "pubName=sample_app",
-      "--global-property", "skipFormModel=false",
-      "--output", "target/" + getClass().getSimpleName())
-      .toArray(new String[0]));
-  }
-
-  @Test
-  public void runTypeCheck() {
-    String location = getClass().getResource("/sample-types.yaml").getFile();
-    OpenAPIGenerator.main(Arrays.asList("generate",
-      "--input-spec", location,
-      "--generator-name", "dart2-api",
-      "--additional-properties", "pubName=sample_app",
-      "--global-property", "skipFormModel=false",
-      "--output", "target/" + getClass().getSimpleName())
-      .toArray(new String[0]));
-  }
+//  @Test
+//  public void runExpedia() {
+//    String location = getClass().getResource("/expedia.yaml").getFile();
+//    OpenAPIGenerator.main(Arrays.asList("generate",
+//      "--input-spec", location,
+//      "--generator-name", "dart2-api",
+//      "--additional-properties", "pubName=sample_app",
+//      "--global-property", "skipFormModel=false",
+//      "--output", "target/" + getClass().getSimpleName())
+//      .toArray(new String[0]));
+//  }
+//
+//  @Test
+//  public void runIssue19() {
+//    String location = getClass().getResource("/issue-19.json").getFile();
+//    OpenAPIGenerator.main(Arrays.asList("generate",
+//      "--input-spec", location,
+//      "--generator-name", "dart2-api",
+//      "--additional-properties", "pubName=sample_app",
+//      "--global-property", "skipFormModel=false",
+//      "--output", "target/" + getClass().getSimpleName())
+//      .toArray(new String[0]));
+//  }
+//
+//  @Test
+//  public void runTypeCheck() {
+//    String location = getClass().getResource("/sample-types.yaml").getFile();
+//    OpenAPIGenerator.main(Arrays.asList("generate",
+//      "--input-spec", location,
+//      "--generator-name", "dart2-api",
+//      "--additional-properties", "pubName=sample_app",
+//      "--global-property", "skipFormModel=false",
+//      "--output", "target/" + getClass().getSimpleName())
+//      .toArray(new String[0]));
+//  }
 
 //  @Test
 //  public void runFH() {
