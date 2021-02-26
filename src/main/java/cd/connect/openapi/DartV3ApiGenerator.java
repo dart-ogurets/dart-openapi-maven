@@ -213,6 +213,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           if (cm.vars != null) {
             cm.vars.forEach(cp -> {
               CodegenProperty correctingSettings = cp;
+              cp.vendorExtensions.put("generateNullValuesToJson", Boolean.parseBoolean((String) additionalProperties.get("generateNullValuesToJson")));
 
               while (correctingSettings != null) {
                 correctInternals(cm, correctingSettings);
