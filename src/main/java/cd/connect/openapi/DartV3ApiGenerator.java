@@ -299,6 +299,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
     tagOperationWithExtension(co.consumes, co.vendorExtensions, "consumes");
     tagOperationWithExtension(co.produces, co.vendorExtensions, "produces");
+
+    co.vendorExtensions.put("x-valid-status-codes",
+      co.responses.stream().map(r -> r.code).collect(Collectors.joining(",")));
+
+    if (co.returnType == null && co.responses.stream().anyMatch(r -> "204".equals(r.code))) {
+      co.vendorExtensions.put("x-return-no-content", Boolean.TRUE);
+    }
   }
 
   private void tagOperationWithExtension(List<Map<String, String>> mediaTypes, Map<String, Object> extensions, String midfix) {

@@ -4,7 +4,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^vendorExtensions.x-dart-inherited}}
     {{#description}}/* {{{description}}} */{{/description}}
     {{^allowableValues}}
-      {{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+      {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
     {{/allowableValues}}
     {{#allowableValues}}
       {{#isEnum}}
@@ -13,19 +13,19 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{^isEnum}}
         {{^complexType}}
           {{#min}} // range from {{min}} to {{max}}
-            {{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+            {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
           {{/min}}
           {{classname}}{{nameInCamelCase}}Enum {{{name}}}{{#defaultValue}} = {{classname}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
         {{#complexType}}
-              {{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+              {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
       {{/isEnum}}
     {{/allowableValues}}
   {{/vendorExtensions.x-dart-inherited}}
 {{/vars}}
 {{^hasVars}}
-  dynamic json;
+  dynamic{{#nullSafe}}?{{/nullSafe}} json;
 {{/hasVars}}
 {{classname}}();
 
@@ -44,7 +44,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   }
 {{/hasVars}}
 {{#hasVars}}
-  fromJson(Map<String, dynamic> json) {
+  fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     if (json == null) return;
   {{#parent}}super.fromJson(json);{{/parent}}
   {{#vars}}
@@ -53,7 +53,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   }
 
-  {{classname}}.fromJson(Map<String, dynamic> json) {
+  {{classname}}.fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     fromJson(json); // allows child classes to call
   }
 
@@ -65,7 +65,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     if ({{{name}}} != null) {
         {{/isNullable}}
       {{#isArray}}
-        json[r'{{baseName}}'] = {{{name}}}.map((v) => LocalApiClient.serialize(v)).toList();
+        json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.map((v) => LocalApiClient.serialize(v)).toList();
       {{/isArray}}
       {{#isMap}}
         json[r'{{baseName}}'] = Map.fromIterables({{{name}}}.keys,
@@ -73,16 +73,16 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isMap}}
       {{^items}}
         {{#isDateTime}}
-          json[r'{{baseName}}'] = {{{name}}}.toUtc().toIso8601String();
+          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toUtc().toIso8601String();
         {{/isDateTime}}
         {{#isDate}}
-          json[r'{{baseName}}'] = {{{name}}}.toDateString();
+          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toDateString();
         {{/isDate}}
         {{#isEnum}}
-          json[r'{{baseName}}'] = {{{name}}}.toJson();
+          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toJson();
         {{/isEnum}}
         {{#isModel}}
-          json[r'{{baseName}}'] = {{{name}}}.toJson();
+          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toJson();
         {{/isModel}}
         {{#isPrimitiveType}}
           json[r'{{baseName}}'] = {{{name}}};
@@ -98,11 +98,11 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     return json;
   }
 {{/hasVars}}
-  static List<{{classname}}> listFromJson(List<dynamic> json) {
+  static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
   }
 
-  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
+  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     final map = <String, {{classname}}>{};
     if (json != null && json.isNotEmpty) {
       json.forEach((String key, dynamic value) => map[key] = {{classname}}.fromJson(value));
@@ -111,7 +111,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(Object{{#nullSafe}}?{{/nullSafe}} other) {
     if (identical(this, other)) {
       return true;
     }
@@ -176,7 +176,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
   {{classname}} copyWith({{#hasVars}}{
      {{#vars}}
-         {{{dataType}}} {{{name}}},
+         {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
     {{classname}} copy = {{classname}}();
@@ -209,10 +209,10 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
               {{#enumVars}}{{{enumName}}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
             {{/allowableValues}} };
 
-            String toJson() => toMap[this];
-            static {{{enumName}}} fromJson(String key) => key == null ? null : fromMap[key];
+            String{{#nullSafe}}?{{/nullSafe}} toJson() => toMap[this];
+            static {{{enumName}}}{{#nullSafe}}?{{/nullSafe}} fromJson(String key) => key == null ? null : fromMap[key];
 
-            static List<{{{enumName}}}> listFromJson(List<dynamic> json) =>
+            static List<{{{enumName}}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) =>
               json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList();
 
             static {{{enumName}}} copyWith({{{enumName}}} instance) => instance;
