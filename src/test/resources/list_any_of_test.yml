@@ -1,0 +1,53 @@
+---
+openapi: 3.0.1
+info:
+  title: fruity
+  version: 0.0.1
+paths:
+  "/":
+    get:
+      responses:
+        '200':
+          description: desc
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/fruit_basket"
+components:
+  schemas:
+    fruit_basket:
+      title: fruit
+      type: object
+      required:
+        - owner
+      properties:
+        owner:
+          type: string
+        fruits:
+          items:
+            # https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
+            anyOf:
+              - $ref: '#/components/schemas/my_apple'
+              - $ref: '#/components/schemas/my_banana'
+            discriminator:
+              propertyName: type
+              mapping:
+                banana: '#/components/schemas/my_banana'
+                apple: '#/components/schemas/my_apple'
+          type: array
+    my_apple:
+      title: apple
+      type: object
+      properties:
+        type:
+          type: string
+        kind:
+          type: string
+    my_banana:
+      title: banana
+      type: object
+      properties:
+        type:
+          type: string
+        count:
+          type: number

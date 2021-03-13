@@ -92,6 +92,9 @@
                 <additionalProperty>
                   nullSafe-array-default=true
                 </additionalProperty>
+                <additionalProperty>
+                  listAnyOf=true
+                </additionalProperty>
               </additionalProperties>
               <globalProperties>
                 <skipFormModel>false</skipFormModel>
