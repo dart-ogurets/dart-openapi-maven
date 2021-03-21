@@ -21,7 +21,7 @@ class {{classname}} {
 
     final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
-    if (![{{{vendorExtenions.x-valid-status-codes}}}].contains(response.statusCode)) {
+    if (![{{{vendorExtensions.x-valid-status-codes}}}].contains(response.statusCode)) {
       throw ApiException(500, 'Invalid response code ${response.statusCode} returned from API');
     }
 
@@ -33,7 +33,7 @@ class {{classname}} {
 
     final body = response.body;
     if(response.statusCode >= 400) {
-      throw ApiException(response.statusCode, body == null ? null : await decodeBodyBytes(body));
+    throw ApiException(response.statusCode, body == null ? null : await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}));
     }
 
   {{^returnType}}
@@ -45,7 +45,7 @@ class {{classname}} {
       throw ApiException(500, 'Received an empty body');
     }
 
-    return await apiDelegate.{{nickname}}_decode(body);
+    return await apiDelegate.{{nickname}}_decode({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
   {{/returnType}}
   }
 
@@ -182,22 +182,22 @@ class {{classname}} {
   {{^vendorExtensions.x-dart-produces-json}}
     {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
   {{/vendorExtensions.x-dart-produces-json}}
-  {{nickname}}_decode(Stream<List<int>> body) async {
+  {{nickname}}_decode({{#nullSafe}}Stream<List<int>> body{{/nullSafe}}{{^nullSafe}}ApiResponse response{{/nullSafe}}) async {
   {{#vendorExtensions.x-dart-produces-json}}
     {{#isArray}}
       {{#returnType}}
-          return (LocalApiClient.deserializeFromString(await decodeBodyBytes(body), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
+          return (LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
       {{/returnType}}
     {{/isArray}}
     {{^isArray}}
       {{#isMap}}
         {{#returnType}}
-            return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await decodeBodyBytes(body), '{{{returnType}}}'));
+            return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}'));
         {{/returnType}};
       {{/isMap}}
       {{^isMap}}
         {{#returnType}}
-            return LocalApiClient.deserializeFromString(await decodeBodyBytes(body), '{{{returnType}}}') as {{{returnType}}};
+            return LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
         {{/returnType}}
       {{/isMap}}
     {{/isArray}}

@@ -4,11 +4,11 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^vendorExtensions.x-dart-inherited}}
     {{#description}}/* {{{description}}} */{{/description}}
     {{^allowableValues}}
-      {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+      {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}; {{sausage}}
     {{/allowableValues}}
     {{#allowableValues}}
       {{#isEnum}}
-        {{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+        {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
       {{/isEnum}}
       {{^isEnum}}
         {{^complexType}}
