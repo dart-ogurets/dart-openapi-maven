@@ -27,8 +27,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
 	private static final String LIBRARY_NAME = "dart2-api";
 	private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
+  private static final String NULL_SAFE = "nullSafe";
 
-	public DartV3ApiGenerator() {
+  public DartV3ApiGenerator() {
 		super();
 		library = LIBRARY_NAME;
 		supportedLibraries.clear();
@@ -188,6 +189,11 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       cp.isEnum = true;
       cp.isPrimitiveType = false;
     }
+
+    // now push the required down to items if it is on the parent
+    if (cp.required && cp.items != null) {
+      cp.items.required = cp.required;
+    }
   }
 
   // for debugging inevitable weirdness in the model generated
@@ -232,15 +238,16 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   // TODO: check with multiple levels of hierarchy
   private void updateModelsWithAllOfInheritance(Map<String, CodegenModel> models) {
-    models.values().forEach(cm -> {
+    for (CodegenModel cm : models.values()) {
       if (cm.getParent() != null) {
         CodegenModel parent = models.get(cm.getParent());
         if (parent == null) {
           log.info("Cannot find parent for class {}:{}", cm.getName(), cm.getParent());
-          return;
+          continue;
         }
 
-        Map<String, CodegenProperty> props = parent.getVars().stream().collect(Collectors.toMap(CodegenProperty::getName, f -> f));
+        Map<String, CodegenProperty> props =
+          parent.getVars().stream().collect(Collectors.toMap(CodegenProperty::getName, f -> f));
 
         cm.getVars().forEach((v) -> {
           CodegenProperty matchingName = props.get(v.getName());
@@ -249,7 +256,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           }
         });
       }
-    });
+    }
   }
 
   // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been generated to the file

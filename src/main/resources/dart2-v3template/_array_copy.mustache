@@ -1,25 +1,25 @@
 {{#items}}
   {{#isArray}}
-    (data as List).map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    (data as List){{^required}}?{{/required}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isArray}}
   {{#isMap}}
-      (data as List).map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+      (data as List){{^required}}?{{/required}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
     {{#isEnum}}
-      (data as List<{{enumName}}>).toList()
+      (data as List<{{enumName}}>{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}){{^required}}?{{/required}}.toList()
     {{/isEnum}}
     {{#isDateTime}}
-      (data as List<DateTime>).toList()
+      (data as List<DateTime>{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}){{^required}}?{{/required}}.toList()
     {{/isDateTime}}
     {{#isDate}}
-      (data as List<DateTime>).toList()
+      (data as List<DateTime>{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}){{^required}}?{{/required}}.toList()
     {{/isDate}}
     {{#isModel}}
-     (data as List<{{complexType}}>).map((data) => data.copyWith()).toList()
+     (data as List<{{complexType}}>{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}){{^required}}?{{/required}}.map((data) => data.copyWith()).toList()
     {{/isModel}}
     {{#isPrimitiveType}}
-      (data as List<{{{dataType}}}>).toList()
+      (data as List<{{{dataType}}}>{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}){{^required}}?{{/required}}.toList()
     {{/isPrimitiveType}}
   {{/items}}
 {{/items}}

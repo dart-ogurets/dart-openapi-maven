@@ -4,30 +4,30 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^vendorExtensions.x-dart-inherited}}
     {{#description}}/* {{{description}}} */{{/description}}
     {{^allowableValues}}
-      {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}; {{sausage}}
+      {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
     {{/allowableValues}}
     {{#allowableValues}}
       {{#isEnum}}
-        {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+        {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
       {{/isEnum}}
       {{^isEnum}}
         {{^complexType}}
           {{#min}} // range from {{min}} to {{max}}
-            {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
           {{/min}}
           {{classname}}{{nameInCamelCase}}Enum {{{name}}}{{#defaultValue}} = {{classname}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
         {{#complexType}}
-              {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
       {{/isEnum}}
     {{/allowableValues}}
   {{/vendorExtensions.x-dart-inherited}}
 {{/vars}}
 {{^hasVars}}
-  dynamic{{#nullSafe}}?{{/nullSafe}} json;
+  {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} json;
 {{/hasVars}}
-{{classname}}();
+{{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}required {{/nullSafe}}{{/required}}this.{{{name}}}, {{/vars}} });
 
   @override
   String toString() {
@@ -42,15 +42,31 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   dynamic toJson() {
     return json;
   }
+
 {{/hasVars}}
 {{#hasVars}}
   fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     if (json == null) return;
   {{#parent}}super.fromJson(json);{{/parent}}
+  {{#nullSafe}}
+    {{#vars}}
+      {{^vendorExtensions.x-dart-inherited}}
+        {{#required}}
+          {
+          final _jsonData = json[r'{{{baseName}}}'];
+          if (_jsonData == null) throw DeserialisationError(json, r'{{{baseName}}}', r'{{{className}}}', '{{{name}}} field is null and is required to have a value');
+          {{#isArray}}{{>_complex_from_json_required}}{{/isArray}}{{#isMap}}{{>_complex_from_json_required}}{{/isMap}}{{^items}}{{>_simple_from_json_required}}{{/items}}
+          }{{/required}}
+
+        {{^required}}{{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{>_simple_from_json}}{{/items}}{{/required}}
+      {{/vendorExtensions.x-dart-inherited}}{{/vars}}
+  {{/nullSafe}}
+  {{^nullSafe}}
   {{#vars}}
     {{^vendorExtensions.x-dart-inherited}}
     {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{{name}}} = (json[r'{{{baseName}}}'] == null) ? null : {{>_simple_from_json}};{{/items}}
     {{/vendorExtensions.x-dart-inherited}}{{/vars}}
+  {{/nullSafe}}
   }
 
   {{classname}}.fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
@@ -61,11 +77,11 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     final json = <String, dynamic>{};
     {{#vars}}
       {{^vendorExtensions.x-dart-inherited}}
-        {{^isNullable}}
+        {{^required}}
     if ({{{name}}} != null) {
-        {{/isNullable}}
+        {{/required}}
       {{#isArray}}
-        json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.map((v) => LocalApiClient.serialize(v)).toList();
+        json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}.map((v) => LocalApiClient.serialize(v)).toList();
       {{/isArray}}
       {{#isMap}}
         json[r'{{baseName}}'] = Map.fromIterables({{{name}}}.keys,
@@ -73,26 +89,26 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isMap}}
       {{^items}}
         {{#isDateTime}}
-          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toUtc().toIso8601String();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}.toUtc().toIso8601String();
         {{/isDateTime}}
         {{#isDate}}
-          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toDateString();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}.toDateString();
         {{/isDate}}
         {{#isEnum}}
-          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toJson();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}.toJson();
         {{/isEnum}}
         {{#isModel}}
-          json[r'{{baseName}}'] = {{{name}}}{{#nullSafe}}?{{/nullSafe}}.toJson();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}.toJson();
         {{/isModel}}
         {{#isPrimitiveType}}
           json[r'{{baseName}}'] = {{{name}}};
         {{/isPrimitiveType}}
       {{/items}}
-      {{^isNullable}}
+      {{^required}}
     } {{#generateNullValuesToJson}}else {
     json[r'{{baseName}}'] = null;
     }{{/generateNullValuesToJson}}
-        {{/isNullable}}
+        {{/required}}
       {{/vendorExtensions.x-dart-inherited}}
     {{/vars}}
     return json;
@@ -179,14 +195,26 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
          {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
-    {{classname}} copy = {{classname}}();
+
   {{#vars}}{{^vendorExtensions.x-dart-inherited}}{{{name}}} ??= this.{{{name}}};
   {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   {{#vars}}
-    {{^vendorExtensions.x-dart-inherited}}
-      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}copy.{{{name}}} = {{>_simple_copy}};{{/items}}
-    {{/vendorExtensions.x-dart-inherited}}{{/vars}}
-    return copy;
+  {{^vendorExtensions.x-dart-inherited}}
+  {{#nullSafe}}
+  {{#required}}
+    {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}.copyWith(){{/isModel}};{{/items}}
+  {{/required}}
+  {{^required}}
+    {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
+  {{/required}}
+  {{/nullSafe}}
+  {{^nullSafe}}
+    {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
+  {{/nullSafe}}
+  {{/vendorExtensions.x-dart-inherited}}{{/vars}}
+
+    return {{{classname}}}(
+      {{#vars}}{{{name}}}: _copy_{{{name}}},{{/vars}});
   }
 }
 
