@@ -201,7 +201,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
 
 
-    if (cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null && !cp.required) {
+    if (cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null) {
       cp.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
       if (cp.items != null) { // it should be not null, its an array
         cp.items.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);

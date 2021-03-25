@@ -27,7 +27,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 {{^hasVars}}
   {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} json;
 {{/hasVars}}
-{{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}required {{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}this.{{{name}}} = const {{{defaultValue}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}this.{{{name}}}{{/vendorExtensions.x-ns-default-val}},
+{{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}required {{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}this.{{{name}}} = const {{{defaultValue}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}this.{{{name}}}{{/vendorExtensions.x-ns-default-val}},
     {{/vars}} });
 
   @override
