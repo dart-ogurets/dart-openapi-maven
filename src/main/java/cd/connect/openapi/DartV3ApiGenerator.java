@@ -27,7 +27,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
 	private static final String LIBRARY_NAME = "dart2-api";
 	private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
-  private static final String NULL_SAFE = "nullSafe";
+  private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
+  protected boolean arraysThatHaveADefaultAreNullSafe;
 
   public DartV3ApiGenerator() {
 		super();
@@ -72,6 +73,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     this.supportingFiles.add(new SupportingFile("apilib.mustache", libFolder, "api.dart"));
 
     this.additionalProperties.put("x-internal-enums", extraInternalEnumProperties);
+
+    arraysThatHaveADefaultAreNullSafe =
+      additionalProperties.containsKey(ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE);
+
   }
 
   /**
@@ -193,6 +198,14 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     // now push the required down to items if it is on the parent
     if (cp.required && cp.items != null) {
       cp.items.required = cp.required;
+    }
+
+
+    if (cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null && !cp.required) {
+      cp.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
+      if (cp.items != null) { // it should be not null, its an array
+        cp.items.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
+      }
     }
   }
 

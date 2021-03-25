@@ -1,5 +1,5 @@
 {
 final _jsonData = json[r'{{{baseName}}}'];
-{{name}} = (_jsonData == null) ? null : ((dynamic data) { return {{>_from_json}}; }(_jsonData));
+{{name}} = (_jsonData == null) ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : ((dynamic data) { return {{>_from_json}}; }(_jsonData));
 } // _jsonFieldName
 

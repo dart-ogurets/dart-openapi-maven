@@ -15,7 +15,7 @@
     data == null ? DateTime.parse(data + 'T00:00:00.000Z')
   {{/isDate}}
   {{#isModel}}
-    data == null ? null : {{{complexType}}}.fromJson(data)
+    data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
   {{/isModel}}
   {{#isPrimitiveType}}
     data as {{{dataType}}}

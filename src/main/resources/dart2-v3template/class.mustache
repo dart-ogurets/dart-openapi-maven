@@ -4,7 +4,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^vendorExtensions.x-dart-inherited}}
     {{#description}}/* {{{description}}} */{{/description}}
     {{^allowableValues}}
-      {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+      {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
     {{/allowableValues}}
     {{#allowableValues}}
       {{#isEnum}}
@@ -18,7 +18,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
           {{classname}}{{nameInCamelCase}}Enum {{{name}}}{{#defaultValue}} = {{classname}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
         {{#complexType}}
-          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
       {{/isEnum}}
     {{/allowableValues}}
@@ -27,7 +27,8 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 {{^hasVars}}
   {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} json;
 {{/hasVars}}
-{{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}required {{/nullSafe}}{{/required}}this.{{{name}}}, {{/vars}} });
+{{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}required {{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}this.{{{name}}} = const {{{defaultValue}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}this.{{{name}}}{{/vendorExtensions.x-ns-default-val}},
+    {{/vars}} });
 
   @override
   String toString() {
@@ -64,7 +65,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^nullSafe}}
   {{#vars}}
     {{^vendorExtensions.x-dart-inherited}}
-    {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{{name}}} = (json[r'{{{baseName}}}'] == null) ? null : {{>_simple_from_json}};{{/items}}
+    {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{{name}}} = (json[r'{{{baseName}}}'] == null) ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{>_simple_from_json}};{{/items}}
     {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   {{/nullSafe}}
   }
@@ -78,7 +79,12 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{#vars}}
       {{^vendorExtensions.x-dart-inherited}}
         {{^required}}
-    if ({{{name}}} != null) {
+{{#vendorExtensions.x-ns-default-val}}
+  if ({{{name}}}.isNotEmpty) {
+{{/vendorExtensions.x-ns-default-val}}
+{{^vendorExtensions.x-ns-default-val}}
+  if ({{{name}}} != null) {
+{{/vendorExtensions.x-ns-default-val}}
         {{/required}}
       {{#isArray}}
         json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}.map((v) => LocalApiClient.serialize(v)).toList();
@@ -205,7 +211,12 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}.copyWith(){{/isModel}};{{/items}}
   {{/required}}
   {{^required}}
-    {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
+    {{#vendorExtensions.x-ns-default-val}}
+      {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}.copyWith(){{/isModel}};{{/items}}
+    {{/vendorExtensions.x-ns-default-val}}
+    {{^vendorExtensions.x-ns-default-val}}
+      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
+    {{/vendorExtensions.x-ns-default-val}}
   {{/required}}
   {{/nullSafe}}
   {{^nullSafe}}
