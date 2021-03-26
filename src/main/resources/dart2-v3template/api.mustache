@@ -4,7 +4,7 @@ part of {{pubName}}.api;
 
 class {{classname}} {
   final {{classname}}Delegate apiDelegate;
-  {{classname}}(ApiClient apiClient) : assert(apiClient != null), apiDelegate = {{classname}}Delegate(apiClient);
+  {{classname}}(ApiClient apiClient) : {{^nullSafe}}assert(apiClient != null), {{/nullSafe}}apiDelegate = {{classname}}Delegate(apiClient);
 
 
   {{#operation}}
@@ -73,12 +73,12 @@ class {{classname}} {
   class {{classname}}Delegate {
   final ApiClient apiClient;
 
-{{classname}}Delegate(this.apiClient) : assert(apiClient != null);
+{{classname}}Delegate(this.apiClient){{^nullSafe}} : assert(apiClient != null){{/nullSafe}};
 
 {{#operation}}
     Future<ApiResponse>
   {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
-    Object{{#nullSafe}}?{{/nullSafe}} postBody{{#bodyParam}} = {{paramName}}{{/bodyParam}};
+    Object{{^bodyParams}}{{#nullSafe}}?{{/nullSafe}}{{/bodyParams}} postBody{{#bodyParam}} = {{paramName}}{{/bodyParam}};
 
   {{^nullSafe}}
     // verify required params are set
@@ -129,9 +129,13 @@ class {{classname}} {
       if (contentTypes.isNotEmpty && headerParams['Content-Type'] == null) {
       headerParams['Content-Type'] = contentTypes[0];
       }
+    {{^nullSafe}}
       if (postBody != null) {
+    {{/nullSafe}}
       postBody = LocalApiClient.serialize(postBody);
-      }
+    {{^nullSafe}}
+        }
+    {{/nullSafe}}
   {{/vendorExtensions.x-dart-consumes-json}}
   {{#vendorExtensions.x-dart-consumes-form}}
       if (headerParams['Content-Type'] == null) {
