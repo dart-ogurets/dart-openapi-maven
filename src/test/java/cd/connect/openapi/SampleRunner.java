@@ -61,6 +61,8 @@ public class SampleRunner {
 //      "--input-spec", location,
 //      "--generator-name", "dart2-api",
 //      "--additional-properties", "pubName=mrapi",
+//      "--additional-properties", "nullSafe=true",
+//      "--additional-properties", "nullSafe-array-default=true",
 //      "--output", "/Users/richard/projects/fh/featurehub/admin-frontend/app_mr_layer")
 //      .toArray(new String[0]));
 //  }

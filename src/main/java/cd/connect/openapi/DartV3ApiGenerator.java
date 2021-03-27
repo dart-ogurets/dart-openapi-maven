@@ -27,8 +27,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
 	private static final String LIBRARY_NAME = "dart2-api";
 	private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
+  private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
+  protected boolean arraysThatHaveADefaultAreNullSafe;
 
-	public DartV3ApiGenerator() {
+  public DartV3ApiGenerator() {
 		super();
 		library = LIBRARY_NAME;
 		supportedLibraries.clear();
@@ -71,6 +73,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     this.supportingFiles.add(new SupportingFile("apilib.mustache", libFolder, "api.dart"));
 
     this.additionalProperties.put("x-internal-enums", extraInternalEnumProperties);
+
+    arraysThatHaveADefaultAreNullSafe =
+      additionalProperties.containsKey(ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE);
+
   }
 
   /**
@@ -176,6 +182,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           cp.dataType = "Map<String, " + cp.enumName + ">";
         } else {
           cp.dataType = cp.enumName;
+
+          if (cp.defaultValue != null) {
+            if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
+              cp.defaultValue = cp.defaultValue.substring(1, cp.defaultValue.length() - 1);
+            }
+            cp.defaultValue = cp.dataType + "." + cp.defaultValue;
+          }
         }
 
         // we need to add this to the serialiser otherwise it will not correctly serialize
@@ -187,6 +200,26 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       }
       cp.isEnum = true;
       cp.isPrimitiveType = false;
+    }
+
+    // now push the required down to items if it is on the parent
+    if (cp.required && cp.items != null) {
+      cp.items.required = cp.required;
+    }
+
+    // now allow arrays to be non nullable by making them empty
+    if (cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null) {
+      cp.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
+      if (cp.items != null) { // it should be not null, its an array
+        cp.items.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
+      }
+      List<CodegenProperty> props = (List<CodegenProperty>)model.vendorExtensions.get("x-ns-default-vals");
+      if (props == null) {
+        props = new ArrayList<>();
+        model.vendorExtensions.put("x-ns-default-vals", props);
+        model.vendorExtensions.put("x-has-ns-default-vals", Boolean.TRUE);
+      }
+      props.add(cp);
     }
   }
 
@@ -232,15 +265,16 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   // TODO: check with multiple levels of hierarchy
   private void updateModelsWithAllOfInheritance(Map<String, CodegenModel> models) {
-    models.values().forEach(cm -> {
+    for (CodegenModel cm : models.values()) {
       if (cm.getParent() != null) {
         CodegenModel parent = models.get(cm.getParent());
         if (parent == null) {
           log.info("Cannot find parent for class {}:{}", cm.getName(), cm.getParent());
-          return;
+          continue;
         }
 
-        Map<String, CodegenProperty> props = parent.getVars().stream().collect(Collectors.toMap(CodegenProperty::getName, f -> f));
+        Map<String, CodegenProperty> props =
+          parent.getVars().stream().collect(Collectors.toMap(CodegenProperty::getName, f -> f));
 
         cm.getVars().forEach((v) -> {
           CodegenProperty matchingName = props.get(v.getName());
@@ -249,7 +283,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           }
         });
       }
-    });
+    }
   }
 
   // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been generated to the file
@@ -299,6 +333,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
     tagOperationWithExtension(co.consumes, co.vendorExtensions, "consumes");
     tagOperationWithExtension(co.produces, co.vendorExtensions, "produces");
+
+    final String codes = co.responses.stream().map(r -> r.code).collect(Collectors.joining(","));
+    co.vendorExtensions.put("x-valid-status-codes", codes);
+
+    if (co.returnType == null && co.responses.stream().anyMatch(r -> "204".equals(r.code))) {
+      co.vendorExtensions.put("x-return-no-content", Boolean.TRUE);
+    }
   }
 
   private void tagOperationWithExtension(List<Map<String, String>> mediaTypes, Map<String, Object> extensions, String midfix) {

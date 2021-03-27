@@ -3,11 +3,11 @@ part of {{pubName}}.api;
 
 
 class LocalApiClient {
-
+{{^nullSafe}}
   static final _regList = RegExp(r'^List<(.*)>$');
   static final _regMap = RegExp(r'^Map<String,(.*)>$');
-
-  static dynamic serialize(Object value) {
+{{/nullSafe}}
+  static dynamic serialize(Object{{#nullSafe}}?{{/nullSafe}} value) {
     try {
       if (value == null) {
         return null;
@@ -44,7 +44,7 @@ return value.toString();
     }
   }
 
-  static dynamic deserializeFromString(String json, String targetType) {
+  static dynamic deserializeFromString(String{{#nullSafe}}?{{/nullSafe}} json, String targetType) {
     if (json == null) { // HTTP Code 204
       return null;
     }
@@ -54,11 +54,11 @@ return value.toString();
 
     if (targetType == 'String') return json;
 
-    var decodedJson = jsonDecode(json);
+    final decodedJson = jsonDecode(json);
     return deserialize(decodedJson, targetType);
   }
 
-  static dynamic deserialize(dynamic value, String targetType) {
+  static dynamic deserialize(dynamic{{#nullSafe}}?{{/nullSafe}} value, String targetType) {
     if (value == null) return null; // 204
     try {
       switch (targetType) {
@@ -86,7 +86,8 @@ return value.toString();
             return {{{enumName}}}Extension.fromJson(value);
         {{/x-internal-enums}}
         default:
-          {
+{{^nullSafe}}
+  {
             Match match;
             if (value is List &&
                 (match = _regList.firstMatch(targetType)) != null) {
@@ -99,16 +100,19 @@ return value.toString();
                   value.values.map((v) => deserialize(v, newTargetType)));
             }
           }
+{{/nullSafe}}
+{{#nullSafe}}
+          return matchLeftovers(value, targetType, (v, t) => deserialize(v, t));
+{{/nullSafe}}
       }
     } on Exception catch (e, stack) {
       throw ApiException.withInner(500, 'Exception during deserialization.', e, stack);
     }
-    throw ApiException(500, 'Could not find a suitable class for deserialization');
   }
 
 
    /// Format the given parameter object into string.
-  static String parameterToString(dynamic value) {
+  static String parameterToString(dynamic{{#nullSafe}}?{{/nullSafe}} value) {
     if (value == null) {
       return '';
     } else if (value is DateTime) {

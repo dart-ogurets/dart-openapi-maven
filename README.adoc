@@ -12,6 +12,19 @@ There is an article on Medium discussing https://medium.com/@irinasouthwell_220/
 
 ==== Changelog
 
+- 5.0 - is a significant departure and you will need to use the public Dart tool to migrate your code https://pub.dev/packages/openapi_migrate/versions/1.0.0
+It allows the use of null safe code by adding in the extra _additionalProperty_ `nullSafe`. It will also allow you to assume (and ensure
+defaults are set) null safety for all arrays that are otherwise not declared such in your OpenAPI yaml (by making them empty arrays)
+by the use of `nullSafe-array-default`. 
+
+It is recommended for 5.0 that you do an intermediate step and regenerate your existing code without these null safe functions turned on,
+and use the `openapi_migrate` tool on your code. Its likely you will need to run it multiple times to catch everything. When you are ready
+to move your whole project to null safety, you will be able to regenerate your API with the additionalProperty flags and then do the normal
+`dart migrate` process. We are doing this with our codebase over at FeatureHub (https://featurehub.io).
+
+Another significant departure for 5.0 is that it enforces return vaulues - you cannot return a status code from an API that is not declared in
+your OpenAPI.
+
 - 4.2 - if you directly use the Type Transformers for enums, this is a breaking change. They have changed to extensions
 and have been slightly remodeled based on Robert's inlining work. The whole deserialisation mechanism has changed particluarly
 for lists and maps because it wasn't able to cope more than one level deep with lists and maps (issue #19). The date

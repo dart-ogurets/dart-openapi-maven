@@ -1,0 +1,12 @@
+{{#isEnum}}{{#required}}
+final _enumVal = {{enumName}}Extension.fromJson(_jsonData);
+if (_enumVal == null) throw DeserialisationError(json, r'{{{baseName}}}', r'{{{className}}}', '{{enumName}} has no valid translation from $_enumVal');{{/required}}
+{{/isEnum}}
+{{{name}}} = {{#isEnum}}
+  {{#required}}_enumVal;{{/required}}
+  {{^required}}{{enumName}}Extension.fromJson(_jsonData);{{/required}}
+{{/isEnum}}
+{{#isDateTime}}DateTime.parse(_jsonData);{{/isDateTime}}
+{{#isDate}}DateTime.parse(_jsonData + 'T00:00:00.000Z');{{/isDate}}
+{{#isModel}}{{{complexType}}}.fromJson(_jsonData);{{/isModel}}
+{{#isPrimitiveType}}(_jsonData as {{{dataType}}});{{/isPrimitiveType}}

@@ -363,13 +363,14 @@ components:
       type: object
       required:
         - opType
-        - operation
         - value
       properties:
         value:
           type: string
+          default: ""
         opType:
           type: string
+          default: equal
           enum:
             - less_or_equal
             - greater^equal

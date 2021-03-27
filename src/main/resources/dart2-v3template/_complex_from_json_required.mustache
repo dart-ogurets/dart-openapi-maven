@@ -1,0 +1,4 @@
+{
+{{name}} = (_jsonData == null) ? {{#isArray}}[]{{/isArray}}{{#isMap}}{}{{/isMap}} : ((dynamic data) { return {{>_from_json}}; }(_jsonData));
+} // _jsonFieldName
+

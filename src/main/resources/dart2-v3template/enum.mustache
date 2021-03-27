@@ -6,10 +6,10 @@ enum {{classname}} {
 }
 
 extension {{classname}}Extension on {{classname}} {
-  String get name => toMap[this];
+  String{{#nullSafe}}?{{/nullSafe}} get name => toMap[this];
 
   // you have to call this extension class to use this as this is not yet supported
-  static {{classname}} type(String name) => fromMap[name];
+  static {{classname}}{{#nullSafe}}?{{/nullSafe}} type(String name) => fromMap[name];
 
   static Map<String, {{classname}}> fromMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
@@ -18,19 +18,24 @@ extension {{classname}}Extension on {{classname}} {
   {{#enumVars}}{{classname}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
 
-  static {{classname}} fromJson(dynamic data) => data == null ? null : fromMap[data];
+  static {{classname}}{{#nullSafe}}?{{/nullSafe}} fromJson(dynamic{{#nullSafe}}?{{/nullSafe}} data) => data == null ? null : fromMap[data];
 
   dynamic toJson() => toMap[this];
 
-  static List<{{classname}}> listFromJson(List<dynamic> json) =>
-    json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList();
+  static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) =>
+    json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList(){{#nullSafe}}.fromNull(){{/nullSafe}};
 
   static {{classname}} copyWith({{classname}} instance) => instance;
 
-  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic> json) {
+  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic{{#nullSafe}}?{{/nullSafe}}>{{#nullSafe}}?{{/nullSafe}} json) {
     final map = <String, {{classname}}>{};
     if (json != null && json.isNotEmpty) {
-      json.forEach((String key, dynamic value) => map[key] = fromJson(value));
+      json.forEach((String key, dynamic{{#nullSafe}}?{{/nullSafe}} value) {
+        final val = fromJson(value);
+        if (val != null) {
+          map[key] = val;
+        }
+      });
     }
     return map;
   }

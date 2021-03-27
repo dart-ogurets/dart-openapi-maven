@@ -5,17 +5,18 @@
   {{>_map_copy}}
 {{/isMap}}
 {{^items}}
-  {{#isEnum}}
-data
-  {{/isEnum}}
+  {{#isEnum}}data{{/isEnum}}
   {{#isDateTime}}
-data == null ? null : data.add(Duration())
+{{#required}}data.add(Duration()){{/required}}
+{{^required}}data == null ? null : data.add(Duration()){{/required}}
   {{/isDateTime}}
   {{#isDate}}
-data == null ? null : data.add(Duration())
+{{#required}}data.add(Duration()){{/required}}
+{{^required}}data == null ? null : data.add(Duration()){{/required}}
   {{/isDate}}
   {{#isModel}}
-data == null ? null : data.copyWith()
+{{#required}}data.copyWith(){{/required}}
+{{^required}}data == null ? null : data.copyWith(){{/required}}
   {{/isModel}}
   {{#isPrimitiveType}}
 data

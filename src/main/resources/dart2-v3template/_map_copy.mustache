@@ -1,25 +1,25 @@
 {{#items}}
   {{#isMap}}
-    (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
+    (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>().map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
   {{/isMap}}
   {{#isArray}}
-    (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
+    (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>().map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
   {{/isArray}}
   {{^items}}
     {{#isEnum}}
-      (data as Map).cast<String, {{{enumName}}}>().map((String key, {{{enumName}}} data) => MapEntry<String, {{{enumName}}}>(key, {{>_copy}} ))
+      (data as Map).cast<String, {{{enumName}}}>().map((String key, {{{enumName}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{enumName}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, {{>_copy}} ))
     {{/isEnum}}
     {{#isDateTime}}
-      (data as Map).cast<String, {{{complexType}}}>().map((String key, {{{complexType}}} data) => MapEntry<String, {{{complexType}}}>(key, {{>_copy}} ))
+      (data as Map).cast<String, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>().map((String key, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, {{>_copy}} ))
     {{/isDateTime}}
     {{#isDate}}
-      (data as Map).cast<String, {{{complexType}}}>().map((String key, {{{complexType}}} data) => MapEntry<String, {{{complexType}}}>(key, {{>_copy}} ))
+      (data as Map).cast<String, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>().map((String key, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, {{>_copy}} ))
     {{/isDate}}
     {{#isModel}}
-      (data as Map).cast<String, {{{complexType}}}>().map((String key, {{{complexType}}} data) => MapEntry<String, {{{complexType}}}>(key, {{>_copy}} ))
+      (data as Map).cast<String, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>().map((String key, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{complexType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, {{>_copy}} ))
     {{/isModel}}
     {{#isPrimitiveType}}
-      (data as Map).cast<String, {{{dataType}}}>().map((String key, {{{dataType}}} data) => MapEntry<String, {{{dataType}}}>(key, data))
+      (data as Map).cast<String, {{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>().map((String key, {{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(key, data))
     {{/isPrimitiveType}}
   {{/items}}
 {{/items}}
