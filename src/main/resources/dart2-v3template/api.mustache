@@ -63,7 +63,16 @@ class {{classname}} {
 
       final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
-      return ApiResponse(response.statusCode, response.headers, response.body);
+    {{#nullSafe}}
+       return ApiResponse(response.statusCode, response.headers, response.body);
+    {{/nullSafe}}
+    {{^nullSafe}}
+        return ApiResponse()
+      ..statusCode = response.statusCode
+      ..headers = response.headers
+      ..body = response.body;
+    {{/nullSafe}}
+
     }
   {{/vendorExtensions.x-dart-extension-name}}
   {{/operation}}

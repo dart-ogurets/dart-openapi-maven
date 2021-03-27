@@ -182,6 +182,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           cp.dataType = "Map<String, " + cp.enumName + ">";
         } else {
           cp.dataType = cp.enumName;
+
+          if (cp.defaultValue != null) {
+            if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
+              cp.defaultValue = cp.defaultValue.substring(1, cp.defaultValue.length() - 1);
+            }
+            cp.defaultValue = cp.dataType + "." + cp.defaultValue;
+          }
         }
 
         // we need to add this to the serialiser otherwise it will not correctly serialize
@@ -200,7 +207,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       cp.items.required = cp.required;
     }
 
-
+    // now allow arrays to be non nullable by making them empty
     if (cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null) {
       cp.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
       if (cp.items != null) { // it should be not null, its an array
