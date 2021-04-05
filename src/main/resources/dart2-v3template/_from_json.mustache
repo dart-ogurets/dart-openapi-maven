@@ -9,13 +9,40 @@
     {{enumName}}Extension.fromJson(data)
   {{/isEnum}}
   {{#isDateTime}}
-    data == null ? data : DateTime.parse(data)
+    {{#required}}{{#nullSafe}}
+      DateTime.parse(date!)
+    {{/nullSafe}}
+    {{^nullSafe}}
+      data == null ? data : DateTime.parse(data)
+    {{/nullSafe}}
+    {{/required}}
+    {{^required}}
+      data == null ? data : DateTime.parse(data)
+    {{/required}}
   {{/isDateTime}}
   {{#isDate}}
-    data == null ? DateTime.parse(data + 'T00:00:00.000Z')
+    {{#required}}{{#nullSafe}}
+      DateTime.parse(data! + 'T00:00:00.000Z')
+    {{/nullSafe}}
+    {{^nullSafe}}
+      data == null ? DateTime.parse(data + 'T00:00:00.000Z')
+    {{/nullSafe}}
+    {{/required}}
+    {{^required}}
+      data == null ? DateTime.parse(data + 'T00:00:00.000Z')
+    {{/required}}
   {{/isDate}}
   {{#isModel}}
-    data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
+    {{#required}}{{#nullSafe}}
+      data == null ? {{{complexType}}}.fromJson(data)
+    {{/nullSafe}}
+    {{^nullSafe}}
+      data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
+    {{/nullSafe}}
+    {{/required}}
+    {{^required}}
+      data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
+    {{/required}}
   {{/isModel}}
   {{#isPrimitiveType}}
     data as {{{dataType}}}

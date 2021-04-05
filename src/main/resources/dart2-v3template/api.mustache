@@ -87,7 +87,7 @@ class {{classname}} {
 {{#operation}}
     Future<ApiResponse>
   {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
-    Object{{^bodyParams}}{{#nullSafe}}?{{/nullSafe}}{{/bodyParams}} postBody{{#bodyParam}} = {{paramName}}{{/bodyParam}};
+  {{#bodyParams}}Object{{#nullSafe}}{{^required}}?{{/required}}{{/nullSafe}} postBody = {{paramName}};{{/bodyParams}}
 
   {{^nullSafe}}
     // verify required params are set
@@ -138,13 +138,21 @@ class {{classname}} {
       if (contentTypes.isNotEmpty && headerParams['Content-Type'] == null) {
       headerParams['Content-Type'] = contentTypes[0];
       }
-    {{^nullSafe}}
-      if (postBody != null) {
-    {{/nullSafe}}
-      postBody = LocalApiClient.serialize(postBody);
-    {{^nullSafe}}
-        }
-    {{/nullSafe}}
+    {{#bodyParam}}
+      {{^nullSafe}}
+          if (postBody != null) {
+            postBody = LocalApiClient.serialize(postBody);
+          }
+      {{/nullSafe}}
+      {{#nullSafe}}
+        {{#required}}
+            postBody = LocalApiClient.serialize(postBody);
+        {{/required}}
+        {{^required}}
+            postBody = postBody == null ? null : LocalApiClient.serialize(postBody);
+        {{/required}}
+      {{/nullSafe}}
+    {{/bodyParam}}
   {{/vendorExtensions.x-dart-consumes-json}}
   {{#vendorExtensions.x-dart-consumes-form}}
       if (headerParams['Content-Type'] == null) {
@@ -157,7 +165,7 @@ class {{classname}} {
       {{/isFile}}
     {{/formParams}}
     {{#hasFormParams}}
-        postBody = formData.entries.map((me) => me.key + "=" + me.value).join("&");
+        Object postBody = formData.entries.map((me) => me.key + "=" + me.value).join("&");
     {{/hasFormParams}}
   {{/vendorExtensions.x-dart-consumes-form}}
   {{#vendorExtensions.x-dart-consumes-multipartform}}
@@ -178,15 +186,18 @@ class {{classname}} {
           }
       {{/isFile}}
     {{/formParams}}
+    {{#hasFormParams}}
+      Object{{#nullSafe}}?{{/nullSafe}} postBody = null;
       if (formData.isNotEmpty) {
       postBody = FormData.fromMap(formData);
       }
+    {{/hasFormParams}}
   {{/vendorExtensions.x-dart-consumes-multipartform}}
 
     opt.headers = headerParams;
     opt.method = '{{httpMethod}}';
 
-    return await apiClient.invokeAPI(__path, queryParams, postBody, authNames, opt);
+    return await apiClient.invokeAPI(__path, queryParams, {{#hasFormParams}}postBody{{/hasFormParams}}{{#bodyParam}}postBody{{/bodyParam}}{{^bodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{/bodyParam}}, authNames, opt);
     }
 
   {{#vendorExtensions.x-dart-produces-json}}
@@ -199,24 +210,24 @@ class {{classname}} {
   {{#vendorExtensions.x-dart-produces-json}}
     {{#isArray}}
       {{#returnType}}
-          return (LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
+          return (LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
       {{/returnType}}
     {{/isArray}}
     {{^isArray}}
       {{#isMap}}
         {{#returnType}}
-            return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}'));
+            return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}'));
         {{/returnType}};
       {{/isMap}}
       {{^isMap}}
         {{#returnType}}
-            return LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
+            return LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
         {{/returnType}}
       {{/isMap}}
     {{/isArray}}
   {{/vendorExtensions.x-dart-produces-json}}
   {{^vendorExtensions.x-dart-produces-json}}
-      return await decodeBodyBytes(response);
+      return await utf8.decodeStream(body);
   {{/vendorExtensions.x-dart-produces-json}}
     }
 {{/operation}}
