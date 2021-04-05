@@ -4,21 +4,21 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^vendorExtensions.x-dart-inherited}}
     {{#description}}/* {{{description}}} */{{/description}}
     {{^allowableValues}}
-      {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+      {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
     {{/allowableValues}}
     {{#allowableValues}}
       {{#isEnum}}
-        {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+        {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
       {{/isEnum}}
       {{^isEnum}}
         {{^complexType}}
           {{#min}} // range from {{min}} to {{max}}
-          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
           {{/min}}
           {{classname}}{{nameInCamelCase}}Enum {{{name}}}{{#defaultValue}} = {{classname}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
         {{#complexType}}
-          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}}{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+          {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}{{{dataType}}} {{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
       {{/isEnum}}
     {{/allowableValues}}
@@ -90,8 +90,8 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
       {{/isArray}}
       {{#isMap}}
-        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}.keys,
-          {{{name}}}.values.map((v) => LocalApiClient.serialize(v)));
+        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#nullSafe}}!{{/nullSafe}}.keys,
+          {{{name}}}{{#nullSafe}}!{{/nullSafe}}.values.map((v) => LocalApiClient.serialize(v)));
       {{/isMap}}
       {{^items}}
         {{#isDateTime}}
@@ -217,7 +217,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
   {{classname}} copyWith({{#hasVars}}{
      {{#vars}}
-         {{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}},
+         {{{dataType}}}{{#required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}{{^required}}{{#vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}} {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
 
@@ -271,7 +271,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
             static {{{enumName}}}{{#nullSafe}}?{{/nullSafe}} fromJson(String key) => key == null ? null : fromMap[key];
 
             static List<{{{enumName}}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) =>
-              json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList();
+              json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList(){{#nullSafe}}.fromNull(){{/nullSafe}};
 
             static {{{enumName}}} copyWith({{{enumName}}} instance) => instance;
           }
