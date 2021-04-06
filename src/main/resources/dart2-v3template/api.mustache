@@ -2,225 +2,236 @@ part of {{pubName}}.api;
 
 {{#operations}}
 
-class {{classname}} {
+  class {{classname}} {
   final {{classname}}Delegate apiDelegate;
   {{classname}}(ApiClient apiClient) : {{^nullSafe}}assert(apiClient != null), {{/nullSafe}}apiDelegate = {{classname}}Delegate(apiClient);
 
 
   {{#operation}}
-  /// {{summary}}
-  ///
-  /// {{notes}}
-  {{#vendorExtensions.x-dart-produces-json}}
-    {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
-  {{/vendorExtensions.x-dart-produces-json}}
-  {{^vendorExtensions.x-dart-produces-json}}
-    {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
-  {{/vendorExtensions.x-dart-produces-json}}
-  {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
-
-    final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
-
-    if (![{{{vendorExtensions.x-valid-status-codes}}}].contains(response.statusCode)) {
-      throw ApiException(500, 'Invalid response code ${response.statusCode} returned from API');
-    }
-
-  {{^returnType}}
-    if (response.statusCode == 204) {
-      return;
-    }
-  {{/returnType}}
-
-    final body = response.body;
-    if(response.statusCode >= 400) {
-    throw ApiException(response.statusCode, body == null ? null : await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}));
-    }
-
-  {{^returnType}}
-    throw ApiException(500, 'Invalid response received for 204 based API');
-  {{/returnType}}
-  {{#returnType}}
-
-    if (body == null) {
-      throw ApiException(500, 'Received an empty body');
-    }
-
-    return await apiDelegate.{{nickname}}_decode({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
-  {{/returnType}}
-  }
-
-  /// {{summary}}
-  ///
-  /// {{notes}}
-  {{#vendorExtensions.x-dart-extension-name}}
+    /// {{summary}}
+    ///
+    /// {{notes}}
     {{#vendorExtensions.x-dart-produces-json}}
-      {{#returnType}}Future<ApiResponse> {{/returnType}}{{^returnType}}Future<ApiResponse> {{/returnType}}
+      {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
     {{/vendorExtensions.x-dart-produces-json}}
     {{^vendorExtensions.x-dart-produces-json}}
-        Future<ApiResponse>
+      {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
     {{/vendorExtensions.x-dart-produces-json}}
-  {{vendorExtensions.x-dart-extension-name}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
+    {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
 
       final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
-    {{#nullSafe}}
-       return ApiResponse(response.statusCode, response.headers, response.body);
-    {{/nullSafe}}
-    {{^nullSafe}}
-        return ApiResponse()
-      ..statusCode = response.statusCode
-      ..headers = response.headers
-      ..body = response.body;
-    {{/nullSafe}}
+      if (![{{{vendorExtensions.x-valid-status-codes}}}].contains(response.statusCode)) {
+      throw ApiException(500, 'Invalid response code ${response.statusCode} returned from API');
+      }
 
-    }
-  {{/vendorExtensions.x-dart-extension-name}}
+    {{^returnType}}
+        if (response.statusCode == 204) {
+        return;
+        }
+    {{/returnType}}
+
+      final body = response.body;
+      if(response.statusCode >= 400) {
+      throw ApiException(response.statusCode, body == null ? null : await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}));
+      }
+
+    {{^returnType}}
+        throw ApiException(500, 'Invalid response received for 204 based API');
+    {{/returnType}}
+    {{#returnType}}
+
+        if (body == null) {
+        throw ApiException(500, 'Received an empty body');
+        }
+
+        return await apiDelegate.{{nickname}}_decode({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
+    {{/returnType}}
+      }
+
+      /// {{summary}}
+      ///
+      /// {{notes}}
+    {{#vendorExtensions.x-dart-extension-name}}
+      {{#vendorExtensions.x-dart-produces-json}}
+        {{#returnType}}Future<ApiResponse> {{/returnType}}{{^returnType}}Future<ApiResponse> {{/returnType}}
+      {{/vendorExtensions.x-dart-produces-json}}
+      {{^vendorExtensions.x-dart-produces-json}}
+          Future<ApiResponse>
+      {{/vendorExtensions.x-dart-produces-json}}
+      {{vendorExtensions.x-dart-extension-name}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
+
+        final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
+
+      {{#nullSafe}}
+          return ApiResponse(response.statusCode, response.headers, response.body);
+      {{/nullSafe}}
+      {{^nullSafe}}
+          return ApiResponse()
+          ..statusCode = response.statusCode
+          ..headers = response.headers
+          ..body = response.body;
+      {{/nullSafe}}
+
+        }
+    {{/vendorExtensions.x-dart-extension-name}}
   {{/operation}}
-}
-
-
-  class {{classname}}Delegate {
-  final ApiClient apiClient;
-
-{{classname}}Delegate(this.apiClient){{^nullSafe}} : assert(apiClient != null){{/nullSafe}};
-
-{{#operation}}
-    Future<ApiResponse>
-  {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
-    Object{{^bodyParams}}{{#nullSafe}}?{{/nullSafe}}{{/bodyParams}} postBody{{#bodyParam}} = {{paramName}}{{/bodyParam}};
-
-  {{^nullSafe}}
-    // verify required params are set
-  {{#allParams}}
-    {{#required}}
-        if({{paramName}} == null) {
-        throw ApiException(400, 'Missing required param: {{paramName}}');
-        }
-    {{/required}}
-  {{/allParams}}
-  {{/nullSafe}}
-
-    // create path and map variables
-    final __path = '{{{path}}}'{{#pathParams}}.replaceAll('{' + '{{baseName}}' + '}', {{{paramName}}}.toString()){{/pathParams}};
-
-    // query params
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{}..addAll(options?.headers?.cast<String, String>() ?? {});
-    if(headerParams['Accept'] == null) {
-  {{#vendorExtensions.x-dart-produces-json}}
-      // we only want to accept this format as we can parse it
-      headerParams['Accept'] = 'application/json';
-  {{/vendorExtensions.x-dart-produces-json}}
-  {{^vendorExtensions.x-dart-produces-json}}
-    {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{^-last}},{{/-last}}{{/produces}}';{{/hasProduces}}
-  {{/vendorExtensions.x-dart-produces-json}}
     }
 
-  {{#queryParams}}
-    {{^required}}
-        if({{paramName}} != null) {
-    {{/required}}
-      queryParams.addAll(convertParametersForCollectionFormat(LocalApiClient.parameterToString, '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
-    {{^required}}
-        }
-    {{/required}}
-  {{/queryParams}}
-  {{#headerParams}}
-      headerParams['{{baseName}}'] = {{paramName}};
-  {{/headerParams}}
 
-    final authNames = <String>[{{#authMethods}}'{{name}}'{{^-last}}, {{/-last}}{{/authMethods}}];
-    final opt = options ?? Options();
+    class {{classname}}Delegate {
+    final ApiClient apiClient;
 
-  {{#vendorExtensions.x-dart-consumes-json}}
-      final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{^-last}},{{/-last}}{{/consumes}}];
+  {{classname}}Delegate(this.apiClient){{^nullSafe}} : assert(apiClient != null){{/nullSafe}};
 
-      if (contentTypes.isNotEmpty && headerParams['Content-Type'] == null) {
-      headerParams['Content-Type'] = contentTypes[0];
-      }
+  {{#operation}}
+      Future<ApiResponse>
+    {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
+    {{#bodyParams}}Object{{#nullSafe}}{{^required}}?{{/required}}{{/nullSafe}} postBody = {{paramName}};{{/bodyParams}}
+
     {{^nullSafe}}
-      if (postBody != null) {
+        // verify required params are set
+      {{#allParams}}
+        {{#required}}
+            if({{paramName}} == null) {
+            throw ApiException(400, 'Missing required param: {{paramName}}');
+            }
+        {{/required}}
+      {{/allParams}}
     {{/nullSafe}}
-      postBody = LocalApiClient.serialize(postBody);
-    {{^nullSafe}}
+
+      // create path and map variables
+      final __path = '{{{path}}}'{{#pathParams}}.replaceAll('{' + '{{baseName}}' + '}', {{{paramName}}}.toString()){{/pathParams}};
+
+      // query params
+      final queryParams = <QueryParam>[];
+      final headerParams = <String, String>{}..addAll(options?.headers?.cast<String, String>() ?? {});
+      if(headerParams['Accept'] == null) {
+    {{#vendorExtensions.x-dart-produces-json}}
+        // we only want to accept this format as we can parse it
+        headerParams['Accept'] = 'application/json';
+    {{/vendorExtensions.x-dart-produces-json}}
+    {{^vendorExtensions.x-dart-produces-json}}
+      {{#hasProduces}}headerParams['Accept'] = '{{#produces}}{{mediaType}}{{^-last}},{{/-last}}{{/produces}}';{{/hasProduces}}
+    {{/vendorExtensions.x-dart-produces-json}}
+      }
+
+    {{#queryParams}}
+      {{^required}}
+          if({{paramName}} != null) {
+      {{/required}}
+        queryParams.addAll(convertParametersForCollectionFormat(LocalApiClient.parameterToString, '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
+      {{^required}}
+          }
+      {{/required}}
+    {{/queryParams}}
+    {{#headerParams}}
+        headerParams['{{baseName}}'] = {{paramName}};
+    {{/headerParams}}
+
+      final authNames = <String>[{{#authMethods}}'{{name}}'{{^-last}}, {{/-last}}{{/authMethods}}];
+      final opt = options ?? Options();
+
+    {{#vendorExtensions.x-dart-consumes-json}}
+        final contentTypes = [{{#consumes}}'{{{mediaType}}}'{{^-last}},{{/-last}}{{/consumes}}];
+
+        if (contentTypes.isNotEmpty && headerParams['Content-Type'] == null) {
+        headerParams['Content-Type'] = contentTypes[0];
         }
-    {{/nullSafe}}
-  {{/vendorExtensions.x-dart-consumes-json}}
-  {{#vendorExtensions.x-dart-consumes-form}}
-      if (headerParams['Content-Type'] == null) {
-      headerParams['Content-Type'] = 'application/x-www-form-urlencoded';
-      }
-      final formData = <String, String>{};
-    {{#formParams}}
-      {{^isFile}}
-          formData['{{baseName}}'] = Uri.encodeFull(LocalApiClient.parameterToString({{paramName}}));
-      {{/isFile}}
-    {{/formParams}}
-    {{#hasFormParams}}
-        postBody = formData.entries.map((me) => me.key + "=" + me.value).join("&");
-    {{/hasFormParams}}
-  {{/vendorExtensions.x-dart-consumes-form}}
-  {{#vendorExtensions.x-dart-consumes-multipartform}}
-      if (headerParams['Content-Type'] == null) {
-      headerParams['Content-Type'] = 'multipart/form-data';
-      }
-      final formData = <String, dynamic>{};
+      {{#bodyParam}}
+        {{^nullSafe}}
+            if (postBody != null) {
+            postBody = LocalApiClient.serialize(postBody);
+            }
+        {{/nullSafe}}
+        {{#nullSafe}}
+          {{#required}}
+              postBody = LocalApiClient.serialize(postBody);
+          {{/required}}
+          {{^required}}
+              postBody = postBody == null ? null : LocalApiClient.serialize(postBody);
+          {{/required}}
+        {{/nullSafe}}
+      {{/bodyParam}}
+    {{/vendorExtensions.x-dart-consumes-json}}
+    {{#vendorExtensions.x-dart-consumes-form}}
+        if (headerParams['Content-Type'] == null) {
+        headerParams['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+        final formData = <String, String>{};
+      {{#formParams}}
+        {{^isFile}}
+            formData['{{baseName}}'] = Uri.encodeFull(LocalApiClient.parameterToString({{paramName}}));
+        {{/isFile}}
+      {{/formParams}}
+      {{#hasFormParams}}
+          Object postBody = formData.entries.map((me) => me.key + "=" + me.value).join("&");
+      {{/hasFormParams}}
+    {{/vendorExtensions.x-dart-consumes-form}}
+    {{#vendorExtensions.x-dart-consumes-multipartform}}
+        if (headerParams['Content-Type'] == null) {
+        headerParams['Content-Type'] = 'multipart/form-data';
+        }
+        final formData = <String, dynamic>{};
 
-    {{#formParams}}
-      {{^isFile}}
-          if ({{paramName}} != null) {
-          formData['{{baseName}}'] = Uri.encodeFull(LocalApiClient.parameterToString({{paramName}}));
+      {{#formParams}}
+        {{^isFile}}
+            if ({{paramName}} != null) {
+            formData['{{baseName}}'] = Uri.encodeFull(LocalApiClient.parameterToString({{paramName}}));
+            }
+        {{/isFile}}
+        {{#isFile}}
+            if ({{paramName}} != null) {
+            formData['{{baseName}}'] = {{paramName}};
+            }
+        {{/isFile}}
+      {{/formParams}}
+      {{#hasFormParams}}
+          Object{{#nullSafe}}?{{/nullSafe}} postBody = null;
+          if (formData.isNotEmpty) {
+          postBody = FormData.fromMap(formData);
           }
-      {{/isFile}}
-      {{#isFile}}
-          if ({{paramName}} != null) {
-          formData['{{baseName}}'] = {{paramName}};
-          }
-      {{/isFile}}
-    {{/formParams}}
-      if (formData.isNotEmpty) {
-      postBody = FormData.fromMap(formData);
+      {{/hasFormParams}}
+    {{/vendorExtensions.x-dart-consumes-multipartform}}
+
+      opt.headers = headerParams;
+      opt.method = '{{httpMethod}}';
+
+      return await apiClient.invokeAPI(__path, queryParams, {{#hasFormParams}}postBody{{/hasFormParams}}{{#bodyParam}}postBody{{/bodyParam}}{{^bodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{/bodyParam}}, authNames, opt);
       }
-  {{/vendorExtensions.x-dart-consumes-multipartform}}
 
-    opt.headers = headerParams;
-    opt.method = '{{httpMethod}}';
-
-    return await apiClient.invokeAPI(__path, queryParams, postBody, authNames, opt);
-    }
-
-  {{#vendorExtensions.x-dart-produces-json}}
-    {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
-  {{/vendorExtensions.x-dart-produces-json}}
-  {{^vendorExtensions.x-dart-produces-json}}
-    {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
-  {{/vendorExtensions.x-dart-produces-json}}
-  {{nickname}}_decode({{#nullSafe}}Stream<List<int>> body{{/nullSafe}}{{^nullSafe}}ApiResponse response{{/nullSafe}}) async {
-  {{#vendorExtensions.x-dart-produces-json}}
-    {{#isArray}}
-      {{#returnType}}
-          return (LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
-      {{/returnType}}
-    {{/isArray}}
-    {{^isArray}}
-      {{#isMap}}
+    {{#vendorExtensions.x-dart-produces-json}}
+      {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
+    {{/vendorExtensions.x-dart-produces-json}}
+    {{^vendorExtensions.x-dart-produces-json}}
+      {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
+    {{/vendorExtensions.x-dart-produces-json}}
+    {{nickname}}_decode({{#nullSafe}}Stream<List<int>> body{{/nullSafe}}{{^nullSafe}}ApiResponse response{{/nullSafe}}) async {
+    {{#vendorExtensions.x-dart-produces-json}}
+      {{#isArray}}
         {{#returnType}}
-            return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}'));
-        {{/returnType}};
-      {{/isMap}}
-      {{^isMap}}
-        {{#returnType}}
-            return LocalApiClient.deserializeFromString(await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
+            return (LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
         {{/returnType}}
-      {{/isMap}}
-    {{/isArray}}
-  {{/vendorExtensions.x-dart-produces-json}}
-  {{^vendorExtensions.x-dart-produces-json}}
-      return await decodeBodyBytes(response);
-  {{/vendorExtensions.x-dart-produces-json}}
+      {{/isArray}}
+      {{^isArray}}
+        {{#isMap}}
+          {{#returnType}}
+              return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}'));
+          {{/returnType}};
+        {{/isMap}}
+        {{^isMap}}
+          {{#returnType}}
+              return LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
+          {{/returnType}}
+        {{/isMap}}
+      {{/isArray}}
+    {{/vendorExtensions.x-dart-produces-json}}
+    {{^vendorExtensions.x-dart-produces-json}}
+        return await utf8.decodeStream(body);
+    {{/vendorExtensions.x-dart-produces-json}}
+      }
+  {{/operation}}
     }
-{{/operation}}
-  }
 
 
 {{/operations}}
