@@ -210,24 +210,24 @@ part of {{pubName}}.api;
     {{#vendorExtensions.x-dart-produces-json}}
       {{#isArray}}
         {{#returnType}}
-            return (LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
+            return (LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
         {{/returnType}}
       {{/isArray}}
       {{^isArray}}
         {{#isMap}}
           {{#returnType}}
-              return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}'));
+              return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}'));
           {{/returnType}};
         {{/isMap}}
         {{^isMap}}
           {{#returnType}}
-              return LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
+              return LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
           {{/returnType}}
         {{/isMap}}
       {{/isArray}}
     {{/vendorExtensions.x-dart-produces-json}}
     {{^vendorExtensions.x-dart-produces-json}}
-        return await utf8.decodeStream(body);
+        return await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}));
     {{/vendorExtensions.x-dart-produces-json}}
       }
   {{/operation}}
