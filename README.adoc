@@ -3,15 +3,20 @@
 This plugin was originally designed for use by the OpenAPi v3 Maven Plugin, but works with the
 command line generator and the Gradle plugin. it generates _excellent_ Dart code and uses Dio.
 
-There is an article on Medium discussing https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[this plugin].
+There is an article on Medium discussing 
+https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[this plugin].
 
 === Developers
 
-- _Irina Southwell (nee Капрельянц Ирина)_, Principal Engineer (https://www.linkedin.com/in/irina-southwell-9727a422/)
-- _Richard Vowles_, Software Developer (https://www.linkedin.com/in/richard-vowles-72035193/)
+- _Irina Southwell (nee Капрельянц Ирина)_, FeatureHub Founder (https://www.linkedin.com/in/irina-southwell-9727a422/)
+- _Richard Vowles_, FeatureHub Founder (https://www.linkedin.com/in/richard-vowles-72035193/)
+
+This is a product of http://featurehub.io
 
 ==== Changelog
 
+- 5.1 - this addresses the issues of a non-required POST body. It does not address the issue of complex tree structures of models as yet,
+this will come in 5.2.
 - 5.0 - is a significant departure and you will need to use the public Dart tool to migrate your code https://pub.dev/packages/openapi_migrate/versions/1.0.0
 It allows the use of null safe code by adding in the extra _additionalProperty_ `nullSafe`. It will also allow you to assume (and ensure
 defaults are set) null safety for all arrays that are otherwise not declared such in your OpenAPI yaml (by making them empty arrays)
