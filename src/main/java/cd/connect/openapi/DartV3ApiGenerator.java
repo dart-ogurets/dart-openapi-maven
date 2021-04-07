@@ -180,6 +180,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       cp.isPrimitiveType = true;
     }
 
+    if (cp.name.equals("status")) {
+      System.out.println("");
+    }
+
     if (cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) {
       // "internal" enums
       if (cp.getMin() == null && cp.complexType == null) {
@@ -206,7 +210,11 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
         }
       } else {
         cp.enumName = cp.complexType;
+        if (isNullSafeEnabled) {
+          cp.dataType = cp.enumName + (cp.required ? "" : "?");
+        }
       }
+      cp.datatypeWithEnum = cp.dataType;
       cp.isEnum = true;
       cp.isPrimitiveType = false;
     }
@@ -224,12 +232,12 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
         cp.dataType = "Map<String, " + inner + ">" + ((cp.required) ? "" : "?");
         cp.vendorExtensions.put("innerMapType", cp.dataType);
-      } else if (cp.isArray && cp.items != null) {
+      } else if (cp.isArray && cp.items != null && !cp.isEnum) {
         String inner = nullGenChild(cp.items);
         cp.dataType = "List<" + inner + ">" + ((cp.required || arraysThatHaveADefaultAreNullSafe) ?
           "" : "?");
         cp.vendorExtensions.put("x-innerListType", cp.dataType);
-      } else if (!cp.required) {
+      } else if (!cp.required && !cp.isEnum) {
         cp.dataType = cp.dataType + "?";
 
       }
