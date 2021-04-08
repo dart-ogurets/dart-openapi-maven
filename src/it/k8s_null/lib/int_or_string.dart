@@ -2,7 +2,7 @@ part of k8s_api.api;
 
 // this is a kubernetes style custom class
 class IntOrString {
-  String value;
+  String? value;
 
   static List<IntOrString> listFromJson(dynamic json) {
     return (json as List)

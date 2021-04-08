@@ -1,1 +1,1 @@
-final _copy_{{{name}}} = ({{{name}}} == null) ? {{#defaultValue}}{{{defaultValue}}} as {{{vendorExtensions.x-nsType}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : (({{{dataType}}} data) { return {{>_copy}}; }({{{name}}}));
+final _copy_{{{name}}} = ({{{name}}} == null) ? {{#defaultValue}}{{{defaultValue}}} as {{{dataType}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : (({{{dataType}}} data) { return {{>_copy}}; }({{{name}}}));

@@ -225,25 +225,25 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
 
     // rewrite the entire map/list thing
-    if (isNullSafeEnabled && classLevelField && !cp.isEnum) {
+    if (classLevelField && !cp.isEnum) {
       if (cp.isMap && cp.items != null) {
         String inner = nullGenChild(cp.items);
         cp.vendorExtensions.put("x-innerMapType", inner);
 
-        cp.dataType = "Map<String, " + inner + ">" + ((cp.required) ? "" : "?");
-        cp.vendorExtensions.put("innerMapType", cp.dataType);
+        cp.dataType = "Map<String, " + inner + ">" +  (isNullSafeEnabled ? ((cp.required) ? "" : "?") : "");
       } else if (cp.isArray && cp.items != null) {
         String inner = nullGenChild(cp.items);
-        cp.dataType = "List<" + inner + ">" + ((cp.required || arraysThatHaveADefaultAreNullSafe) ?
-          "" : "?");
-        cp.vendorExtensions.put("x-innerListType", cp.dataType);
-      } else if (!cp.required) {
+        cp.dataType = "List<" + inner + ">" + (isNullSafeEnabled ?
+          ((cp.required || arraysThatHaveADefaultAreNullSafe) ? "" : "?") : "");
+        if (!isNullSafeEnabled || (isNullSafeEnabled && !(cp.required || arraysThatHaveADefaultAreNullSafe))) {
+          cp.vendorExtensions.put("x-list-null", Boolean.TRUE);
+        }
+      } else if (!cp.required && isNullSafeEnabled) {
         cp.dataType = cp.dataType + "?";
-
       }
-    }
 
-    cp.vendorExtensions.put("x-nsType", cp.dataType);
+      cp.vendorExtensions.put("x-innerType", cp.dataType);
+    }
 
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
     // it affects the constructor and defaults of top level fields
@@ -263,19 +263,22 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   private String nullGenChild(CodegenProperty cp) {
-    String suffix = cp.required ? "" : "?";
+    String suffix = isNullSafeEnabled  ? (cp.required ? "" : "?") : "";
     String val;
+
     if (cp.isMap) {
       val = "Map<String, " + nullGenChild(cp.items) + ">" + suffix;
-      cp.vendorExtensions.put("innerMapType", val);
     } else if (cp.isArray) {
-      val = "List<" + nullGenChild(cp.items) + ">" + suffix;
-      cp.vendorExtensions.put("x-innerListType", val);
+      val = "List<" + nullGenChild(cp.items) + ">" + (isNullSafeEnabled ?
+        ((cp.required || arraysThatHaveADefaultAreNullSafe) ? "" : "?") : "");
+      if (!isNullSafeEnabled || (isNullSafeEnabled && !(cp.required || arraysThatHaveADefaultAreNullSafe))) {
+        cp.vendorExtensions.put("x-list-null", Boolean.TRUE);
+      }
     } else {
       val = cp.dataType + suffix;
     }
 
-    cp.vendorExtensions.put("x-nsType", val);
+    cp.vendorExtensions.put("x-innerType", val);
 
     return val;
   }

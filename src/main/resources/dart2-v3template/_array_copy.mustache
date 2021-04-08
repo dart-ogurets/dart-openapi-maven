@@ -1,16 +1,16 @@
 {{#items}}
   {{#isArray}}
-    data{{^required}}?{{/required}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isArray}}
   {{#isMap}}
-    data{{^required}}?{{/required}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
     {{^isModel}}
-      data{{^required}}?{{/required}}.toList()
+      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.toList()
     {{/isModel}}
     {{#isModel}}
-      data{{^required}}?{{/required}}.map((data) => data{{^required}}?{{/required}}.copyWith()).toList()
+      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) => data{{^required}}?{{/required}}.copyWith()).toList()
     {{/isModel}}
   {{/items}}
 {{/items}}

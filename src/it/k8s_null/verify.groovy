@@ -6,7 +6,7 @@ def runCommand = { strList ->
   assert ( strList instanceof String ||
     ( strList instanceof List && strList.each{ it instanceof String } ) \
 )
-  def proc = strList.execute(null, new File("target/it/k8s"))
+  def proc = strList.execute(null, new File("target/it/k8s_null"))
   proc.in.eachLine { line -> println line }
   proc.out.close()
   proc.waitFor()
