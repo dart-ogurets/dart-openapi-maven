@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,29 +24,30 @@ import java.util.stream.Collectors;
 
 public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConfig {
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
-	private static final String LIBRARY_NAME = "dart2-api";
-	private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
+  private static final String LIBRARY_NAME = "dart2-api";
+  private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
   private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
   protected boolean arraysThatHaveADefaultAreNullSafe;
   protected boolean isNullSafeEnabled;
 
   public DartV3ApiGenerator() {
-		super();
-		library = LIBRARY_NAME;
-		supportedLibraries.clear();
-		supportedLibraries.put(LIBRARY_NAME, LIBRARY_NAME);
-	}
+    super();
+    library = LIBRARY_NAME;
+    supportedLibraries.clear();
+    supportedLibraries.put(LIBRARY_NAME, LIBRARY_NAME);
+  }
 
-	public String getName() {
-		return LIBRARY_NAME;
-	}
+  public String getName() {
+    return LIBRARY_NAME;
+  }
 
-	public String getHelp() {
-		return "dart2 api generator. generates all classes and interfaces with jax-rs annotations with jersey2 extensions as necessary";
-	}
+  public String getHelp() {
+    return "dart2 api generator. generates all classes and interfaces with jax-rs annotations with jersey2 extensions" +
+      " as necessary";
+  }
 
-	// we keep track of this for the serialiser/deserialiser
-	List<CodegenProperty> extraInternalEnumProperties = new ArrayList<>();
+  // we keep track of this for the serialiser/deserialiser
+  List<CodegenProperty> extraInternalEnumProperties = new ArrayList<>();
 
   @Override
   public void processOpts() {
@@ -91,7 +91,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   private void deps(String addnPropertiesTag, String vendorPrefix) {
-    String depsKey = (String)additionalProperties.get(addnPropertiesTag);
+    String depsKey = (String) additionalProperties.get(addnPropertiesTag);
     List<String> deps = new ArrayList<>();
     additionalProperties.put(vendorPrefix, deps);
     if (depsKey != null) {
@@ -122,7 +122,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   // don't just add stuff to the end of the name willy nilly, check it is a reserved word first
   @Override
   public String escapeReservedWord(String name) {
-	  return (isReservedWord(name)) ? name + "_" : name;
+    return (isReservedWord(name)) ? name + "_" : name;
   }
 
   @Override
@@ -159,10 +159,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public String toModelFilename(String name) {
-	  if (name.contains(".")) {
-	    int lastIndex = name.lastIndexOf(".");
-	    String path = name.substring(0, lastIndex).replace(".", File.separator).replace('-', '_');
-	    String modelName = name.substring(lastIndex+1);
+    if (name.contains(".")) {
+      int lastIndex = name.lastIndexOf(".");
+      String path = name.substring(0, lastIndex).replace(".", File.separator).replace('-', '_');
+      String modelName = name.substring(lastIndex + 1);
       return path + File.separator + org.openapitools.codegen.utils.StringUtils.underscore(this.toModelName(modelName));
     } else {
       return org.openapitools.codegen.utils.StringUtils.underscore(this.toModelName(name));
@@ -225,25 +225,25 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
 
     // rewrite the entire map/list thing
-    if (isNullSafeEnabled && classLevelField) {
+    if (isNullSafeEnabled && classLevelField && !cp.isEnum) {
       if (cp.isMap && cp.items != null) {
         String inner = nullGenChild(cp.items);
         cp.vendorExtensions.put("x-innerMapType", inner);
 
         cp.dataType = "Map<String, " + inner + ">" + ((cp.required) ? "" : "?");
         cp.vendorExtensions.put("innerMapType", cp.dataType);
-      } else if (cp.isArray && cp.items != null && !cp.isEnum) {
+      } else if (cp.isArray && cp.items != null) {
         String inner = nullGenChild(cp.items);
         cp.dataType = "List<" + inner + ">" + ((cp.required || arraysThatHaveADefaultAreNullSafe) ?
           "" : "?");
         cp.vendorExtensions.put("x-innerListType", cp.dataType);
-      } else if (!cp.required && !cp.isEnum) {
+      } else if (!cp.required) {
         cp.dataType = cp.dataType + "?";
 
       }
-
-      cp.vendorExtensions.put("x-nsType", cp.dataType);
     }
+
+    cp.vendorExtensions.put("x-nsType", cp.dataType);
 
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
     // it affects the constructor and defaults of top level fields
@@ -252,7 +252,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       if (cp.items != null) { // it should be not null, its an array
         cp.items.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
       }
-      List<CodegenProperty> props = (List<CodegenProperty>)model.vendorExtensions.get("x-ns-default-vals");
+      List<CodegenProperty> props = (List<CodegenProperty>) model.vendorExtensions.get("x-ns-default-vals");
       if (props == null) {
         props = new ArrayList<>();
         model.vendorExtensions.put("x-ns-default-vals", props);
@@ -287,19 +287,20 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
     Map<String, CodegenModel> allModels = new HashMap<>();
 
-	  objs.values().forEach(o -> {
-	    Map<String, Object> modelData = (Map<String, Object>)o;
-	    List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
-	    if (models != null) {
-	      models.forEach(modelMap -> {
-          CodegenModel cm = (CodegenModel)modelMap.get("model");
+    objs.values().forEach(o -> {
+      Map<String, Object> modelData = (Map<String, Object>) o;
+      List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
+      if (models != null) {
+        models.forEach(modelMap -> {
+          CodegenModel cm = (CodegenModel) modelMap.get("model");
           if (cm == null) {
             return;
           }
           if (!cm.getName().endsWith("_allOf")) {
             allModels.put(cm.getName(), cm);
           }
-          cm.vendorExtensions.put("dartClassName", org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
+          cm.vendorExtensions.put("dartClassName",
+            org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
           if (cm.vars != null) {
             cm.vars.forEach(cp -> {
               CodegenProperty correctingSettings = cp;
@@ -317,7 +318,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       }
     });
 
-	  updateModelsWithAllOfInheritance(allModels);
+    updateModelsWithAllOfInheritance(allModels);
 
     return objs;
   }
@@ -345,7 +346,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
   }
 
-  // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been generated to the file
+  // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been
+  // generated to the file
   // system
   @Override
   public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
@@ -353,8 +355,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     processPubspecMappings();
 
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
-    final List<CodegenOperation> ops = (List<CodegenOperation>) ((Map<String, Object>) objs.get("operations")).get("operation");
-    for(CodegenOperation co : ops) {
+    final List<CodegenOperation> ops = (List<CodegenOperation>) ((Map<String, Object>) objs.get("operations")).get(
+      "operation");
+    for (CodegenOperation co : ops) {
       final Object richOp = co.vendorExtensions.get("x-dart-rich-operationId");
       if (richOp != null) {
         co.vendorExtensions.put("x-dart-extension-name", toVarName(richOp.toString()));
@@ -380,14 +383,15 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   @Override
-    protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
+  protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
     //super.addAdditionPropertiesToCodeGenModel(codegenModel, schema);
     codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(openAPI, schema));
     addImport(codegenModel, codegenModel.additionalPropertiesType);
   }
 
   @Override
-  public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
+  public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co,
+                                  Map<String, List<CodegenOperation>> operations) {
     super.addOperationToGroup(tag, resourcePath, operation, co, operations);
 
     tagOperationWithExtension(co.consumes, co.vendorExtensions, "consumes");
@@ -401,8 +405,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
   }
 
-  private void tagOperationWithExtension(List<Map<String, String>> mediaTypes, Map<String, Object> extensions, String midfix) {
-    List<String> lowerCaseContentTypes = mediaTypes != null ? mediaTypes.stream().map(p -> p.get("mediaType").toLowerCase()).collect(Collectors.toList()) : new ArrayList<>();
+  private void tagOperationWithExtension(List<Map<String, String>> mediaTypes, Map<String, Object> extensions,
+                                         String midfix) {
+    List<String> lowerCaseContentTypes = mediaTypes != null ?
+      mediaTypes.stream().map(p -> p.get("mediaType").toLowerCase()).collect(Collectors.toList()) : new ArrayList<>();
     String prefix = "x-dart-" + midfix + "-";
     if (lowerCaseContentTypes.contains("application/json")) {
       extensions.put(prefix + "json", "application/json");
@@ -454,12 +460,14 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 //      }
 //
 //      if (this.isReservedWord(name)) {
-//        log.warn(name + " (reserved word) cannot be used as model filename. Renamed to " + org.openapitools.codegen.utils.StringUtils.camelize("model_" + name));
+//        log.warn(name + " (reserved word) cannot be used as model filename. Renamed to " + org.openapitools.codegen
+//        .utils.StringUtils.camelize("model_" + name));
 //        name = "model_" + name;
 //      }
 //
 //      if (name.matches("^\\d.*")) {
-//        log.warn(name + " (model name starts with number) cannot be used as model name. Renamed to " + org.openapitools.codegen.utils.StringUtils.camelize("model_" + name));
+//        log.warn(name + " (model name starts with number) cannot be used as model name. Renamed to " + org
+//        .openapitools.codegen.utils.StringUtils.camelize("model_" + name));
 //        name = "model_" + name;
 //      }
 //

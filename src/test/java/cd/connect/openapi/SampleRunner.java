@@ -14,8 +14,8 @@ public class SampleRunner {
       "--generator-name", "dart2-api",
       "--additional-properties", "pubName=sample_app",
       "--global-property", "skipFormModel=false",
-      "--additional-properties", "nullSafe=true",
-      "--additional-properties", "nullSafe-array-default=true",
+//      "--additional-properties", "nullSafe=true",
+//      "--additional-properties", "nullSafe-array-default=true",
       "--output", "target/" + getClass().getSimpleName())
       .toArray(new String[0]));
   }

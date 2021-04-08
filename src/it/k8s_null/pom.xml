@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>k8s-testing</artifactId>
+  <groupId>k8s.testing</groupId>
+  <name>extensive example of class and model generation from openapi for k8s</name>
+  <version>1.1-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>lib</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>docs</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>test</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>.openapi-generator</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+            <fileset>
+              <directory>.openapi-generator</directory>
+              <includes>
+                <include>**/**</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>5.0.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.bluetrainsoftware.maven</groupId>
+            <artifactId>openapi-dart-generator</artifactId>
+            <version>@project.version@</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>k8s-api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <output>${project.basedir}</output>
+              <!-- https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json -->
+              <inputSpec>${project.basedir}/test.yaml</inputSpec>
+<!--              <inputSpec>${project.basedir}/swagger.json</inputSpec>-->
+              <generatorName>dart2-api</generatorName>
+              <typeMappings>int-or-string=IntOrString</typeMappings>
+              <reservedWordsMappings>user_id=myUserId</reservedWordsMappings>
+              <importMappings>IntOrString=./int_or_string.dart</importMappings>
+              <enablePostProcessFile>true</enablePostProcessFile>
+              <additionalProperties>
+                <additionalProperty>
+                  pubName=k8s_api
+                </additionalProperty>
+                <additionalProperty><![CDATA[
+                  pubspec-dependencies=path: '>=1.7.0 <2.0.0',rxdart: 0.24.0]]>
+                </additionalProperty>
+                <additionalProperty>
+                  pubspec-dev-dependencies=uuid: 2.0.4
+                </additionalProperty>
+                <additionalProperty>
+                  nullSafe=true
+                </additionalProperty>
+                <additionalProperty>
+                  nullSafe-array-default=true
+                </additionalProperty>
+              </additionalProperties>
+              <globalProperties>
+                <skipFormModel>false</skipFormModel>
+              </globalProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
