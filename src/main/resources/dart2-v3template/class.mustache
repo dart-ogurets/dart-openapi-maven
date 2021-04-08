@@ -121,7 +121,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   }
 {{/hasVars}}
   static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
-    return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
+    return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList(){{#nullSafe}}.fromNull(){{/nullSafe}};
   }
 
   static Map<String, {{classname}}> mapFromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
@@ -271,7 +271,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
             static {{{enumName}}}{{#nullSafe}}?{{/nullSafe}} fromJson(String key) => key == null ? null : fromMap[key];
 
             static List<{{{enumName}}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) =>
-              json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList();
+              json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList(){{#nullSafe}}.fromNull(){{/nullSafe}};
 
             static {{{enumName}}} copyWith({{{enumName}}} instance) => instance;
           }
