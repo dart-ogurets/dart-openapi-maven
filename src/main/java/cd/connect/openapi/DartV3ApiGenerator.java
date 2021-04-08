@@ -48,6 +48,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   // we keep track of this for the serialiser/deserialiser
   List<CodegenProperty> extraInternalEnumProperties = new ArrayList<>();
+  // when external classes are used for the "type" field
+  List<CodegenProperty> extraPropertiesThatUseExternalFormatters = new ArrayList<>();
 
   @Override
   public void processOpts() {
@@ -74,6 +76,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     this.supportingFiles.add(new SupportingFile("apilib.mustache", libFolder, "api.dart"));
 
     this.additionalProperties.put("x-internal-enums", extraInternalEnumProperties);
+    this.additionalProperties.put("x-external-formatters", extraPropertiesThatUseExternalFormatters);
 
     arraysThatHaveADefaultAreNullSafe =
       additionalProperties.containsKey(ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE);
@@ -180,7 +183,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       cp.isPrimitiveType = true;
     }
 
-    if (cp.name.equals("status")) {
+    if ("int-or-string".equals(cp.dataFormat)) {
       System.out.println("");
     }
 
@@ -243,6 +246,15 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       }
 
       cp.vendorExtensions.put("x-innerType", cp.dataType);
+    }
+
+    // if we have a weird format which is a String/int/etc with an unknown format
+    if (cp.isString && cp.complexType != null) {
+//      cp.vendorExtensions.put("x-extendedType", Boolean.TRUE);
+      cp.isModel = true;
+      if (extraPropertiesThatUseExternalFormatters.stream().noneMatch(c -> c.complexType.equals(cp.complexType))) {
+        extraPropertiesThatUseExternalFormatters.add(cp);
+      }
     }
 
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because

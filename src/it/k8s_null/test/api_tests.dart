@@ -79,23 +79,24 @@ main() {
 
     var ap = AddProps3.fromJson(addProp);
     expect(ap.discrim, 'fred');
-    expect(ap.readings.length, 2);
-    expect(ap.readings['one'], 1);
-    expect(ap.readings['two'], 2.3);
-    expect(ap.dependencies['deps1'], ['a', 34.2, true]);
-    expect(ap.dependencies['deps2'], [17.8, false, 'b']);
-    expect(ap.otherDeps['name'], ['tom', 'dick', 'harry']);
-    expect(ap.otherDeps['height'], [1.7, 1.3, 1.4]);
-    expect(ap.otherDeps['info'], 'this is top secret');
-    expect(ap.yetMoreAdditional['sList'], ['a', 'b', 'c']);
+    expect(ap.readings?.length, 2);
+    expect(ap.readings?['one'], 1);
+    expect(ap.readings?['two'], 2.3);
+    expect(ap.dependencies?['deps1'], ['a', 34.2, true]);
+    expect(ap.dependencies?['deps2'], [17.8, false, 'b']);
+    expect(ap.otherDeps?['name'], ['tom', 'dick', 'harry']);
+    expect(ap.otherDeps?['height'], [1.7, 1.3, 1.4]);
+    expect(ap.otherDeps?['info'], 'this is top secret');
+    expect(ap.yetMoreAdditional?['sList'], ['a', 'b', 'c']);
     expect(
-        ap.mapWithComplexObject['c1'][0],
+        ap.mapWithComplexObject?['c1']?[0],
         Event()
           ..status = EventStatus.STREAMING
           ..id = 'xx'
           ..title = 'Scully'
           ..img = 'img'
           ..imageUrl = 'http://blah');
-    expect(ap.mapWithEnums['statuses'], [EventStatus.STREAMING, EventStatus.CLOSED]);
+    expect(ap.mapWithEnums?['statuses'],
+        [EventStatus.STREAMING, EventStatus.CLOSED]);
   });
 }

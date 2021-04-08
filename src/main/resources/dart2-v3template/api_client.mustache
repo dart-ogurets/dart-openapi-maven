@@ -32,6 +32,11 @@ class LocalApiClient {
           }
         {{/model}}
       {{/models}}
+      {{#x-external-formatters}}
+        if (value is {{complexType}}) {
+          return value.toJson();
+        }
+      {{/x-external-formatters}}
       {{#x-internal-enums}}
         if (value is {{{enumName}}}) {
            return value.toJson();
@@ -81,6 +86,10 @@ return value.toString();
             {{/isEnum}}
           {{/model}}
         {{/models}}
+       {{#x-external-formatters}}
+        case '{{complexType}}':
+          return value.toJson();
+      {{/x-external-formatters}}
         {{#x-internal-enums}}
           case '{{{enumName}}}':
             return {{{enumName}}}Extension.fromJson(value);

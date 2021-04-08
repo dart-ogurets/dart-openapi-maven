@@ -10,6 +10,14 @@ class IntOrString {
         .toList();
   }
 
+  IntOrString copyWith() {
+    return IntOrString()..value = this.value;
+  }
+
+  dynamic toJson() {
+    return this.value;
+  }
+
   static IntOrString fromJson(dynamic json) {
     return IntOrString()..value = json != null ? json.toString() : null;
   }
