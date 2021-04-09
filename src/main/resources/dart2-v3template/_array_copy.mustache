@@ -1,25 +1,16 @@
 {{#items}}
   {{#isArray}}
-    (data as List){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isArray}}
   {{#isMap}}
-      (data as List){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
-    {{#isEnum}}
-      (data as List<{{enumName}}>{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.toList()
-    {{/isEnum}}
-    {{#isDateTime}}
-      (data as List<DateTime>{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.toList()
-    {{/isDateTime}}
-    {{#isDate}}
-      (data as List<DateTime>{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.toList()
-    {{/isDate}}
-    {{#isModel}}
-     (data as List<{{complexType}}>{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.map((data) => data.copyWith()).toList()
+    {{^isModel}}
+      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.toList()
     {{/isModel}}
-    {{#isPrimitiveType}}
-      (data as List<{{{dataType}}}>{{^required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}){{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.toList()
-    {{/isPrimitiveType}}
+    {{#isModel}}
+      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) => {{>_copy}}).toList()
+    {{/isModel}}
   {{/items}}
 {{/items}}

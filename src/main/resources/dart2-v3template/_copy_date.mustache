@@ -1,0 +1,2 @@
+{{#vendorExtensions.x-not-nullable}}data.add(Duration()){{/vendorExtensions.x-not-nullable}}
+{{^vendorExtensions.x-not-nullable}}data == null ? null : data.add(Duration()){{/vendorExtensions.x-not-nullable}}

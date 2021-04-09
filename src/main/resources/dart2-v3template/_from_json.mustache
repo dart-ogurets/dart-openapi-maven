@@ -9,13 +9,40 @@
     {{enumName}}Extension.fromJson(data)
   {{/isEnum}}
   {{#isDateTime}}
-    data == null ? data : DateTime.parse(data)
+    {{#vendorExtensions.x-not-nullable}}{{#nullSafe}}
+      DateTime.parse(data!)
+    {{/nullSafe}}
+    {{^nullSafe}}
+      data == null ? null : DateTime.parse(data)
+    {{/nullSafe}}
+    {{/vendorExtensions.x-not-nullable}}
+    {{^vendorExtensions.x-not-nullable}}
+      data == null ? null : DateTime.parse(data)
+    {{/vendorExtensions.x-not-nullable}}
   {{/isDateTime}}
   {{#isDate}}
-    data == null ? DateTime.parse(data + 'T00:00:00.000Z')
+    {{#vendorExtensions.x-not-nullable}}{{#nullSafe}}
+      DateTime.parse(data! + 'T00:00:00.000Z')
+    {{/nullSafe}}
+    {{^nullSafe}}
+      data == null ? null : DateTime.parse(data + 'T00:00:00.000Z')
+    {{/nullSafe}}
+    {{/vendorExtensions.x-not-nullable}}
+    {{^vendorExtensions.x-not-nullable}}
+      data == null ? null : DateTime.parse(data + 'T00:00:00.000Z')
+    {{/vendorExtensions.x-not-nullable}}
   {{/isDate}}
   {{#isModel}}
-    data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
+    {{#vendorExtensions.x-not-nullable}}{{#nullSafe}}
+      {{{complexType}}}.fromJson(data)
+    {{/nullSafe}}
+    {{^nullSafe}}
+      data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
+    {{/nullSafe}}
+    {{/vendorExtensions.x-not-nullable}}
+    {{^vendorExtensions.x-not-nullable}}
+      data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
+    {{/vendorExtensions.x-not-nullable}}
   {{/isModel}}
   {{#isPrimitiveType}}
     data as {{{dataType}}}

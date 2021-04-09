@@ -63,54 +63,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Event"
-  /event/optional-post:
-    post:
-      tags:
-        - ControlService
-      description: "Sample optional body for post"
-      operationId: optionalPost
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EventRequest"
-      responses:
-        "200":
-          description: "upcoming events"
-          content:
-            application/yaml:
-              schema:
-                $ref: "#/components/schemas/EventResponse"
-    delete:
-      tags:
-        - ControlService
-      description: "Sample optional body for post"
-      operationId: optionalDelete
-      responses:
-        "204":
-          description: "upcoming events"
   #  /event/upcoming2:
-#    post:
-#      tags:
-#        - ControlService
-#      description: "Get the list of upcoming events"
-#      operationId: upcomingEvents2
-#      requestBody:
-#        required: true
-#        content:
-#          application/json:
-#            schema:
-#              oneOf:
-#                - $ref: '#/components/schemas/EventRequest'
-#                - $ref: '#/components/schemas/EventResponse'
-#      responses:
-#        "200":
-#          description: "upcoming events"
-#          content:
-#            application/yaml:
-#              schema:
-#                $ref: "#/components/schemas/EventResponse"
+  #    post:
+  #      tags:
+  #        - ControlService
+  #      description: "Get the list of upcoming events"
+  #      operationId: upcomingEvents2
+  #      requestBody:
+  #        required: true
+  #        content:
+  #          application/json:
+  #            schema:
+  #              oneOf:
+  #                - $ref: '#/components/schemas/EventRequest'
+  #                - $ref: '#/components/schemas/EventResponse'
+  #      responses:
+  #        "200":
+  #          description: "upcoming events"
+  #          content:
+  #            application/yaml:
+  #              schema:
+  #                $ref: "#/components/schemas/EventResponse"
   /hello:
     get:
       tags:
@@ -174,8 +147,6 @@ components:
           type: string
           format: date
     EventResponse:
-      required:
-        - mandatoryList
       properties:
         error:
           type: integer
@@ -185,10 +156,6 @@ components:
           type: array
           items:
             type: number
-        mandatoryList:
-          type: array
-          items:
-            type: string
         listOfIntegers:
           type: array
           items:
@@ -289,29 +256,21 @@ components:
       properties:
         discrim:
           type: string
-        nonNullableArrayOfStrings:
-          type: array
-          items:
-            nullable: false
-            type: string
         readings:
           type: object
           additionalProperties:
-            nullable: false
             type: number
             format: decimal
         extra:
           type: object
           additionalProperties:
             type: array
-            nullable: true
             items:
               $ref: "#/components/schemas/TimeType"
         dependencies:
           type: object
           additionalProperties:
             type: array
-            nullable: true
             items:
               $ref: "#/components/schemas/JSONType"
         otherDeps:
@@ -349,7 +308,6 @@ components:
     TimeType:
       type: string
       format: date-time
-      nullable: true
     Messages:
       type: object
       additionalProperties:
@@ -405,14 +363,13 @@ components:
       type: object
       required:
         - opType
+        - operation
         - value
       properties:
         value:
           type: string
-          default: ""
         opType:
           type: string
-          default: equal
           enum:
             - less_or_equal
             - greater^equal

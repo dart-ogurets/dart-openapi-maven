@@ -1,25 +1,25 @@
 {{#items}}
   {{#isMap}}
-    (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_from_json}}; }(data) ))
+    (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{dataType}}}>(key, (dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) { return {{>_from_json}}; }(data) ))
   {{/isMap}}
   {{#isArray}}
-    (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_from_json}}; }(data) ))
+    (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{dataType}}}>(key, (dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) { return {{>_from_json}}; }(data) ))
   {{/isArray}}
   {{^items}}
     {{#isEnum}}
-      (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{enumName}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isEnum}}
     {{#isDateTime}}
-      (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{complexType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isDateTime}}
     {{#isDate}}
-      (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{complexType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isDate}}
     {{#isModel}}
-      (data as Map).cast<String, dynamic>().map((String key, dynamic data) => MapEntry<String, {{{complexType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isModel}}
     {{#isPrimitiveType}}
-      (data as Map).cast<String, {{{dataType}}}>()
+      (data as Map).cast<String, {{{dataType}}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}
     {{/isPrimitiveType}}
   {{/items}}
 {{/items}}
