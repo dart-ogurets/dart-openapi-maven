@@ -1,9 +1,9 @@
 {{#items}}
   {{#isArray}}
-    (data as List<dynamic>).map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
+    (data as List<dynamic>){{#nullSafe}}.fromNull(){{/nullSafe}}.map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
   {{/isArray}}
   {{#isMap}}
-    (data as List<dynamic>).map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
+    (data as List<dynamic>){{#nullSafe}}.fromNull(){{/nullSafe}}.map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
     {{#isEnum}}

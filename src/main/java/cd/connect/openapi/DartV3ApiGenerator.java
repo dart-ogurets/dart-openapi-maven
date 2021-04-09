@@ -172,6 +172,14 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
   }
 
+  private String listOrMapSuffix(CodegenProperty cp) {
+    if (cp.isNullable && isNullSafeEnabled) {
+      return "?";
+    }
+
+    return "";
+  }
+
   private void correctInternals(CodegenModel model, CodegenProperty cp, boolean classLevelField) {
     if ("DateTime".equals(cp.complexType) || "Date".equals(cp.complexType)) {
       cp.isDateTime = "date-time".equals(cp.getDataFormat());
@@ -183,7 +191,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       cp.isPrimitiveType = true;
     }
 
-    if ("int-or-string".equals(cp.dataFormat)) {
+    if ("dependencies".equals(cp.name)) {
       System.out.println("");
     }
 
@@ -191,13 +199,12 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       // "internal" enums
       if (cp.getMin() == null && cp.complexType == null) {
         cp.enumName = model.classname + cp.nameInCamelCase + "Enum";
-        String suffix = isNullSafeEnabled ? (cp.required ? "" : "?") : "";
         if (cp.isArray) {
-          cp.dataType = "List<" + cp.enumName + suffix + ">";
+          cp.dataType = "List<" + cp.enumName + listOrMapSuffix(cp) + ">";
         } else if (cp.isMap) {
-          cp.dataType = "Map<String, " + cp.enumName + suffix + ">";
+          cp.dataType = "Map<String, " + cp.enumName + listOrMapSuffix(cp) + ">";
         } else {
-          cp.dataType = cp.enumName + suffix;
+          cp.dataType = cp.enumName + (isNullSafeEnabled ? (cp.required ? "" : "?") : "");
 
           if (cp.defaultValue != null) {
             if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
@@ -238,7 +245,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
         String inner = nullGenChild(cp.items);
         cp.dataType = "List<" + inner + ">" + (isNullSafeEnabled ?
           ((cp.required || arraysThatHaveADefaultAreNullSafe) ? "" : "?") : "");
-        if (!isNullSafeEnabled || (isNullSafeEnabled && !(cp.required || arraysThatHaveADefaultAreNullSafe))) {
+        if (!isNullSafeEnabled || (!(cp.required || arraysThatHaveADefaultAreNullSafe))) {
           cp.vendorExtensions.put("x-list-null", Boolean.TRUE);
         }
       } else if (!cp.required && isNullSafeEnabled) {
@@ -246,6 +253,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       }
 
       cp.vendorExtensions.put("x-innerType", cp.dataType);
+    }
+
+    if (classLevelField && cp.items == null) {
+      cp.vendorExtensions.put("x-not-nullable", cp.required || !cp.isNullable);
     }
 
     // if we have a weird format which is a String/int/etc with an unknown format
@@ -275,19 +286,19 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   private String nullGenChild(CodegenProperty cp) {
-    String suffix = isNullSafeEnabled  ? (cp.required ? "" : "?") : "";
     String val;
 
     if (cp.isMap) {
-      val = "Map<String, " + nullGenChild(cp.items) + ">" + suffix;
+      val = "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp);
     } else if (cp.isArray) {
       val = "List<" + nullGenChild(cp.items) + ">" + (isNullSafeEnabled ?
         ((cp.required || arraysThatHaveADefaultAreNullSafe) ? "" : "?") : "");
-      if (!isNullSafeEnabled || (isNullSafeEnabled && !(cp.required || arraysThatHaveADefaultAreNullSafe))) {
+      if (!isNullSafeEnabled) {
         cp.vendorExtensions.put("x-list-null", Boolean.TRUE);
       }
     } else {
-      val = cp.dataType + suffix;
+      val = cp.dataType + listOrMapSuffix(cp);
+      cp.vendorExtensions.put("x-not-nullable", cp.required || !cp.isNullable);
     }
 
     cp.vendorExtensions.put("x-innerType", val);

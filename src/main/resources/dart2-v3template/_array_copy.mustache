@@ -10,7 +10,7 @@
       data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.toList()
     {{/isModel}}
     {{#isModel}}
-      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) => data{{^required}}?{{/required}}.copyWith()).toList()
+      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) => {{>_copy}}).toList()
     {{/isModel}}
   {{/items}}
 {{/items}}

@@ -6,19 +6,11 @@
 {{/isMap}}
 {{^items}}
   {{#isEnum}}data{{/isEnum}}
-  {{#isDateTime}}
-{{#required}}data.add(Duration()){{/required}}
-{{^required}}data == null ? null : data.add(Duration()){{/required}}
-  {{/isDateTime}}
-  {{#isDate}}
-{{#required}}data.add(Duration()){{/required}}
-{{^required}}data == null ? null : data.add(Duration()){{/required}}
-  {{/isDate}}
+  {{#isDateTime}}{{>_copy_date}}{{/isDateTime}}
+  {{#isDate}}{{>_copy_date}}{{/isDate}}
   {{#isModel}}
-{{#required}}data.copyWith(){{/required}}
-{{^required}}data == null ? null : data.copyWith(){{/required}}
+    {{#vendorExtensions.x-not-nullable}}data.copyWith(){{/vendorExtensions.x-not-nullable}}
+    {{^vendorExtensions.x-not-nullable}}data == null ? null : data.copyWith(){{/vendorExtensions.x-not-nullable}}
   {{/isModel}}
-  {{#isPrimitiveType}}
-data
-  {{/isPrimitiveType}}
+  {{#isPrimitiveType}}data{{/isPrimitiveType}}
 {{/items}}
