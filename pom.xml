@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<openapi-codegen-version>5.0.0</openapi-codegen-version>
+		<openapi-codegen-version>5.1.0</openapi-codegen-version>
 	</properties>
 
 	<prerequisites>
