@@ -18,7 +18,12 @@ part of {{pubName}}.api;
       {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
     {{/vendorExtensions.x-dart-produces-json}}
     {{^vendorExtensions.x-dart-produces-json}}
+      {{#vendorExtensions.x-dart-produces-raw}}
+      {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
+      {{/vendorExtensions.x-dart-produces-raw}}
+      {{^vendorExtensions.x-dart-produces-raw}}
       {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
+      {{/vendorExtensions.x-dart-produces-raw}}
     {{/vendorExtensions.x-dart-produces-json}}
     {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
 
@@ -48,7 +53,12 @@ part of {{pubName}}.api;
         throw ApiException(500, 'Received an empty body');
         }
 
+    {{#vendorExtensions.x-dart-produces-raw}}
+      return response;
+    {{/vendorExtensions.x-dart-produces-raw}}
+    {{^vendorExtensions.x-dart-produces-raw}}
         return await apiDelegate.{{nickname}}_decode({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
+    {{/vendorExtensions.x-dart-produces-raw}}
     {{/returnType}}
       }
 
@@ -203,6 +213,7 @@ part of {{pubName}}.api;
       return await apiClient.invokeAPI(__path, queryParams, {{#hasFormParams}}postBody{{/hasFormParams}}{{#bodyParam}}postBody{{/bodyParam}}{{^bodyParam}}{{^hasFormParams}}null{{/hasFormParams}}{{/bodyParam}}, authNames, opt);
       }
 
+    {{^vendorExtensions.x-dart-produces-raw}}
     {{#vendorExtensions.x-dart-produces-json}}
       {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
     {{/vendorExtensions.x-dart-produces-json}}
@@ -224,15 +235,24 @@ part of {{pubName}}.api;
         {{/isMap}}
         {{^isMap}}
           {{#returnType}}
+            {{#vendorExtensions.x-dart-produces-raw}}
+                return response;
+            {{/vendorExtensions.x-dart-produces-raw}}
+            {{^vendorExtensions.x-dart-produces-raw}}
               return LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
+            {{/vendorExtensions.x-dart-produces-raw}}
           {{/returnType}}
         {{/isMap}}
       {{/isArray}}
     {{/vendorExtensions.x-dart-produces-json}}
     {{^vendorExtensions.x-dart-produces-json}}
+        {{^vendorExtensions.x-dart-produces-raw}}
         return await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}});
+        {{/vendorExtensions.x-dart-produces-raw}}
     {{/vendorExtensions.x-dart-produces-json}}
       }
+    {{/vendorExtensions.x-dart-produces-raw}}
+
   {{/operation}}
     }
 
