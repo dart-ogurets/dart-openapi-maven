@@ -29,5 +29,5 @@ jobs:
           java-version: '11'
           distribution: adopt
       - name: Build with Maven
-        run: mvn --batch-mode verify
+        run: mvn -Dmaven.wagon.http.retryHandler.count=5 --batch-mode verify
 
