@@ -34,6 +34,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventResponse"
+  /event/kivan/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - ControlService
+      description: "testing application/octet-stream"
+      operationId: getOctetStream
+      responses:
+        200:
+          description: "content is octet-stream"
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
   /event/getstatus:
     post:
       tags:

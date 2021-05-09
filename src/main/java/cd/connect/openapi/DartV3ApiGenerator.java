@@ -26,6 +26,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
   private static final String LIBRARY_NAME = "dart2-api";
   private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
+  private static final String API_PRODUCES_RAW_STREAM = "vendorExtensions.x-dart-produces-raw";
   private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
   protected boolean arraysThatHaveADefaultAreNullSafe;
   protected boolean isNullSafeEnabled;
@@ -58,6 +59,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     // replace Object with dynamic
     this.typeMapping.put("object", "dynamic");
     this.typeMapping.put("AnyType", "dynamic");
+    this.typeMapping.put("file", "ApiResponse");
+    this.typeMapping.put("binary", "ApiResponse");
 
     // override the location
     embeddedTemplateDir = templateDir = DART2_TEMPLATE_FOLDER;
@@ -189,10 +192,6 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     if ("dynamic".equals(cp.complexType)) {
       cp.isAnyType = true;
       cp.isPrimitiveType = true;
-    }
-
-    if ("dependencies".equals(cp.name)) {
-      System.out.println("");
     }
 
     if (cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) {
@@ -446,6 +445,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       extensions.put(prefix + "xml", "application/xml");
     } else if (lowerCaseContentTypes.contains("application/yaml")) {
       extensions.put(prefix + "yaml", "application/yaml");
+    } else if (lowerCaseContentTypes.contains("application/octet-stream")) {
+      extensions.put(prefix + "raw", "application/octet-stream");
     } else {
       extensions.put(prefix + "json", "application/json"); // fallback
     }
