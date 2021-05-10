@@ -3,15 +3,6 @@
 This plugin was originally designed for use by the OpenAPi v3 Maven Plugin, but works with the
 command line generator and the Gradle plugin. it generates _excellent_ Dart code and uses Dio.
 
-There is an article on Medium discussing 
-https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[this plugin].
-
-=== Developers
-
-- _Irina Southwell (nee Капрельянц Ирина)_, FeatureHub Founder (https://www.linkedin.com/in/irina-southwell-9727a422/)
-- _Richard Vowles_, FeatureHub Founder (https://www.linkedin.com/in/richard-vowles-72035193/)
-
-This is a product of http://featurehub.io
 
 ==== Changelog
 
