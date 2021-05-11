@@ -6,6 +6,8 @@ command line generator and the Gradle plugin. it generates _excellent_ Dart code
 
 ==== Changelog
 
+- 5.3 - AnyOf support contribution by Łukasz Wiśniewski (https://github.com/vishna) and a resolution of the application/octet-stream issue
+where binary data is now returned as an ApiResponse (always).
 - 5.2 - this version addresses issues with complex codegen. It assumes that by default List and Map entries will be non null for
 null safe support. 
 - 5.1 - this addresses the issues of a non-required POST body. It does not address the issue of complex tree structures of models as yet,
@@ -302,7 +304,7 @@ To test locally you can run tests by invoking this command:
 
 [source,bash]
 ----
-mvn -Dmaven.wagon.http.retryHandler.count=5 --batch-mode verify
+mvn clean verify
 ----
 
 The source for the tests is located in src/k8s** folders. The generated test output will be in target/it/k8s**.
