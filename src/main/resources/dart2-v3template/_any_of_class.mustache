@@ -1,0 +1,107 @@
+class {{classname}} {
+  {{classname}}();
+
+  {{#nullSafe}}late {{/nullSafe}}dynamic _value;
+  dynamic get value => _value;
+  void set value(dynamic v) {
+    {{#innerTypes}}
+    if (v is {{classname}}) {
+      _value = v;
+      _discriminator = {{enumClassname}}.{{classname}};
+      return;
+    }
+    {{/innerTypes}}
+    throw ArgumentError("${v.runtimeType} cannot be a value of AnyOf<{{anyOfTemplate}}>");
+  }
+
+  {{#nullSafe}}late {{/nullSafe}}{{enumClassname}} _discriminator;
+  {{enumClassname}} get discriminator => _discriminator;
+
+  @override
+  String toString() {
+    return 'AnyOf<{{anyOfTemplate}}>[value=$_value]';
+  }
+
+  fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+    if (json == null) return;
+
+    final discriminatorStr = json[r'{{discriminatorProperty}}'];
+
+    if (discriminatorStr == null) {
+      return;
+    }
+
+    switch (discriminatorStr) {
+      {{#innerTypes}}
+      case r'{{discriminatorValue}}':
+        _value = {{classname}}.fromJson(json);
+        _discriminator = {{enumClassname}}.{{classname}};
+        break;
+      {{/innerTypes}}
+    }
+  }
+
+  {{classname}}.fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+    fromJson(json); // allows child classes to call
+  }
+
+  Map<String, dynamic> toJson() => LocalApiClient.serialize(_value);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (other is {{classname}} && runtimeType == other.runtimeType) {
+      return _value == other._value;
+    }
+
+    return false;
+  }
+
+  @override
+  int get hashCode {
+    var hashCode = runtimeType.hashCode;
+
+    if (_value != null) {
+      hashCode = hashCode * 31 + _value.hashCode;
+    }
+
+    {{#nullSafe}}hashCode = hashCode * 31 + _discriminator.hashCode;{{/nullSafe}}
+    {{^nullSafe}}
+    if (_discriminator != null) {
+      hashCode = hashCode * 31 + _discriminator.hashCode;
+    }
+    {{/nullSafe}}
+
+    return hashCode;
+  }
+
+  {{classname}} copyWith() {
+    final copy = {{classname}}();
+    copy._value = _value.copyWith();
+    copy._discriminator = _discriminator;
+    return copy;
+  }
+
+  static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+    return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
+  }
+
+  {{#innerTypes}}{{classname}} as{{classname}}() => _value as {{classname}};
+  {{/innerTypes}}
+
+  dynamic as({{enumClassname}} type) {
+    switch (type) {
+      {{#innerTypes}}
+      case {{enumClassname}}.{{classname}}:
+        return _value as {{classname}};
+      {{/innerTypes}}
+    }
+  }
+}
+
+enum {{enumClassname}} {
+  {{#innerTypes}}{{classname}},{{/innerTypes}}
+}

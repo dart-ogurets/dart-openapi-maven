@@ -296,3 +296,13 @@ behind as you generate.
       </plugin>
 ----
 
+=== Testing
+
+To test locally you can run tests by invoking this command:
+
+[source,bash]
+----
+mvn -Dmaven.wagon.http.retryHandler.count=5 --batch-mode verify
+----
+
+The source for the tests is located in src/k8s** folders. The generated test output will be in target/it/k8s**.

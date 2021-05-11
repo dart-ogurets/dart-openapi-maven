@@ -86,6 +86,9 @@
                 <additionalProperty>
                   pubspec-dev-dependencies=uuid: 2.0.4
                 </additionalProperty>
+                <additionalProperty>
+                  listAnyOf=true
+                </additionalProperty>
               </additionalProperties>
               <globalProperties>
                 <skipFormModel>false</skipFormModel>

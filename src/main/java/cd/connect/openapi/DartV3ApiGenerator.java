@@ -1,6 +1,8 @@
 package cd.connect.openapi;
 
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.media.ComposedSchema;
+import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,9 +19,13 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConfig {
@@ -28,8 +34,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
   private static final String API_PRODUCES_RAW_STREAM = "vendorExtensions.x-dart-produces-raw";
   private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
+  private static final String LIST_ANY_OF = "listAnyOf";
   protected boolean arraysThatHaveADefaultAreNullSafe;
   protected boolean isNullSafeEnabled;
+
+  Map<String, AnyOfClass> extraAnyOfClasses = new HashMap<String, AnyOfClass>();
+  Set<String> extraAnyParts = new HashSet<String>();
+  boolean listAnyOf = false;
 
   public DartV3ApiGenerator() {
     super();
@@ -86,6 +97,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
     isNullSafeEnabled = additionalProperties.containsKey("nullSafe");
 
+    this.additionalProperties.put("x-dart-anyparts", extraAnyParts);
+    listAnyOf = additionalProperties.containsKey(LIST_ANY_OF);
   }
 
   /**
@@ -310,6 +323,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   public Map<String, Object> updateAllModels(Map<String, Object> objs) {
     super.updateAllModels(objs);
 
+    if (listAnyOf) {
+      // add models for List<AnyOf<*>> classes
+      extraAnyOfClasses.values().forEach(anyOfClass -> {
+        objs.put(anyOfClass.fileName, anyOfClass.toModelMap(this));
+      });
+    }
+
     Map<String, CodegenModel> allModels = new HashMap<>();
 
     objs.values().forEach(o -> {
@@ -533,6 +553,91 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       } catch (Exception e) {
         log.error("Error running the command ({}). Exception: {}", command, e.getMessage());
       }
+    }
+  }
+
+  @Override
+  public String toAnyOfName(List<String> names, ComposedSchema composedSchema) {
+    if (listAnyOf) {
+      // create models for List<anyOf> classes that have discriminator
+      if (composedSchema.getDiscriminator() != null) {
+        // ensure alphabetical sorting
+        names = new ArrayList<String>(names);
+        Collections.sort(names);
+        List<String> namesFilename = names.stream().map(this::toModelFilename).collect(Collectors.toList());
+        List<String> namesCapitalized = names.stream().map(StringUtils::capitalize).collect(Collectors.toList());
+        String className = "AnyOf" + String.join("", namesCapitalized);
+        String enumClassName = "AnyOfDiscriminator" + String.join("", namesCapitalized);
+        String fileName = "any_of_" + String.join("_", namesFilename);
+        String filePart = "model/" + fileName + ".dart";
+        // collect any of classes
+        extraAnyOfClasses.put(className, new AnyOfClass(fileName, filePart, toModelName(className), toModelName(enumClassName), composedSchema));
+        extraAnyParts.add(filePart);
+        return className;
+      }
+    }
+    return super.toAnyOfName(names, composedSchema);
+  }
+
+  static class AnyOfClass {
+    final String fileName;
+    final String filePart;
+    final String className;
+    final String enumClassName;
+    final ComposedSchema composedSchema;
+    final Discriminator discriminatorProperty;
+
+    AnyOfClass(String fileName, String filePart, String className, String enumClassName, ComposedSchema composedSchema) {
+      this.fileName = fileName;
+      this.filePart = filePart;
+      this.className = className;
+      this.enumClassName = enumClassName;
+      this.composedSchema = composedSchema;
+      discriminatorProperty = composedSchema.getDiscriminator();
+      assert (discriminatorProperty != null);
+    }
+
+    Map<String, Object> toModelMap(DartV3ApiGenerator generator) {
+      Map<String, Object> data = new HashMap<>();
+      List<Map<String, Object>> innerTypes = new ArrayList<>();
+      List<String> _types = new ArrayList<String>();
+      data.put("pubName", generator.pubName);
+      data.put("isAnyOfClass", true);
+      data.put("classname", className);
+      data.put("enumClassname", enumClassName);
+      data.put("discriminatorProperty", discriminatorProperty.getPropertyName());
+      data.put("innerTypes", innerTypes);
+      data.put("nullSafe", generator.additionalProperties.get("nullSafe"));
+
+      composedSchema.getAnyOf().stream().forEach(schema -> {
+        String ref = schema.get$ref();
+        String type = generator.getTypeDeclaration(schema);
+        _types.add(type);
+        String discriminatorValue = ModelUtils.getSimpleRef(ref);
+        // lookup discriminator mappings if there any
+        if (discriminatorProperty.getMapping() != null) {
+          for (Entry<String, String> e : discriminatorProperty.getMapping().entrySet()) {
+            if (e.getValue().equals(ref)) {
+              discriminatorValue = e.getKey();
+            }
+          }
+        }
+        innerTypes.add(createType(type, discriminatorValue));
+      });
+
+      Collections.sort(_types);
+      data.put("anyOfTemplate", String.join(",", _types));
+
+      return data;
+    }
+
+    private static Map<String, Object> createType(String classname, String discriminatorValue) {
+      assert (classname != null);
+      assert (discriminatorValue != null);
+      Map<String, Object> data = new HashMap<>();
+      data.put("classname", classname);
+      data.put("discriminatorValue", discriminatorValue);
+      return data;
     }
   }
 }
