@@ -133,42 +133,42 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   }
 
   @override
-  bool operator ==(Object{{#nullSafe}}?{{/nullSafe}} other) {
-    if (identical(this, other)) {
+  bool operator ==(Object{{#nullSafe}}?{{/nullSafe}} __other) {
+    if (identical(this, __other)) {
       return true;
     }
 
-    if (other is {{classname}} && runtimeType == other.runtimeType) {
+    if (__other is {{classname}} && runtimeType == __other.runtimeType) {
   {{#hasVars}}
-    return {{^hasVars}}json?.equals(other.json);{{/hasVars}}{{#vars}}{{^vendorExtensions.x-dart-inherited}}
+    return {{^hasVars}}json?.equals(__other.json);{{/hasVars}}{{#vars}}{{^vendorExtensions.x-dart-inherited}}
     {{#complexType}}
       {{#isArray}}
-        const ListEquality().equals({{{name}}}, other.{{{name}}}){{^-last}} &&
+        const ListEquality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
       {{/-last}}
       {{/isArray}}
       {{^isArray}}
         {{#isMap}}
-          const MapEquality().equals({{{name}}}, other.{{{name}}}){{^-last}} &&
+          const MapEquality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
         {{/-last}}
         {{/isMap}}
         {{^isMap}}
-          {{{name}}} == other.{{{name}}}{{^-last}} && // other
+          {{{name}}} == __other.{{{name}}}{{^-last}} && // __other
         {{/-last}}
         {{/isMap}}
       {{/isArray}}
     {{/complexType}}{{^complexType}}
     {{#isArray}}
-      const ListEquality().equals({{{name}}}, other.{{{name}}}){{^-last}} &&
+      const ListEquality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
     {{/-last}}
     {{/isArray}}
     {{^isArray}}
-     {{{name}}} == other.{{{name}}}{{^-last}} &&
+     {{{name}}} == __other.{{{name}}}{{^-last}} &&
     {{/-last}}
     {{/isArray}}
   {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}
     {{#parent}} &&
-    super==other{{/parent}};{{/hasVars}}{{^hasVars}}
-    return {{#parent}}super==other{{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+    super==__other{{/parent}};{{/hasVars}}{{^hasVars}}
+    return {{#parent}}super==__other{{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
     }
 
     return false;

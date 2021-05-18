@@ -3,77 +3,10 @@
 This plugin was originally designed for use by the OpenAPi v3 Maven Plugin, but works with the
 command line generator and the Gradle plugin. it generates _excellent_ Dart code and uses Dio.
 
+== How to use
 
-==== Changelog
-
-- 5.3 - AnyOf support contribution by Łukasz Wiśniewski (https://github.com/vishna) and a resolution of the application/octet-stream issue
-where binary data is now returned as an ApiResponse (always).
-- 5.2 - this version addresses issues with complex codegen. It assumes that by default List and Map entries will be non null for
-null safe support. 
-- 5.1 - this addresses the issues of a non-required POST body. It does not address the issue of complex tree structures of models as yet,
-this will come in 5.2.
-- 5.0 - is a significant departure and you will need to use the public Dart tool to migrate your code https://pub.dev/packages/openapi_migrate/versions/1.0.0
-It allows the use of null safe code by adding in the extra _additionalProperty_ `nullSafe`. It will also allow you to assume (and ensure
-defaults are set) null safety for all arrays that are otherwise not declared such in your OpenAPI yaml (by making them empty arrays)
-by the use of `nullSafe-array-default`. 
-
-It is recommended for 5.0 that you do an intermediate step and regenerate your existing code without these null safe functions turned on,
-and use the `openapi_migrate` tool on your code. Its likely you will need to run it multiple times to catch everything. When you are ready
-to move your whole project to null safety, you will be able to regenerate your API with the additionalProperty flags and then do the normal
-`dart migrate` process. We are doing this with our codebase over at FeatureHub (https://featurehub.io).
-
-Another significant departure for 5.0 is that it enforces return vaulues - you cannot return a status code from an API that is not declared in
-your OpenAPI.
-
-- 4.2 - if you directly use the Type Transformers for enums, this is a breaking change. They have changed to extensions
-and have been slightly remodeled based on Robert's inlining work. The whole deserialisation mechanism has changed particluarly
-for lists and maps because it wasn't able to cope more than one level deep with lists and maps (issue #19). The date
-format now serialises directly properly, but not in lists. 
-- 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart. Please note that
-  with the move to 4.1, form models are by default NOT generated, so your parameters for methods calling forms won't
-  work. You need to set a global property called `skipFormModels` to false. In Maven this is in the configuration
-
-[source,xml]
-----
-  <globalProperties>
-    <skipFormModels>false</skipFormModels>
-  </globalProperties>
-----
-
-- 3.10 - support extension methods for mapping between enum names and types
-- 3.9 - support for reserved words mappings in variable names
-- 3.8 - non complex lists were not being compared in equals or hash functions correctly
-- 3.7 - resolved an issue with inline enums - thanks to Robert of https://github.com/BlackBeltTechnology
-- 3.5 - resolved an issue where class level variables were being duplicated from the parent, causing equals to fail
-- 3.4 - backed out some experimental features and exposed the serialization capabilities. fixed a NPE on the copyWith.
-- 3.3 - introduces feedback from Jpi & Brian Janssen around making all the LocalApi serializer calls static, so `toJson()`
-can be called by jsonEncode without introducing non-Dart-like complexity. Further, we introduce an experimental vendor
-extension on an operation called `x-dart-rich-operationId` - this has to be another operation id, not the same as `operationId:`
-as Dart cannot have two functions with different return types. It will give you the same method signature, but return the
-deserialized object, the headers and the status code. It does not interfere with the existing code generation and was introduced
-to allow situations where session data is being returned outside of the body. It will be documented further once accepted.
-- 3.2 - introduces support for extra elements in the pubspec, import support, arbitrary part support and a fix for arrays of date times and dates
-- 3.1 - introduces support for the Kubernetes API in terms of compilation along with a considerable degree of support for the
-complexity of that API. It also reduces the code generated when no forms are used or forms are used but not json. It also supports
-the return of non-json data by just returning the string, allowing you to decode it. 
-- 2.9 - support inheritance using allOf where it exists. If the model from the generator provides a parentClass we modify the
-output to now support the correct code generation to support inheritance. Resolve issue around headers not being merged if passed
-by user. Fix issue with form data generation where fields need to be json encoded. 
-- 2.8 - resolves a number of Dart Analysis issues
-- 2.6/7 - add in a new copyWith() method that allows you to make deep copies of the model and replace specific parts
-- 2.5 - fixed a dangling } issue from pedantic, fixed additionalProperties support for k8s api generation, added integration tests
-- 2.4 - fixed an issue if no authNames were being provided, a List<dynamic> was created instead of a List<String>
-- 2.3 - this is a cleanup of the move to Dio based on pedantic feedback
-- 1.5 - fixed the pubspec.yaml 
-- 1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.
-
-==== Roadmap
-
-- We intend to support the `oneOf` syntax for parameters for request and response types by using optional parameters. This
-won't change method calls when you are only passing one type.
-- We will start investigating how to support `anyOf` syntax. 
-- We will wrap exceptions that have generated models
-- We intend to be generating server side code for supporting Dart server side applications. 
+This tool can be used via Maven, Gradle or from the command line. There are important additional properties that
+you can configure especially around support for null safety, so read on!
 
 === Usage in Maven
 
@@ -89,7 +22,7 @@ To use it, do something like this:
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>4.2</version>
+            <version>5.4</version>
           </dependency>
         </dependencies>
         <executions>
@@ -104,13 +37,18 @@ To use it, do something like this:
               <inputSpec>${project.basedir}/target/mrapi/mr-api.yaml</inputSpec>
               <generatorName>dart2-api</generatorName>
               <enablePostProcessFile>true</enablePostProcessFile>
+              <additionalProperties>
+                <additionalProperty>
+                  pubName=k8s_api
+                </additionalProperty>
+              </additionalProperties>
             </configuration>
           </execution>
         </executions>
       </plugin>
 -----
 
-We use the enablePostProcessFile because if it finds a FLUTTER environment variable, it 
+We use the enablePostProcessFile because if it finds a FLUTTER environment variable, it
 will run dartfmt on the generated files.
 
 === Usage in Gradle
@@ -126,7 +64,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:4.2"
+		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:5.4"
 	}
 }
 ----
@@ -150,7 +88,7 @@ openApiGenerate {
 
 === Usage from the command line
 
-Please refer to Irina's article https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[on Medium].
+Please refer to the article https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[on Medium].
 
 ==== Additional Properties
 
@@ -159,6 +97,11 @@ Additional properties allow you to customise how code is generated and we honour
 - `pubspec-dependencies`: anything in this will be split on a command added to the dependencies section of your
 generated code.
 - `pubspec-dev-dependencies`: anything here will be added to the dev dependencies of your generated code.
+- `nullSafe=true' and `nullSafe-array-default=true` - these two normally go together and change the minimum version
+of Dart to 2.12 and generate null safe code. Using the nullSafe-array-default, it makes even arrays that are not listed
+as being `required` in your OpenAPI "required" but making them always generate a default value of `[]`. This ends up
+being considerably easier to use.
+- `listAnyOf=false` - this will turn _off_ AnyOf support. This would be a bit weird, but you can do it if you want.
 
 the normal ones include:
 
@@ -253,7 +196,7 @@ for testing purposes.
       </plugin>
 ----
 
-And we include a custom Clean plugin definition to ensure old artifacts aren't left 
+And we include a custom Clean plugin definition to ensure old artifacts aren't left
 behind as you generate.
 
 [source,xml]
@@ -300,6 +243,19 @@ behind as you generate.
 
 === Testing
 
+If you are trying to make changes to the repository, I recommend adding a new test to "SampleRunner"
+with your options - you can change it to point to your own yaml OpenAPI file and it will generate the project
+into `target/SampleRunner`. Also open this project (from `target/SampleRunner`) in the IDE and you will be able to
+run the test and regenerate the project (just don't do a mvn clean).
+
+If you run and debug the test in the IDE it means you can see what OpenAPI is putting in what places and see
+the breakdown of the structures and tagging that is going on.
+
+If you add something, please make sure you provide integration tests - so add the parts of the yaml that don't
+otherwise work to the projects in src/it/* projects and run the `mvn verify` command. Please make sure you add tests
+to the test subfolder to ensure the code is generating and working the way you want, especially if you add stuff
+to the deep copy mechanism, the hash or equals mechanisms.
+
 To test locally you can run tests by invoking this command:
 
 [source,bash]
@@ -308,3 +264,76 @@ mvn clean verify
 ----
 
 The source for the tests is located in src/k8s** folders. The generated test output will be in target/it/k8s**.
+
+==== Changelog
+
+- 5.4 - change the equals method to use a local variable called `__other` instead of `other` as when a class had an `other`
+property,  the equals would break.
+- 5.3 - AnyOf support contribution by Łukasz Wiśniewski (https://github.com/vishna) and a resolution of the application/octet-stream issue
+where binary data is now returned as an ApiResponse (always).
+- 5.2 - this version addresses issues with complex codegen. It assumes that by default List and Map entries will be non null for
+null safe support.
+- 5.1 - this addresses the issues of a non-required POST body. It does not address the issue of complex tree structures of models as yet,
+this will come in 5.2.
+- 5.0 - is a significant departure and you will need to use the public Dart tool to migrate your code https://pub.dev/packages/openapi_migrate/versions/1.0.0
+It allows the use of null safe code by adding in the extra _additionalProperty_ `nullSafe`. It will also allow you to assume (and ensure
+defaults are set) null safety for all arrays that are otherwise not declared such in your OpenAPI yaml (by making them empty arrays)
+by the use of `nullSafe-array-default`.
+
+It is recommended for 5.0 that you do an intermediate step and regenerate your existing code without these null safe functions turned on,
+and use the `openapi_migrate` tool on your code. Its likely you will need to run it multiple times to catch everything. When you are ready
+to move your whole project to null safety, you will be able to regenerate your API with the additionalProperty flags and then do the normal
+`dart migrate` process. We are doing this with our codebase over at FeatureHub (https://featurehub.io).
+
+Another significant departure for 5.0 is that it enforces return vaulues - you cannot return a status code from an API that is not declared in
+your OpenAPI.
+
+- 4.2 - if you directly use the Type Transformers for enums, this is a breaking change. They have changed to extensions
+and have been slightly remodeled based on Robert's inlining work. The whole deserialisation mechanism has changed particluarly
+for lists and maps because it wasn't able to cope more than one level deep with lists and maps (issue #19). The date
+format now serialises directly properly, but not in lists.
+- 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart. Please note that
+with the move to 4.1, form models are by default NOT generated, so your parameters for methods calling forms won't
+work. You need to set a global property called `skipFormModels` to false. In Maven this is in the configuration
+
+[source,xml]
+----
+  <globalProperties>
+    <skipFormModels>false</skipFormModels>
+  </globalProperties>
+----
+
+- 3.10 - support extension methods for mapping between enum names and types
+- 3.9 - support for reserved words mappings in variable names
+- 3.8 - non complex lists were not being compared in equals or hash functions correctly
+- 3.7 - resolved an issue with inline enums - thanks to Robert of https://github.com/BlackBeltTechnology
+- 3.5 - resolved an issue where class level variables were being duplicated from the parent, causing equals to fail
+- 3.4 - backed out some experimental features and exposed the serialization capabilities. fixed a NPE on the copyWith.
+- 3.3 - introduces feedback from Jpi & Brian Janssen around making all the LocalApi serializer calls static, so `toJson()`
+can be called by jsonEncode without introducing non-Dart-like complexity. Further, we introduce an experimental vendor
+extension on an operation called `x-dart-rich-operationId` - this has to be another operation id, not the same as `operationId:`
+as Dart cannot have two functions with different return types. It will give you the same method signature, but return the
+deserialized object, the headers and the status code. It does not interfere with the existing code generation and was introduced
+to allow situations where session data is being returned outside of the body. It will be documented further once accepted.
+- 3.2 - introduces support for extra elements in the pubspec, import support, arbitrary part support and a fix for arrays of date times and dates
+- 3.1 - introduces support for the Kubernetes API in terms of compilation along with a considerable degree of support for the
+complexity of that API. It also reduces the code generated when no forms are used or forms are used but not json. It also supports
+the return of non-json data by just returning the string, allowing you to decode it.
+- 2.9 - support inheritance using allOf where it exists. If the model from the generator provides a parentClass we modify the
+output to now support the correct code generation to support inheritance. Resolve issue around headers not being merged if passed
+by user. Fix issue with form data generation where fields need to be json encoded.
+- 2.8 - resolves a number of Dart Analysis issues
+- 2.6/7 - add in a new copyWith() method that allows you to make deep copies of the model and replace specific parts
+- 2.5 - fixed a dangling } issue from pedantic, fixed additionalProperties support for k8s api generation, added integration tests
+- 2.4 - fixed an issue if no authNames were being provided, a List<dynamic> was created instead of a List<String>
+- 2.3 - this is a cleanup of the move to Dio based on pedantic feedback
+- 1.5 - fixed the pubspec.yaml
+- 1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.
+
+==== Roadmap
+
+- We intend to support the `oneOf` syntax for parameters for request and response types by using optional parameters. This
+won't change method calls when you are only passing one type.
+- We will wrap exceptions that have generated models
+- We intend to be generating server side code for supporting Dart server side applications.
+- We are considering memoization
