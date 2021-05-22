@@ -407,6 +407,11 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       if (richOp != null) {
         co.vendorExtensions.put("x-dart-extension-name", toVarName(richOp.toString()));
       }
+      co.allParams.forEach((p) -> {
+        if (p.isFile) {
+          p.dataType = "Stream<List<int>>";
+        }
+      });
     }
     return som;
   }

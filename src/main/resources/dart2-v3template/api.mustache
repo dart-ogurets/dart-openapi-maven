@@ -133,7 +133,8 @@ part of {{pubName}}.api;
       {{^required}}
           if({{paramName}} != null) {
       {{/required}}
-        queryParams.addAll(convertParametersForCollectionFormat(LocalApiClient.parameterToString, '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
+        queryParams.addAll(convertParametersForCollectionFormat({{#isDateTime}}openApiDateTimeParameterToString{{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}},
+          '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
       {{^required}}
           }
       {{/required}}
@@ -171,15 +172,15 @@ part of {{pubName}}.api;
         if (headerParams['Content-Type'] == null) {
         headerParams['Content-Type'] = 'application/x-www-form-urlencoded';
         }
-        final formData = <String, String>{};
-      {{#formParams}}
-        {{^isFile}}
-            formData['{{baseName}}'] = Uri.encodeFull(LocalApiClient.parameterToString({{paramName}}));
-        {{/isFile}}
-      {{/formParams}}
       {{#hasFormParams}}
-          Object postBody = formData.entries.map((me) => me.key + "=" + me.value).join("&");
+        Object postBody = {
+        {{^isFile}}
+          '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+                          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}}
+        {{/isFile}}
+        }.entries.where((me) => me.value != null).map((me) => me.key + "=" + me.value).join("&);
       {{/hasFormParams}}
+      {{^hasFormParams}}Object postBody = null;{{/hasFormParams}}
     {{/vendorExtensions.x-dart-consumes-form}}
     {{#vendorExtensions.x-dart-consumes-multipartform}}
         if (headerParams['Content-Type'] == null) {

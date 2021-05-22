@@ -11,16 +11,16 @@ import java.util.Arrays;
 public class SampleRunner {
   @Test
   public void runGenerator() {
-//    String location = getClass().getResource("/test.yaml").getFile();
-    String location = getClass().getResource("/k8s_null_test.yml").getFile();
+    String location = getClass().getResource("/test.yaml").getFile();
+//    String location = getClass().getResource("/k8s_null_test.yml").getFile();
 //    OpenAPIGenerator.main(Arrays.asList("help", "generate").toArray(new String[0]));
 
     OpenAPIGenerator.main(Arrays.asList("generate",
       "--input-spec", location,
       "--generator-name", "dart2-api",
       "--additional-properties", "pubName=sample_app",
-      "--type-mappings", "int-or-string=IntOrString",
-      "--import-mappings", "IntOrString=./int_or_string.dart",
+//      "--type-mappings", "int-or-string=IntOrString",
+//      "--import-mappings", "IntOrString=./int_or_string.dart",
       "--global-property", "skipFormModel=false",
       "--additional-properties", "nullSafe=true",
       "--additional-properties", "nullSafe-array-default=true",

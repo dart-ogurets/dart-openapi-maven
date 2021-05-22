@@ -51,6 +51,12 @@ paths:
                   type: string
                 secret:
                   type: string
+                dt:
+                  type: string
+                  format: date-time
+                d:
+                  type: string
+                  format: date
                 params:
                   $ref: '#/components/schemas/UniqueEventRequest'
             encoding:
@@ -82,6 +88,27 @@ paths:
             application/yaml:
               schema:
                 $ref: "#/components/schemas/EventResponse"
+    get:
+      tags:
+        - ControlService
+      parameters:
+        - name: timestamp
+          in: query
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: false
+      description: "Provide query interface for date-time"
+      operationId: optionalGet
+      responses:
+        "200":
+          description: "blah"
     delete:
       tags:
         - ControlService

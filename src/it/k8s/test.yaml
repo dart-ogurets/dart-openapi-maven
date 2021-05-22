@@ -42,6 +42,18 @@ paths:
           required: true
           schema:
             type: string
+        - name: timestamp
+          in: query
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: false
       tags:
         - ControlService
       description: "testing application/octet-stream"

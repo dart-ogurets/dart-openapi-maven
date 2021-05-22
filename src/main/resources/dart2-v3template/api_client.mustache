@@ -119,13 +119,12 @@ return value.toString();
     }
   }
 
-
    /// Format the given parameter object into string.
-  static String parameterToString(dynamic{{#nullSafe}}?{{/nullSafe}} value) {
+  static String? parameterToString(dynamic{{#nullSafe}}?{{/nullSafe}} value) {
     if (value == null) {
-      return '';
-    } else if (value is DateTime) {
-      return value.toUtc().toIso8601String();
+      return null;
+    } else if (value is DateTime) { // shouldn't ever be used, replaced by direct call
+      return Uri.encodeComponent(value.toUtc().toIso8601String());
     } else if (value is String) {
       return value.toString();
     }
