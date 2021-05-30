@@ -125,7 +125,7 @@ return value.toString();
       return null;
     } else if (value is DateTime) { // shouldn't ever be used, replaced by direct call
       return Uri.encodeComponent(value.toUtc().toIso8601String());
-    } else if (value is String) {
+    } else if (value is String || value is num || value is bool) {
       return value.toString();
     }
 

@@ -114,7 +114,9 @@ part of {{pubName}}.api;
     {{/nullSafe}}
 
       // create path and map variables
-      final __path = '{{{path}}}'{{#pathParams}}.replaceAll('{' + '{{baseName}}' + '}', {{{paramName}}}.toString()){{/pathParams}};
+      final __path = '{{{path}}}'{{#pathParams}}.replaceAll('{' + '{{baseName}}' + '}',
+    {{#isDateTime}}openApiDateTimeParameterToString{{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}(
+        {{{paramName}}}){{#nullSafe}}{{^isDateTime}}{{^isDate}}!{{/isDate}}{{/isDateTime}}{{/nullSafe}}){{/pathParams}};
 
       // query params
       final queryParams = <QueryParam>[];

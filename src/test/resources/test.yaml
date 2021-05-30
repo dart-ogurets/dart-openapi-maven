@@ -34,6 +34,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventResponse"
+  /event/sample/{id}/{date}/{dateTime}/{nums}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: nums
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: dateTime
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date-time
+      operationId: getSampleWithAllTypes
+      tags:
+        - ControlService
+      responses:
+        200:
+          description: "some desc"
+  /event/kivan/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: timestamp
+          in: query
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: false
+      tags:
+        - FileService
+      description: "testing application/octet-stream"
+      operationId: getOctetStream
+      responses:
+        200:
+          description: "content is octet-stream"
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
   /event/file-test:
     post:
       tags:

@@ -18,7 +18,7 @@ part 'api_client.dart';
 
 {{#apiInfo}}{{#apis}}part 'api/{{classFilename}}.dart';
 {{/apis}}{{/apiInfo}}
-{{#models}}{{#model}}part 'model/{{classFilename}}.dart';
+{{#models}}{{#model}}{{^isInlineObject}}part 'model/{{classFilename}}.dart';{{/isInlineObject}}
 {{/model}}{{/models}}
 
 {{#x-dart-parts}}

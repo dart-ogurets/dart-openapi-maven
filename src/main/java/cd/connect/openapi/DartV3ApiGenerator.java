@@ -354,6 +354,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
           }
           if (cm.getName().startsWith("inline_object")) {
             removeInlines.add(modelMap);
+            modelMap.put("isInlineModel", "true");
           } else {
             if (!cm.getName().endsWith("_allOf")) {
               allModels.put(cm.getName(), cm);
@@ -545,8 +546,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public void postProcessFile(File file, String fileType) {
-
-//    if (file.getName().startsWith())
+    if (file.getName().startsWith("inline_object")) {
+      file.delete();
+    }
   }
 
   private void outputStreamToConsole(Process proc) throws Exception {

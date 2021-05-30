@@ -34,6 +34,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventResponse"
+  /event/file-test:
+    post:
+      tags:
+        - FileService
+      description: "file post service"
+      operationId: fileMultipartPost
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: yup
+  /event/pure-file-test:
+    post:
+      tags:
+        - FileService
+      description: "file post service"
+      operationId: pureFilePost
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: file
+      responses:
+        "200":
+          description: yup
+  /event/sample/{id}/{date}/{dateTime}/{nums}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: nums
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: dateTime
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date-time
+      operationId: getSampleWithAllTypes
+      tags:
+        - ControlService
+      responses:
+        200:
+          description: "some desc"
   /event/kivan/{id}:
     get:
       parameters:
