@@ -22,7 +22,7 @@ To use it, do something like this:
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>5.4</version>
+            <version>5.5</version>
           </dependency>
         </dependencies>
         <executions>
@@ -267,6 +267,9 @@ The source for the tests is located in src/k8s** folders. The generated test out
 
 ==== Changelog
 
+- 5.5 - this is a release focused on form, multi-part uploads, file uploads and downloads and enhancing the parameters as lodged in
+a couple of tickets. DO NOT UPGRADE if you are using complex non-named JSON bodies in your requestBodies - *please* move your non-form objects into the `#/components/schemas` section if you are using complex json bodies. This is an _extremely_ bad API smell and as this is an opinionated
+generator, I need to remove this support, you should not be using classes called "InlineObject1" and "InlineOBject2".  
 - 5.4 - change the equals method to use a local variable called `__other` instead of `other` as when a class had an `other`
 property,  the equals would break.
 - 5.3 - AnyOf support contribution by Łukasz Wiśniewski (https://github.com/vishna) and a resolution of the application/octet-stream issue
