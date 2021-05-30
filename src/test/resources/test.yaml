@@ -22,6 +22,10 @@ paths:
                   type: string
                 secret:
                   type: string
+                usernames:
+                  type: array
+                  items:
+                    type: number
                 params:
                   $ref: '#/components/schemas/EventRequest'
             encoding:
@@ -116,6 +120,31 @@ paths:
                 avatar:
                   type: string
                   format: binary
+      responses:
+        "200":
+          description: yup
+  /event/multi-file-test:
+    post:
+      tags:
+        - FileService
+      description: "file post service"
+      operationId: fileMultifilePost
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: array
+                  items:
+                    type: string
+                avatar:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         "200":
           description: yup

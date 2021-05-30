@@ -176,10 +176,17 @@ part of {{pubName}}.api;
         }
       {{#hasFormParams}}
         final postBody = <String, dynamic{{#nullSafe}}?{{/nullSafe}}>{ {{#formParams}}
-        {{^isFile}}
+          {{^isFile}}
+        {{^isArray}}
           '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
                           {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
-        {{/isFile}}
+        {{/isArray}}
+        {{#isArray}}
+            '{{baseName}}': {{paramName}}{{^required}}?{{/required}}{{#nullSafe}}.whereNotNull(){{/nullSafe}}{{^nullSafe}}.where((p) => p != null){{/nullSafe}}
+                .map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
+        {{/isArray}}
+          {{/isFile}}
         {{/formParams}} }.entries.where((me) => me.value != null).map((me) => me.key + "=" + Uri.encodeComponent(me.value)).join("&");
       {{/hasFormParams}}
       {{^hasFormParams}}Object postBody = null;{{/hasFormParams}}
@@ -191,8 +198,15 @@ part of {{pubName}}.api;
       {{#hasFormParams}}
           final postBody = FormData.fromMap(Map.fromEntries(<String, dynamic{{#nullSafe}}?{{/nullSafe}}>{ {{#formParams}}
           {{^isFile}}
+            {{^isArray}}
               '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
-            {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
+                              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
+            {{/isArray}}
+            {{#isArray}}
+                '{{baseName}}': {{paramName}}{{^required}}?{{/required}}{{#nullSafe}}.whereNotNull(){{/nullSafe}}{{^nullSafe}}.where((p) => p != null){{/nullSafe}}
+                .map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
+            {{/isArray}}
           {{/isFile}}
           {{#isFile}}
               '{{baseName}}': {{paramName}},

@@ -431,8 +431,13 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
       co.allParams.forEach((p) -> {
         if (p.isFile || p.isBinary || (p.isBodyParam && bodyIsFile)) {
-          p.dataType = "MultipartFile";
-          p.baseType = "MultipartFile";
+          if (p.isArray) {
+            p.dataType = "List<MultipartFile>";
+          } else {
+            p.dataType = "MultipartFile";
+          }
+
+          p.baseType = p.dataType;
         }
       });
     }
