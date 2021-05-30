@@ -135,7 +135,9 @@ part of {{pubName}}.api;
       {{^required}}
           if({{paramName}} != null) {
       {{/required}}
-        queryParams.addAll(convertParametersForCollectionFormat({{#isDateTime}}openApiDateTimeParameterToString{{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}},
+        queryParams.addAll(convertParametersForCollectionFormat(
+      {{#nullSafe}}(p) => {{/nullSafe}}
+      {{#isDateTime}}openApiDateTimeParameterToString{{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}{{#nullSafe}}(p)!{{/nullSafe}},
           '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
       {{^required}}
           }
@@ -175,7 +177,7 @@ part of {{pubName}}.api;
         headerParams['Content-Type'] = 'application/x-www-form-urlencoded';
         }
       {{#hasFormParams}}
-        final postBody = <String, dynamic{{#nullSafe}}?{{/nullSafe}}>{ {{#formParams}}
+        final postBody = <String, dynamic>{ {{#formParams}}
           {{^isFile}}
         {{^isArray}}
           '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
@@ -196,7 +198,7 @@ part of {{pubName}}.api;
         headerParams['Content-Type'] = 'multipart/form-data';
         }
       {{#hasFormParams}}
-          final postBody = FormData.fromMap(Map.fromEntries(<String, dynamic{{#nullSafe}}?{{/nullSafe}}>{ {{#formParams}}
+          final postBody = FormData.fromMap(Map.fromEntries(<String, dynamic>{ {{#formParams}}
           {{^isFile}}
             {{^isArray}}
               '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}

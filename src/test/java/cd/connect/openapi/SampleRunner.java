@@ -23,8 +23,8 @@ public class SampleRunner {
 //      "--type-mappings", "int-or-string=IntOrString",
 //      "--import-mappings", "IntOrString=./int_or_string.dart",
       "--global-property", "skipFormModel=false",
-      "--additional-properties", "nullSafe=true",
-      "--additional-properties", "nullSafe-array-default=true",
+//      "--additional-properties", "nullSafe=true",
+//      "--additional-properties", "nullSafe-array-default=true",
       "--additional-properties", "listAnyOf=true",
       "--output", "target/" + getClass().getSimpleName())
       .toArray(new String[0]));

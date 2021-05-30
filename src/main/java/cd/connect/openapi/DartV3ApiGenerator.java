@@ -198,7 +198,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   private String listOrMapSuffix(CodegenProperty cp) {
-    if (cp.isNullable && isNullSafeEnabled) {
+    if (cp.isNullable && isNullSafeEnabled && !"dynamic".equals(cp.dataType)) {
       return "?";
     }
 
@@ -269,7 +269,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
         if (!isNullSafeEnabled || (!(cp.required || arraysThatHaveADefaultAreNullSafe))) {
           cp.vendorExtensions.put("x-list-null", Boolean.TRUE);
         }
-      } else if (!cp.required && isNullSafeEnabled) {
+      } else if (!cp.required && isNullSafeEnabled && !"dynamic".equals(cp.dataType)) {
         cp.dataType = cp.dataType + "?";
       }
 

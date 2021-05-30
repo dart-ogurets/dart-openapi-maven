@@ -63,7 +63,7 @@ return value.toString();
     return deserialize(decodedJson, targetType);
   }
 
-  static dynamic deserialize(dynamic{{#nullSafe}}?{{/nullSafe}} value, String targetType) {
+  static dynamic deserialize(dynamic value, String targetType) {
     if (value == null) return null; // 204
     try {
       switch (targetType) {
@@ -120,7 +120,7 @@ return value.toString();
   }
 
    /// Format the given parameter object into string.
-  static String{{#nullSafe}}?{{/nullSafe}} parameterToString(dynamic{{#nullSafe}}?{{/nullSafe}} value) {
+  static String{{#nullSafe}}?{{/nullSafe}} parameterToString(dynamic value) {
     if (value == null) {
       return null;
     } else if (value is DateTime) { // shouldn't ever be used, replaced by direct call

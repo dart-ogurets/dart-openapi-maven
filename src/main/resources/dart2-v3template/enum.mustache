@@ -18,7 +18,7 @@ extension {{classname}}Extension on {{classname}} {
   {{#enumVars}}{{classname}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
 
-  static {{classname}}{{#nullSafe}}?{{/nullSafe}} fromJson(dynamic{{#nullSafe}}?{{/nullSafe}} data) => data == null ? null : fromMap[data];
+  static {{classname}}{{#nullSafe}}?{{/nullSafe}} fromJson(dynamic data) => data == null ? null : fromMap[data];
 
   dynamic toJson() => toMap[this];
 
@@ -27,10 +27,10 @@ extension {{classname}}Extension on {{classname}} {
 
   static {{classname}} copyWith({{classname}} instance) => instance;
 
-  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic{{#nullSafe}}?{{/nullSafe}}>{{#nullSafe}}?{{/nullSafe}} json) {
+  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     final map = <String, {{classname}}>{};
     if (json != null && json.isNotEmpty) {
-      json.forEach((String key, dynamic{{#nullSafe}}?{{/nullSafe}} value) {
+      json.forEach((String key, dynamic value) {
         final val = fromJson(value);
         if (val != null) {
           map[key] = val;

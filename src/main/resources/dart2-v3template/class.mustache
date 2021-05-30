@@ -25,7 +25,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{/vendorExtensions.x-dart-inherited}}
 {{/vars}}
 {{^hasVars}}
-  {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{#nullSafe}}?{{/nullSafe}}{{/required}} json;
+  {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{/required}} json;
 {{/hasVars}}
 {{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}required {{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}this.{{{name}}}{{/vendorExtensions.x-ns-default-val}},
     {{/vars}} }){{#vendorExtensions.x-has-ns-default-vals}} : {{#vendorExtensions.x-ns-default-vals}}this.{{{name}}} = {{{name}}} ?? []{{^-last}}, {{/-last}}{{/vendorExtensions.x-ns-default-vals}}{{/vendorExtensions.x-has-ns-default-vals}};
