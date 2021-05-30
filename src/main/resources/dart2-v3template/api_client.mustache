@@ -120,7 +120,7 @@ return value.toString();
   }
 
    /// Format the given parameter object into string.
-  static String? parameterToString(dynamic{{#nullSafe}}?{{/nullSafe}} value) {
+  static String{{#nullSafe}}?{{/nullSafe}} parameterToString(dynamic{{#nullSafe}}?{{/nullSafe}} value) {
     if (value == null) {
       return null;
     } else if (value is DateTime) { // shouldn't ever be used, replaced by direct call

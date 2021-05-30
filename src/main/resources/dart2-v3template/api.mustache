@@ -39,9 +39,9 @@ part of {{pubName}}.api;
         }
     {{/returnType}}
 
-      final body = response.body;
+      final __body = response.body;
       if(response.statusCode >= 400) {
-      throw ApiException(response.statusCode, body == null ? null : await decodeBodyBytes({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}));
+      throw ApiException(response.statusCode, __body == null ? null : await decodeBodyBytes({{#nullSafe}}__body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}));
       }
 
     {{^returnType}}
@@ -49,15 +49,15 @@ part of {{pubName}}.api;
     {{/returnType}}
     {{#returnType}}
 
-        if (body == null) {
-        throw ApiException(500, 'Received an empty body');
+        if (__body == null) {
+        throw ApiException(500, 'Received an empty body (not in a 204)');
         }
 
     {{#vendorExtensions.x-dart-produces-raw}}
       return response;
     {{/vendorExtensions.x-dart-produces-raw}}
     {{^vendorExtensions.x-dart-produces-raw}}
-        return await apiDelegate.{{nickname}}_decode({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
+        return await apiDelegate.{{nickname}}_decode({{#nullSafe}}__body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
     {{/vendorExtensions.x-dart-produces-raw}}
     {{/returnType}}
       }
@@ -173,12 +173,12 @@ part of {{pubName}}.api;
         headerParams['Content-Type'] = 'application/x-www-form-urlencoded';
         }
       {{#hasFormParams}}
-        Object postBody = {
+        final postBody = <String, dynamic{{#nullSafe}}?{{/nullSafe}}>{ {{#formParams}}
         {{^isFile}}
           '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
-                          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}}
+                          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
         {{/isFile}}
-        }.entries.where((me) => me.value != null).map((me) => me.key + "=" + me.value).join("&);
+        {{/formParams}} }.entries.where((me) => me.value != null).map((me) => me.key + "=" + Uri.encodeComponent(me.value)).join("&");
       {{/hasFormParams}}
       {{^hasFormParams}}Object postBody = null;{{/hasFormParams}}
     {{/vendorExtensions.x-dart-consumes-form}}
@@ -186,26 +186,18 @@ part of {{pubName}}.api;
         if (headerParams['Content-Type'] == null) {
         headerParams['Content-Type'] = 'multipart/form-data';
         }
-        final formData = <String, dynamic>{};
-
-      {{#formParams}}
-        {{^isFile}}
-            if ({{paramName}} != null) {
-            formData['{{baseName}}'] = Uri.encodeFull(LocalApiClient.parameterToString({{paramName}}));
-            }
-        {{/isFile}}
-        {{#isFile}}
-            if ({{paramName}} != null) {
-            formData['{{baseName}}'] = {{paramName}};
-            }
-        {{/isFile}}
-      {{/formParams}}
       {{#hasFormParams}}
-          Object{{#nullSafe}}?{{/nullSafe}} postBody = null;
-          if (formData.isNotEmpty) {
-          postBody = FormData.fromMap(formData);
-          }
+          final postBody = FormData.fromMap(Map.fromEntries(<String, dynamic{{#nullSafe}}?{{/nullSafe}}>{ {{#formParams}}
+          {{^isFile}}
+              '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+            {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
+          {{/isFile}}
+          {{#isFile}}
+              '{{baseName}}': {{paramName}},
+          {{/isFile}}
+        {{/formParams}} }.entries.where((m) => m.value != null)) );
       {{/hasFormParams}}
+      {{^hasFormParams}}final postBody = null;{{/hasFormParams}}
     {{/vendorExtensions.x-dart-consumes-multipartform}}
 
       opt.headers = headerParams;

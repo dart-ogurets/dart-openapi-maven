@@ -18,6 +18,7 @@ public class SampleRunner {
     OpenAPIGenerator.main(Arrays.asList("generate",
       "--input-spec", location,
       "--generator-name", "dart2-api",
+      "--enable-post-process-file",
       "--additional-properties", "pubName=sample_app",
 //      "--type-mappings", "int-or-string=IntOrString",
 //      "--import-mappings", "IntOrString=./int_or_string.dart",

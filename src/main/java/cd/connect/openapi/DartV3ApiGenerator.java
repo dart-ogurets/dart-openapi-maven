@@ -11,12 +11,15 @@ import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.DartClientCodegen;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +47,12 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   public DartV3ApiGenerator() {
     super();
+
+    // we don't need form "inline" models, but the code in the OpenAPI library is incorrect
+    // it drops component schema models used by the parameters sent to the API methods
+    // so we have to go through and delete them afterwards
+    GlobalSettings.setProperty("skipFormModel", "false");
+
     library = LIBRARY_NAME;
     supportedLibraries.clear();
     supportedLibraries.put(LIBRARY_NAME, LIBRARY_NAME);
@@ -335,31 +344,38 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     objs.values().forEach(o -> {
       Map<String, Object> modelData = (Map<String, Object>) o;
       List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
+
       if (models != null) {
+        List<Map<String, Object>> removeInlines = new ArrayList<>();
         models.forEach(modelMap -> {
           CodegenModel cm = (CodegenModel) modelMap.get("model");
           if (cm == null) {
             return;
           }
-          if (!cm.getName().endsWith("_allOf")) {
-            allModels.put(cm.getName(), cm);
-          }
-          cm.vendorExtensions.put("dartClassName",
-            org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
-          if (cm.vars != null) {
-            cm.vars.forEach(cp -> {
-              CodegenProperty correctingSettings = cp;
+          if (cm.getName().startsWith("inline_object")) {
+            removeInlines.add(modelMap);
+          } else {
+            if (!cm.getName().endsWith("_allOf")) {
+              allModels.put(cm.getName(), cm);
+            }
+            cm.vendorExtensions.put("dartClassName",
+              org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
+            if (cm.vars != null) {
+              cm.vars.forEach(cp -> {
+                CodegenProperty correctingSettings = cp;
 
-              boolean classLevelField = true;
-              while (correctingSettings != null) {
-                correctInternals(cm, correctingSettings, classLevelField);
-                classLevelField = false;
-                correctingSettings = correctingSettings.items;
-              }
-            });
+                boolean classLevelField = true;
+                while (correctingSettings != null) {
+                  correctInternals(cm, correctingSettings, classLevelField);
+                  classLevelField = false;
+                  correctingSettings = correctingSettings.items;
+                }
+              });
+            }
           }
         });
 
+        models.removeAll(removeInlines);
       }
     });
 
@@ -407,9 +423,15 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       if (richOp != null) {
         co.vendorExtensions.put("x-dart-extension-name", toVarName(richOp.toString()));
       }
+
+      boolean bodyIsFile =
+        (co.consumes != null && co.consumes.size() == 1 && "application/octet-stream".equals(co.consumes.get(0).get(
+        "mediaType")));
+
       co.allParams.forEach((p) -> {
-        if (p.isFile) {
-          p.dataType = "Stream<List<int>>";
+        if (p.isFile || p.isBinary || (p.isBodyParam && bodyIsFile)) {
+          p.dataType = "MultipartFile";
+          p.baseType = "MultipartFile";
         }
       });
     }
@@ -496,68 +518,49 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   @Override
   public String toModelName(String modelName) {
     return ("dynamic".equals(modelName) ? modelName : super.toModelName(modelName));
-//    return modelNameCache.computeIfAbsent(modelName, name -> {
-//      if ("dynamic".equals(name)) {
-//        return name;
-//      }
-//
-//      String prefix = "";
-//      if (name.contains(".")) {
-//        final int endIndex = name.lastIndexOf(".");
-//        prefix = name.substring(0, endIndex).replace('-', '_');
-//        if (prefix.length() > 0) {
-//          prefix = prefix + ".";
-//        }
-//        name = name.substring(endIndex+1);
-//      }
-//
-//      if (this.isReservedWord(name)) {
-//        log.warn(name + " (reserved word) cannot be used as model filename. Renamed to " + org.openapitools.codegen
-//        .utils.StringUtils.camelize("model_" + name));
-//        name = "model_" + name;
-//      }
-//
-//      if (name.matches("^\\d.*")) {
-//        log.warn(name + " (model name starts with number) cannot be used as model name. Renamed to " + org
-//        .openapitools.codegen.utils.StringUtils.camelize("model_" + name));
-//        name = "model_" + name;
-//      }
-//
-//      return prefix + org.openapitools.codegen.utils.StringUtils.camelize(name);
-//    });
   }
 
-  // if $FLUTTER is set, format the file.
+  @Override
+  public void postProcess() {
+    String flutterDir = System.getenv("FLUTTER") == null ?  System.getenv("DART_BIN") : System.getenv("FLUTTER");
+
+    if (flutterDir != null && isEnablePostProcessFile()) {
+      String dartPostProcessFixFile = String.format("%s/bin/cache/dart-sdk/bin/dart fix --apply %s", flutterDir, getOutputDir());
+      String dartPostProcessFile = String.format("%s/bin/cache/dart-sdk/bin/dartfmt -w %s", flutterDir, getOutputDir());
+
+      try {
+        log.info("auto-fixing generated issues");
+        final Process fix = Runtime.getRuntime().exec(dartPostProcessFixFile);
+        outputStreamToConsole(fix);
+        fix.waitFor();
+        log.info("formatting");
+        final Process fmt = Runtime.getRuntime().exec(dartPostProcessFile);
+        outputStreamToConsole(fmt);
+        fmt.waitFor();
+      } catch (Exception e) {
+        log.error("Unable to run dart fix command");
+      }
+    }
+  }
+
   @Override
   public void postProcessFile(File file, String fileType) {
-    String flutterDir = System.getenv("FLUTTER");
 
-    if (file == null || flutterDir == null) {
-      System.out.println("Cannot post process file");
-      return;
+//    if (file.getName().startsWith())
+  }
+
+  private void outputStreamToConsole(Process proc) throws Exception {
+    String line;
+    InputStreamReader isr = new InputStreamReader(proc.getInputStream());
+    BufferedReader rdr = new BufferedReader(isr);
+    while((line = rdr.readLine()) != null) {
+      System.out.println(line);
     }
 
-    String dartPostProcessFile = String.format("%s/bin/cache/dart-sdk/bin/dartfmt -w", flutterDir);
-
-    if (StringUtils.isEmpty(dartPostProcessFile)) {
-      return; // skip if DART_POST_PROCESS_FILE env variable is not defined
-    }
-
-    // only process files with dart extension
-    if ("dart".equals(FilenameUtils.getExtension(file.toString()))) {
-      String command = dartPostProcessFile + " " + file.toString();
-      try {
-        log.info("Executing: " + command);
-        Process p = Runtime.getRuntime().exec(command);
-//        int exitValue = p.waitFor();
-//        if (exitValue != 0) {
-//          log.error("Error running the command ({}). Exit code: {}", command, exitValue);
-//        } else {
-//          log.info("Successfully executed: " + command);
-//        }
-      } catch (Exception e) {
-        log.error("Error running the command ({}). Exception: {}", command, e.getMessage());
-      }
+    isr = new InputStreamReader(proc.getErrorStream());
+    rdr = new BufferedReader(isr);
+    while((line = rdr.readLine()) != null) {
+      System.out.println(line);
     }
   }
 
