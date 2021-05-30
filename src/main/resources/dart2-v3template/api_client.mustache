@@ -27,9 +27,11 @@ class LocalApiClient {
       }
       {{#models}}
         {{#model}}
+          {{#isUsedModel}}
           if (value is {{classname}}) {
             return value.toJson();
           }
+          {{/isUsedModel}}
         {{/model}}
       {{/models}}
       {{#x-external-formatters}}
@@ -77,6 +79,7 @@ return value.toString();
           return value is double ? value : double.parse('$value');
         {{#models}}
           {{#model}}
+        {{#isUsedModel}}
         case '{{classname}}':
             {{#isEnum}}
               return {{classname}}Extension.fromJson(value);
@@ -84,6 +87,7 @@ return value.toString();
             {{^isEnum}}
           return {{classname}}.fromJson(value);
             {{/isEnum}}
+        {{/isUsedModel}}
           {{/model}}
         {{/models}}
        {{#x-external-formatters}}
@@ -131,11 +135,13 @@ return value.toString();
 
     {{#models}}
       {{#model}}
+      {{#isUsedModel}}
         {{#isEnum}}
     if (value is {{classname}}) {
       return value.toJson().toString();
     }
         {{/isEnum}}
+    {{/isUsedModel}}
       {{/model}}
     {{/models}}
 

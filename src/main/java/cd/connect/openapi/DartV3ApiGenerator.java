@@ -4,7 +4,6 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.Schema;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
@@ -19,7 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -261,7 +263,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
         String inner = nullGenChild(cp.items);
         cp.vendorExtensions.put("x-innerMapType", inner);
 
-        cp.dataType = "Map<String, " + inner + ">" +  (isNullSafeEnabled ? ((cp.required) ? "" : "?") : "");
+        cp.dataType = "Map<String, " + inner + ">" + (isNullSafeEnabled ? ((cp.required) ? "" : "?") : "");
       } else if (cp.isArray && cp.items != null) {
         String inner = nullGenChild(cp.items);
         cp.dataType = "List<" + inner + ">" + (isNullSafeEnabled ?
@@ -327,6 +329,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     return val;
   }
 
+  // this allows us to keep track of files to remove at the end
+  // because of a bug in the OpenAPI generator around Form models
+  private List<String> modelFilesNotToDeleted = new ArrayList<>();
+
   // for debugging inevitable weirdness in the model generated
   @Override
   public Map<String, Object> updateAllModels(Map<String, Object> objs) {
@@ -346,37 +352,40 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
 
       if (models != null) {
-        List<Map<String, Object>> removeInlines = new ArrayList<>();
         models.forEach(modelMap -> {
           CodegenModel cm = (CodegenModel) modelMap.get("model");
           if (cm == null) {
             return;
           }
-          if (cm.getName().startsWith("inline_object")) {
-            removeInlines.add(modelMap);
-            modelMap.put("isInlineModel", "true");
-          } else {
-            if (!cm.getName().endsWith("_allOf")) {
-              allModels.put(cm.getName(), cm);
-            }
-            cm.vendorExtensions.put("dartClassName",
-              org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
-            if (cm.vars != null) {
-              cm.vars.forEach(cp -> {
-                CodegenProperty correctingSettings = cp;
 
-                boolean classLevelField = true;
-                while (correctingSettings != null) {
-                  correctInternals(cm, correctingSettings, classLevelField);
-                  classLevelField = false;
-                  correctingSettings = correctingSettings.items;
-                }
-              });
-            }
+          // if NOT an inline object we will definitely use it. Only BODY based inline
+          // objects will be otherwise used.
+          if (!cm.getName().startsWith("inline_object")) {
+            cm.vendorExtensions.put("isUsedModel", "true");
+            modelMap.put("isUsedModel", "true");
+            modelFilesNotToDeleted.add(cm.classFilename + ".dart");
+          }
+
+          if (!cm.getName().endsWith("_allOf")) {
+            allModels.put(cm.getName(), cm);
+          }
+          cm.vendorExtensions.put("dartClassName",
+            org.openapitools.codegen.utils.StringUtils.camelize(cm.getClassname()));
+          if (cm.vars != null) {
+            cm.vars.forEach(cp -> {
+              CodegenProperty correctingSettings = cp;
+
+              boolean classLevelField = true;
+              while (correctingSettings != null) {
+                correctInternals(cm, correctingSettings, classLevelField);
+                classLevelField = false;
+                correctingSettings = correctingSettings.items;
+              }
+            });
           }
         });
 
-        models.removeAll(removeInlines);
+
       }
     });
 
@@ -419,6 +428,19 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
     final List<CodegenOperation> ops = (List<CodegenOperation>) ((Map<String, Object>) objs.get("operations")).get(
       "operation");
+
+    // at this point, all the model files have actually already been generated to disk, that horse has bolted. What
+    // we need to do is figured out which models are "form" based and are not required. Basically anything that is
+    // directly used by by a form post
+    final List<Map<String, Object>> models = allModels.stream().map(m -> (Map<String, Object>)m).collect(Collectors.toList());
+    Map<String, CodegenModel> modelMap = new HashMap<>();
+    Map<String, Map<String, Object>> modelMetaMap = new HashMap<>();
+    models.forEach(m -> {
+      CodegenModel cm = (CodegenModel) m.get("model");
+      modelMap.put(cm.getClassname(), cm);
+      modelMetaMap.put(cm.getClassname(), m);
+    });
+
     for (CodegenOperation co : ops) {
       final Object richOp = co.vendorExtensions.get("x-dart-rich-operationId");
       if (richOp != null) {
@@ -427,20 +449,31 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
       boolean bodyIsFile =
         (co.consumes != null && co.consumes.size() == 1 && "application/octet-stream".equals(co.consumes.get(0).get(
-        "mediaType")));
+          "mediaType")));
 
-      co.allParams.forEach((p) -> {
-        if (p.isFile || p.isBinary || (p.isBodyParam && bodyIsFile)) {
-          if (p.isArray) {
-            p.dataType = "List<MultipartFile>";
-          } else {
-            p.dataType = "MultipartFile";
+        if (co.bodyParam != null) {
+          CodegenModel cm = modelMap.get(co.bodyParam.baseType);
+          if (cm != null) {
+            cm.vendorExtensions.put("isUsedModel", "true");
+            modelFilesNotToDeleted.add(cm.classFilename + ".dart");
+            modelMetaMap.get(co.bodyParam.baseType).put("isUsedModel", "true");
           }
-
-          p.baseType = p.dataType;
         }
-      });
+
+        co.allParams.forEach((p) -> {
+          if (p.isFile || p.isBinary || (p.isBodyParam && bodyIsFile)) {
+            if (p.isArray) {
+              p.dataType = "List<MultipartFile>";
+            } else {
+              p.dataType = "MultipartFile";
+            }
+
+            p.baseType = p.dataType;
+          }
+        });
     }
+
+
     return som;
   }
 
@@ -528,10 +561,27 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
   @Override
   public void postProcess() {
-    String flutterDir = System.getenv("FLUTTER") == null ?  System.getenv("DART_BIN") : System.getenv("FLUTTER");
+    String flutterDir = System.getenv("FLUTTER") == null ? System.getenv("DART_BIN") : System.getenv("FLUTTER");
+
+    // we have to do this at the end because we don't know which files to fully delete until
+    // after the Operations have been processed, and the post process per file thing happens
+    // after each step. We have to do it before the Dart Formatting otherwise it will explode
+    // with unreferenced files.
+    try {
+      final int stripLen = (getOutputDir() + "/lib/model/").length();
+      Files.walk(Paths.get(getOutputDir() + "/lib/model"))
+        .filter(Files::isRegularFile)
+        .forEach(p -> {
+          String modelFilename = p.toFile().getAbsolutePath().substring(stripLen);
+          if (!modelFilesNotToDeleted.contains(modelFilename)) {
+            p.toFile().delete();
+          }
+        });
+    } catch (IOException ignored) {}
 
     if (flutterDir != null && isEnablePostProcessFile()) {
-      String dartPostProcessFixFile = String.format("%s/bin/cache/dart-sdk/bin/dart fix --apply %s", flutterDir, getOutputDir());
+      String dartPostProcessFixFile = String.format("%s/bin/cache/dart-sdk/bin/dart fix --apply %s", flutterDir,
+        getOutputDir());
       String dartPostProcessFile = String.format("%s/bin/cache/dart-sdk/bin/dartfmt -w %s", flutterDir, getOutputDir());
 
       try {
@@ -549,24 +599,17 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
   }
 
-  @Override
-  public void postProcessFile(File file, String fileType) {
-    if (file.getName().startsWith("inline_object")) {
-      file.delete();
-    }
-  }
-
   private void outputStreamToConsole(Process proc) throws Exception {
     String line;
     InputStreamReader isr = new InputStreamReader(proc.getInputStream());
     BufferedReader rdr = new BufferedReader(isr);
-    while((line = rdr.readLine()) != null) {
+    while ((line = rdr.readLine()) != null) {
       System.out.println(line);
     }
 
     isr = new InputStreamReader(proc.getErrorStream());
     rdr = new BufferedReader(isr);
-    while((line = rdr.readLine()) != null) {
+    while ((line = rdr.readLine()) != null) {
       System.out.println(line);
     }
   }
@@ -586,7 +629,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
         String fileName = "any_of_" + String.join("_", namesFilename);
         String filePart = "model/" + fileName + ".dart";
         // collect any of classes
-        extraAnyOfClasses.put(className, new AnyOfClass(fileName, filePart, toModelName(className), toModelName(enumClassName), composedSchema));
+        extraAnyOfClasses.put(className, new AnyOfClass(fileName, filePart, toModelName(className),
+          toModelName(enumClassName), composedSchema));
         extraAnyParts.add(filePart);
         return className;
       }
@@ -602,7 +646,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     final ComposedSchema composedSchema;
     final Discriminator discriminatorProperty;
 
-    AnyOfClass(String fileName, String filePart, String className, String enumClassName, ComposedSchema composedSchema) {
+    AnyOfClass(String fileName, String filePart, String className, String enumClassName,
+               ComposedSchema composedSchema) {
       this.fileName = fileName;
       this.filePart = filePart;
       this.className = className;

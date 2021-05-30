@@ -200,6 +200,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Event"
+  /event/inline-post-js:
+    post:
+      tags:
+        - ControlService
+      description: "inline post for bad API"
+      operationId: badApi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+      responses:
+        200:
+          description: "some desc"
   /event/optional-post:
     post:
       tags:
