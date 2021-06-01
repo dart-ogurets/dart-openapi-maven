@@ -341,7 +341,12 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     if (listAnyOf) {
       // add models for List<AnyOf<*>> classes
       extraAnyOfClasses.values().forEach(anyOfClass -> {
-        objs.put(anyOfClass.fileName, anyOfClass.toModelMap(this));
+        final Map<String, Object> modelMap = anyOfClass.toModelMap(this);
+
+        modelMap.put("isUsedModel", "true");
+        modelFilesNotToDeleted.add(anyOfClass.fileName + ".dart");
+
+        objs.put(anyOfClass.fileName, modelMap);
       });
     }
 
@@ -580,15 +585,15 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     } catch (IOException ignored) {}
 
     if (flutterDir != null && isEnablePostProcessFile()) {
-      String dartPostProcessFixFile = String.format("%s/bin/cache/dart-sdk/bin/dart fix --apply %s", flutterDir,
-        getOutputDir());
+//      String dartPostProcessFixFile = String.format("%s/bin/cache/dart-sdk/bin/dart fix --apply %s", flutterDir,
+//        getOutputDir());
       String dartPostProcessFile = String.format("%s/bin/cache/dart-sdk/bin/dartfmt -w %s", flutterDir, getOutputDir());
 
       try {
-        log.info("auto-fixing generated issues");
-        final Process fix = Runtime.getRuntime().exec(dartPostProcessFixFile);
-        outputStreamToConsole(fix);
-        fix.waitFor();
+//        log.info("auto-fixing generated issues");
+//        final Process fix = Runtime.getRuntime().exec(dartPostProcessFixFile);
+//        outputStreamToConsole(fix);
+//        fix.waitFor();
         log.info("formatting");
         final Process fmt = Runtime.getRuntime().exec(dartPostProcessFile);
         outputStreamToConsole(fmt);
