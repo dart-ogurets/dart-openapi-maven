@@ -167,9 +167,10 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     }
 
     name = name.replaceAll("-", "_")
+      .replaceAll(" ", "_")
       .replaceAll("\\$", "__")
       .replaceAll("\\^", "__")
-      .replaceAll("\\=", "__");
+      .replaceAll("\\=", "__").trim();
 
     if (name.matches("^[A-Z_]*$")) {
       return name;
@@ -398,6 +399,8 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
 
     return objs;
   }
+
+
 
   // TODO: check with multiple levels of hierarchy
   private void updateModelsWithAllOfInheritance(Map<String, CodegenModel> models) {

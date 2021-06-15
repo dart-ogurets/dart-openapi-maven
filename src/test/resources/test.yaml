@@ -404,6 +404,12 @@ components:
           type: string
         imageUrl:
           type: string
+    NumericAndSpacedEnum:
+      type: string
+      enum:
+        - Ahoy There
+        - 18 Spaces Here
+        - 667
     EventStatus:
       type: string
       enum:

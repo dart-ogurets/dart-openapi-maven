@@ -549,4 +549,9 @@ components:
           type: string
         count:
           type: number
-
+    NumericAndSpacedEnum:
+      type: string
+      enum:
+        - Ahoy There
+        - 18 Spaces Here
+        - 667
