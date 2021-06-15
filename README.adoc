@@ -267,6 +267,7 @@ The source for the tests is located in src/k8s** folders. The generated test out
 
 ==== Changelog
 
+. 5.7 - includes fix for enums that contain spaces
 - 5.5 - this is a release focused on form, multi-part uploads, file uploads and downloads and enhancing the parameters as lodged in
 a couple of tickets. This release deletes unused models from Inline form models.
 - 5.4 - change the equals method to use a local variable called `__other` instead of `other` as when a class had an `other`
