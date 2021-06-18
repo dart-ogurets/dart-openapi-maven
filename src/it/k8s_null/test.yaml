@@ -131,6 +131,21 @@ paths:
       responses:
         "200":
           description: yup
+  /event/component-referencing-file-test:
+    post:
+      tags:
+        - FileService
+      description: "file post service"
+      operationId: componentReferencingFilePost
+      requestBody:
+        required: true
+        content:
+          multipart/form-data
+            schema:
+              $ref: '#components/schemas/ComponentWithBinaryProperty'
+      responses:
+        "200":
+          description: yup
   /event/kivan/{id}:
     get:
       parameters:
@@ -555,3 +570,10 @@ components:
         - Ahoy There
         - 18 Spaces Here
         - 667
+    ComponentWithBinaryProperty:
+      title: binaryComponent
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary

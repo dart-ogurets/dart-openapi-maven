@@ -164,6 +164,21 @@ paths:
       responses:
         "200":
           description: yup
+  /event/component-referencing-file-test:
+    post:
+      tags:
+        - FileService
+      description: "file post service"
+      operationId: componentReferencingFilePost
+      requestBody:
+        required: true
+        content:
+          multipart/form-data
+            schema:
+              $ref: '#components/schemas/ComponentWithBinaryProperty'
+      responses:
+        "200":
+          description: yup
 
   /event/getstatus:
     post:
@@ -645,5 +660,10 @@ components:
           type: string
         count:
           type: number
-
-
+    ComponentWithBinaryProperty:
+      title: binaryComponent
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
