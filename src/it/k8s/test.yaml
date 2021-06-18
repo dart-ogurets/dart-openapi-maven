@@ -555,3 +555,9 @@ components:
         - Ahoy There
         - 18 Spaces Here
         - 667
+    IntTypeEnum:
+      type: integer
+      enum:
+        - 1
+        - 2
+        - 3
