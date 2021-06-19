@@ -36,8 +36,6 @@ public class DartV3ApiGenerator extends DartClientCodegen {
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
   private static final String LIBRARY_NAME = "dart2-api";
   private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
-  @SuppressWarnings("unused") // mustache uses this (?)
-  private static final String API_PRODUCES_RAW_STREAM = "vendorExtensions.x-dart-produces-raw";
   private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
   private static final String LIST_ANY_OF = "listAnyOf";
   protected boolean arraysThatHaveADefaultAreNullSafe;
