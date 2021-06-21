@@ -9,7 +9,7 @@ extension {{classname}}Extension on {{classname}} {
   {{#isString}}String{{#nullSafe}}?{{/nullSafe}} get name => toMap[this]{{/isString}}{{#isInteger}}int{{#nullSafe}}?{{/nullSafe}} get asInt => toMap[this]{{/isInteger}};
 
   // you have to call this extension class to use this as this is not yet supported
-  static {{classname}}{{#nullSafe}}?{{/nullSafe}} type(String name) => fromMap[name];
+  static {{classname}}{{#nullSafe}}?{{/nullSafe}} type({{dataType}} name) => fromMap[name];
 
   static Map<{{dataType}}, {{classname}}> fromMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
