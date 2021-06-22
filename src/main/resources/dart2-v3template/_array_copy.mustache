@@ -1,6 +1,6 @@
 {{#items}}
   {{#isArray}}
-    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { return ((data) { return {{>_copy}};})(data); }).toList()
   {{/isArray}}
   {{#isMap}}
     data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
