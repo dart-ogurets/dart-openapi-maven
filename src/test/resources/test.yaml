@@ -645,5 +645,9 @@ components:
           type: string
         count:
           type: number
-
-
+    IntTypeEnum:
+      type: integer
+      enum:
+        - 1
+        - 2
+        - 3

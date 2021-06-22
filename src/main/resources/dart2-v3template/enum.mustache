@@ -6,15 +6,15 @@ enum {{classname}} {
 }
 
 extension {{classname}}Extension on {{classname}} {
-  String{{#nullSafe}}?{{/nullSafe}} get name => toMap[this];
+  {{#isString}}String{{#nullSafe}}?{{/nullSafe}} get name => toMap[this]{{/isString}}{{#isInteger}}int{{#nullSafe}}?{{/nullSafe}} get asInt => toMap[this]{{/isInteger}};
 
   // you have to call this extension class to use this as this is not yet supported
-  static {{classname}}{{#nullSafe}}?{{/nullSafe}} type(String name) => fromMap[name];
+  static {{classname}}{{#nullSafe}}?{{/nullSafe}} type({{dataType}} name) => fromMap[name];
 
-  static Map<String, {{classname}}> fromMap = {  {{#allowableValues}}
+  static Map<{{dataType}}, {{classname}}> fromMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
-  static Map<{{classname}}, String> toMap = {  {{#allowableValues}}
+  static Map<{{classname}}, {{dataType}}> toMap = {  {{#allowableValues}}
   {{#enumVars}}{{classname}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
 
