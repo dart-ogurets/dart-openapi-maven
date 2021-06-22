@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenProperty;
@@ -33,11 +32,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConfig {
+public class DartV3ApiGenerator extends DartClientCodegen {
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
   private static final String LIBRARY_NAME = "dart2-api";
   private static final String DART2_TEMPLATE_FOLDER = "dart2-v3template";
-  private static final String API_PRODUCES_RAW_STREAM = "vendorExtensions.x-dart-produces-raw";
   private static final String ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default";
   private static final String LIST_ANY_OF = "listAnyOf";
   protected boolean arraysThatHaveADefaultAreNullSafe;
@@ -156,6 +154,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   @Override
+  @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
   public CodegenModel fromModel(String name, Schema schema) {
     return super.fromModel(name, schema);
   }
@@ -299,6 +298,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
       if (cp.items != null) { // it should be not null, its an array
         cp.items.vendorExtensions.put("x-ns-default-val", Boolean.TRUE);
       }
+      @SuppressWarnings("unchecked") // type-unsafe upstream api
       List<CodegenProperty> props = (List<CodegenProperty>) model.vendorExtensions.get("x-ns-default-vals");
       if (props == null) {
         props = new ArrayList<>();
@@ -354,7 +354,9 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     Map<String, CodegenModel> allModels = new HashMap<>();
 
     objs.values().forEach(o -> {
+      @SuppressWarnings("unchecked") // type-unsafe upstream api
       Map<String, Object> modelData = (Map<String, Object>) o;
+      @SuppressWarnings("unchecked") // type-unsafe upstream api
       List<Map<String, Object>> models = (List<Map<String, Object>>) modelData.get("models");
 
       if (models != null) {
@@ -434,12 +436,14 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
     processPubspecMappings();
 
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
+      @SuppressWarnings("unchecked") // type-unsafe upstream api
     final List<CodegenOperation> ops = (List<CodegenOperation>) ((Map<String, Object>) objs.get("operations")).get(
       "operation");
 
     // at this point, all the model files have actually already been generated to disk, that horse has bolted. What
     // we need to do is figured out which models are "form" based and are not required. Basically anything that is
     // directly used by by a form post
+      @SuppressWarnings("unchecked") // type-unsafe upstream api
     final List<Map<String, Object>> models = allModels.stream().map(m -> (Map<String, Object>)m).collect(Collectors.toList());
     Map<String, CodegenModel> modelMap = new HashMap<>();
     Map<String, Map<String, Object>> modelMetaMap = new HashMap<>();
@@ -486,6 +490,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   @Override
+  @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
   public String toDefaultValue(Schema schema) {
     // default inherited one uses const, and we can't use that anymore as they are inmodifiable
     if (ModelUtils.isMapSchema(schema)) {
@@ -502,6 +507,7 @@ public class DartV3ApiGenerator extends DartClientCodegen implements CodegenConf
   }
 
   @Override
+  @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
   protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Schema schema) {
     //super.addAdditionPropertiesToCodeGenModel(codegenModel, schema);
     codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(openAPI, schema));
