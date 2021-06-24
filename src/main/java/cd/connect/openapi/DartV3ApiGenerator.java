@@ -252,12 +252,12 @@ public class DartV3ApiGenerator extends DartClientCodegen {
                     .getEnum();
                 if (referencedEnum != null && !referencedEnum.isEmpty()) {
                   isComposedEnum = true;
+                  cp.isModel = false;
                 }
               }
             }
           }
         }
-
       } catch (Exception e) {
         e.printStackTrace();
         // continue Execution
