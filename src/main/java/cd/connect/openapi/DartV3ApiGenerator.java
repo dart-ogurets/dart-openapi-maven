@@ -229,34 +229,39 @@ public class DartV3ApiGenerator extends DartClientCodegen {
     // if yes, treat it like an enum.
     // this is a fix for https://github.com/dart-ogurets/dart-openapi-maven/issues/48
     boolean isComposedEnum = false;
-    try {
-      ObjectNode schemaNode = (ObjectNode) ObjectMapperFactory.createJson().readTree(cp.jsonSchema);
-      Schema<?> parsedSchema = new OpenAPIDeserializer().getSchema(schemaNode, "", null);
-      if (parsedSchema instanceof ComposedSchema) {
-        ComposedSchema composedSchema = (ComposedSchema) parsedSchema;
-        @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
-        List<Schema> allOfArray = composedSchema.getAllOf();
-        @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
-        List<Schema> oneOfArray = composedSchema.getOneOf();
-        @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
-        List<Schema> anyOfArray = composedSchema.getAnyOf();
-        if (allOfArray.size() == 1 && anyOfArray.isEmpty() && oneOfArray.isEmpty()) {
-          String singleRef = allOfArray.get(0).get$ref();
-          if (singleRef != null) {
-            Matcher extractLastPathComponent = Pattern.compile("#\\/components\\/schemas\\/([a-zA-Z]*)")
-                .matcher(singleRef);
-            if (extractLastPathComponent.matches()) {
-              List<?> referencedEnum = openAPI.getComponents().getSchemas().get(extractLastPathComponent.group())
-                  .getEnum();
-              if (referencedEnum != null && !referencedEnum.isEmpty()) {
-                isComposedEnum = true;
+    if (cp.isModel) {
+      try {
+        ObjectNode schemaNode = (ObjectNode) ObjectMapperFactory.createJson().readTree(cp.jsonSchema);
+        Schema<?> parsedSchema = new OpenAPIDeserializer().getSchema(schemaNode, "", null);
+        if (parsedSchema instanceof ComposedSchema) {
+          ComposedSchema composedSchema = (ComposedSchema) parsedSchema;
+          @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
+          List<Schema> allOfArray = composedSchema.getAllOf();
+          @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
+          List<Schema> oneOfArray = composedSchema.getOneOf();
+          @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
+          List<Schema> anyOfArray = composedSchema.getAnyOf();
+          if (allOfArray.size() == 1 && anyOfArray == null || anyOfArray.isEmpty() && oneOfArray == null
+              || oneOfArray.isEmpty()) {
+            String singleRef = allOfArray.get(0).get$ref();
+            if (singleRef != null) {
+              Matcher extractLastPathComponent = Pattern.compile("#\\/components\\/schemas\\/([a-zA-Z0-9\\.\\-_]+)")
+                  .matcher(singleRef);
+              if (extractLastPathComponent.matches()) {
+                List<?> referencedEnum = openAPI.getComponents().getSchemas().get(extractLastPathComponent.group(1))
+                    .getEnum();
+                if (referencedEnum != null && !referencedEnum.isEmpty()) {
+                  isComposedEnum = true;
+                }
               }
             }
           }
         }
+
+      } catch (Exception e) {
+        e.printStackTrace();
+        // continue Execution
       }
-    } catch (Exception e) {
-      // continue Execution
     }
     if ((cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) || isComposedEnum) {
       // "internal" enums
