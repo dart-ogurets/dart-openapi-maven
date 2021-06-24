@@ -651,3 +651,13 @@ components:
         - 1
         - 2
         - 3
+    ObjectContainingEnum:
+      type: object
+      properties:
+        name:
+          type: string
+        enumFieldAllOf:
+          allOf:
+            - $ref: '#/components/schemas/NumericAndSpacedEnum'
+        enumFieldPlainRef:
+          $ref: '#/components/schemas/NumericAndSpacedEnum'
