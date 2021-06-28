@@ -259,7 +259,9 @@ public class DartV3ApiGenerator extends DartClientCodegen {
           }
         }
       } catch (Exception e) {
-        e.printStackTrace();
+        log.error(
+            "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
+            model.name, e.toString());
         // continue Execution
       }
     }
