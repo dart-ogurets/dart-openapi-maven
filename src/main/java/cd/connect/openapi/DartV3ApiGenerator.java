@@ -176,6 +176,7 @@ public class DartV3ApiGenerator extends DartClientCodegen {
       .replaceAll(" ", "_")
       .replaceAll("\\$", "__")
       .replaceAll("\\^", "__")
+      .replaceAll("\\+", "_")
       .replaceAll("\\=", "__").trim();
 
     if (name.matches("^[A-Z_]*$")) {

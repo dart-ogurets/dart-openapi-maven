@@ -553,6 +553,7 @@ components:
       type: string
       enum:
         - Ahoy There
+        - application+json
         - 18 Spaces Here
         - 667
     IntTypeEnum:
