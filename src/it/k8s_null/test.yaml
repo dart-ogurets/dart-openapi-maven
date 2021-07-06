@@ -11,6 +11,11 @@ paths:
       description: "Get the list of upcoming events"
       operationId: upcoming-events
       x-dart-rich-operationId: upcoming-events-test
+      parameters:
+        - name: Accept-Language
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
