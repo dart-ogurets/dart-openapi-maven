@@ -115,10 +115,17 @@ main() {
     expect(items[1].asMyBanana().type, "banana");
     expect(items[1].asMyBanana().count, 42);
   });
-  test("int enums being generated with correct type",
-    () {
-      expect(IntTypeEnum.number1.toJson(),1);
-      expect(IntTypeEnum.number1,IntTypeEnumExtension.fromJson(1));
+  test("int enums being generated with correct type", () {
+    expect(IntTypeEnum.number1.toJson(), 1);
+    expect(IntTypeEnum.number1, IntTypeEnumExtension.fromJson(1));
+  });
+  test(
+      "enums included in a model via allOf with reference will be treated as"
+      "enums and generate valid code ", () {
+    final testO = ObjectContainingEnum.fromJson(
+        {"name": "foobar", "enumFieldAllOf": "667"});
+    expect(testO.name, "foobar");
+    expect(testO.enumFieldAllOf, NumericAndSpacedEnum.n667);
   });
 }
 

@@ -1,20 +1,5 @@
 package cd.connect.openapi;
 
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.media.ComposedSchema;
-import io.swagger.v3.oas.models.media.Discriminator;
-import io.swagger.v3.oas.models.media.Schema;
-import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.CodegenModel;
-import org.openapitools.codegen.CodegenOperation;
-import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.SupportingFile;
-import org.openapitools.codegen.config.GlobalSettings;
-import org.openapitools.codegen.languages.DartClientCodegen;
-import org.openapitools.codegen.utils.ModelUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +15,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.config.GlobalSettings;
+import org.openapitools.codegen.languages.DartClientCodegen;
+import org.openapitools.codegen.utils.ModelUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.media.ComposedSchema;
+import io.swagger.v3.oas.models.media.Discriminator;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.parser.ObjectMapperFactory;
+import io.swagger.v3.parser.util.OpenAPIDeserializer;
 
 public class DartV3ApiGenerator extends DartClientCodegen {
   private static final Logger log = LoggerFactory.getLogger(DartV3ApiGenerator.class);
@@ -217,8 +224,48 @@ public class DartV3ApiGenerator extends DartClientCodegen {
       cp.isAnyType = true;
       cp.isPrimitiveType = true;
     }
-
-    if (cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) {
+    // detect wether the schema follows the pattern:
+    // "{ "nullable" : true, "allOf" : [ { "$ref" : <SomeEnum> } ]}",
+    // if yes, treat it like an enum.
+    // this is a fix for https://github.com/dart-ogurets/dart-openapi-maven/issues/48
+    boolean isComposedEnum = false;
+    if (cp.isModel) {
+      try {
+        ObjectNode schemaNode = (ObjectNode) ObjectMapperFactory.createJson().readTree(cp.jsonSchema);
+        Schema<?> parsedSchema = new OpenAPIDeserializer().getSchema(schemaNode, "", null);
+        if (parsedSchema instanceof ComposedSchema) {
+          ComposedSchema composedSchema = (ComposedSchema) parsedSchema;
+          @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
+          List<Schema> allOfArray = composedSchema.getAllOf();
+          @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
+          List<Schema> oneOfArray = composedSchema.getOneOf();
+          @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
+          List<Schema> anyOfArray = composedSchema.getAnyOf();
+          if (allOfArray.size() == 1 && anyOfArray == null || anyOfArray.isEmpty() && oneOfArray == null
+              || oneOfArray.isEmpty()) {
+            String singleRef = allOfArray.get(0).get$ref();
+            if (singleRef != null) {
+              Matcher extractLastPathComponent = Pattern.compile("#\\/components\\/schemas\\/([a-zA-Z0-9\\.\\-_]+)")
+                  .matcher(singleRef);
+              if (extractLastPathComponent.matches()) {
+                List<?> referencedEnum = openAPI.getComponents().getSchemas().get(extractLastPathComponent.group(1))
+                    .getEnum();
+                if (referencedEnum != null && !referencedEnum.isEmpty()) {
+                  isComposedEnum = true;
+                  cp.isModel = false;
+                }
+              }
+            }
+          }
+        }
+      } catch (Exception e) {
+        log.error(
+            "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
+            model.name, e.toString());
+        // continue Execution
+      }
+    }
+    if ((cp.allowableValues != null && cp.allowableValues.get("enumVars") != null) || isComposedEnum) {
       // "internal" enums
       if (cp.getMin() == null && cp.complexType == null) {
         cp.enumName = model.classname + cp.nameInCamelCase + "Enum";
@@ -392,8 +439,6 @@ public class DartV3ApiGenerator extends DartClientCodegen {
             });
           }
         });
-
-
       }
     });
 
