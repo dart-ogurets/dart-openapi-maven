@@ -144,7 +144,7 @@ part of {{pubName}}.api;
       {{/required}}
     {{/queryParams}}
     {{#headerParams}}
-        headerParams['{{baseName}}'] = {{paramName}} ?? '';
+        headerParams['{{baseName}}'] = {{paramName}};
     {{/headerParams}}
 
       final authNames = <String>[{{#authMethods}}'{{name}}'{{^-last}}, {{/-last}}{{/authMethods}}];
