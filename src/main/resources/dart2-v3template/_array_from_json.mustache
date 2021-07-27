@@ -20,7 +20,7 @@
     {{/isModel}}
     {{#isPrimitiveType}}
       {{^nullSafe}}
-          data?.cast<{{{dataType}}}>()
+          (data as List<dynamic>)?.cast<{{{dataType}}}>()
       {{/nullSafe}}
       {{#nullSafe}}
           (data as List<dynamic>?)?.cast<{{{dataType}}}>() ?? <{{{dataType}}}>[]

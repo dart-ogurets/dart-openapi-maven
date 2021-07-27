@@ -577,3 +577,13 @@ components:
             - $ref: '#/components/schemas/NumericAndSpacedEnum'
         enumFieldPlainRef:
           $ref: '#/components/schemas/NumericAndSpacedEnum'
+    PointGeometry:
+      type: object
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: double
