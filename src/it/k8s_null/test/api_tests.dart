@@ -127,6 +127,20 @@ main() {
     expect(testO.name, "foobar");
     expect(testO.enumFieldAllOf, NumericAndSpacedEnum.n667);
   });
+  test("generating 2d array in a correct way", () {
+    const json = {
+      "coordinates": [
+        [-27.6307582, 153.0401564],
+        [37.4220656, -122.0862784],
+      ]
+    };
+    final geometry = PointGeometry.fromJson(json);
+    expect(geometry.coordinates, hasLength(2));
+    final firstPair = geometry.coordinates.first;
+    expect(firstPair, hasLength(2));
+    expect(firstPair[0], -27.6307582);
+    expect(firstPair[1], 153.0401564);
+  });
 }
 
 const _dummyDiscriminatorJson = r"""

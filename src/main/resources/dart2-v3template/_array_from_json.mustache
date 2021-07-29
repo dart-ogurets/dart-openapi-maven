@@ -1,6 +1,6 @@
 {{#items}}
   {{#isArray}}
-    (data as List<dynamic>){{#nullSafe}}.fromNull(){{/nullSafe}}.map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
+    (data as List<dynamic>){{#nullSafe}}.fromNull(){{/nullSafe}}.map((data) { return ((dynamic data) { return {{>_from_json}};})(data); }).toList()
   {{/isArray}}
   {{#isMap}}
     (data as List<dynamic>){{#nullSafe}}.fromNull(){{/nullSafe}}.map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
@@ -19,7 +19,12 @@
       {{complexType}}.listFromJson(data)
     {{/isModel}}
     {{#isPrimitiveType}}
-      data?.cast<{{{dataType}}}>()
+      {{^nullSafe}}
+          (data as List<dynamic>)?.cast<{{{dataType}}}>()
+      {{/nullSafe}}
+      {{#nullSafe}}
+          (data as List<dynamic>?)?.cast<{{{dataType}}}>() ?? <{{{dataType}}}>[]
+      {{/nullSafe}}
     {{/isPrimitiveType}}
   {{/items}}
 {{/items}}
