@@ -25,50 +25,51 @@ public class SampleRunner {
 //      "--global-property", "skipFormModel=false",
       "--additional-properties", "nullSafe=true",
       "--additional-properties", "nullSafe-array-default=true",
+        "--additional-properties", "listAnyOf=true",
       "--output", "target/" + getClass().getSimpleName())
       .toArray(new String[0]));
   }
 
-  @Test
-  public void runGeneratorWithListAnyOfNNBD() {
-    // given
-    String schemaLocation = getClass().getResource("/list_any_of_test.yml").getFile();
-    String outputFolder = "target/" + getClass().getSimpleName()+"_list_any_of_test_NNBD";
-
-    // when
-    OpenAPIGenerator.main(Arrays.asList("generate",
-      "--input-spec", schemaLocation,
-      "--generator-name", "dart2-api",
-      "--additional-properties", "pubName=sample_app",
-      "--additional-properties", "nullSafe=true",
-      "--additional-properties", "nullSafe-array-default=true",
-      "--additional-properties", "listAnyOf=true",
-      "--output", outputFolder)
-      .toArray(new String[0]));
-
-    // then
-    verifyIsDartPackage(outputFolder);
-  }
-
-  @Test
-  public void runGeneratorWithListAnyOfNoNullSafety() {
-    // given
-    String schemaLocation = getClass().getResource("/list_any_of_test.yml").getFile();
-    String outputFolder = "target/" + getClass().getSimpleName()+"_list_any_of_test_no_null_safety";
-
-    // when
-    OpenAPIGenerator.main(Arrays.asList("generate",
-      "--input-spec", schemaLocation,
-      "--generator-name", "dart2-api",
-      "--additional-properties", "pubName=sample_app",
-      // "--additional-properties", "nullSafe=false", // passing anything turns null safety on
-      "--additional-properties", "listAnyOf=true",
-      "--output", outputFolder)
-      .toArray(new String[0]));
-
-    // then
-    verifyIsDartPackage(outputFolder);
-  }
+//  @Test
+//  public void runGeneratorWithListAnyOfNNBD() {
+//    // given
+//    String schemaLocation = getClass().getResource("/list_any_of_test.yml").getFile();
+//    String outputFolder = "target/" + getClass().getSimpleName()+"_list_any_of_test_NNBD";
+//
+//    // when
+//    OpenAPIGenerator.main(Arrays.asList("generate",
+//      "--input-spec", schemaLocation,
+//      "--generator-name", "dart2-api",
+//      "--additional-properties", "pubName=sample_app",
+//      "--additional-properties", "nullSafe=true",
+//      "--additional-properties", "nullSafe-array-default=true",
+//      "--additional-properties", "listAnyOf=true",
+//      "--output", outputFolder)
+//      .toArray(new String[0]));
+//
+//    // then
+//    verifyIsDartPackage(outputFolder);
+//  }
+//
+//  @Test
+//  public void runGeneratorWithListAnyOfNoNullSafety() {
+//    // given
+//    String schemaLocation = getClass().getResource("/list_any_of_test.yml").getFile();
+//    String outputFolder = "target/" + getClass().getSimpleName()+"_list_any_of_test_no_null_safety";
+//
+//    // when
+//    OpenAPIGenerator.main(Arrays.asList("generate",
+//      "--input-spec", schemaLocation,
+//      "--generator-name", "dart2-api",
+//      "--additional-properties", "pubName=sample_app",
+//      // "--additional-properties", "nullSafe=false", // passing anything turns null safety on
+//      "--additional-properties", "listAnyOf=true",
+//      "--output", outputFolder)
+//      .toArray(new String[0]));
+//
+//    // then
+//    verifyIsDartPackage(outputFolder);
+//  }
 
 //  @Test
 //  public void runExpedia() {

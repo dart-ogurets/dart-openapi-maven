@@ -26,5 +26,6 @@
           (data as List<dynamic>?)?.cast<{{{dataType}}}>() ?? <{{{dataType}}}>[]
       {{/nullSafe}}
     {{/isPrimitiveType}}
+    {{#isAnyType}}data{{/isAnyType}}
   {{/items}}
 {{/items}}

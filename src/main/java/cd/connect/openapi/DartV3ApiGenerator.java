@@ -216,6 +216,10 @@ public class DartV3ApiGenerator extends DartClientCodegen {
   }
 
   private void correctInternals(CodegenModel model, CodegenProperty cp, boolean classLevelField) {
+    if ("otherDeps".equals(cp.baseName)) {
+      System.out.println("here");
+    }
+
     if ("DateTime".equals(cp.complexType) || "Date".equals(cp.complexType)) {
       cp.isDateTime = "date-time".equals(cp.getDataFormat());
       cp.isDate = "date".equals(cp.getDataFormat());

@@ -267,6 +267,8 @@ The source for the tests is located in src/k8s** folders. The generated test out
 
 ==== Changelog
 
+- 5.11 - fix date/datetime strings in queries to not be encoded. Updated to use 5.2.1 of OpenAPI. Fixed a bunch
+of templating issues that arose because of it.
 - 5.10 - removal of an unnecessary date/time typecast for null safety
 - 5.9 - fix for null safe 2d APIs (via PiotrMitkowski)
 - 5.8 - slew of different fixes for the generator from different people, particular thanks to NANASHI0X74 for sticky ones!
