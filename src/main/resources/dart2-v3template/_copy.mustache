@@ -13,4 +13,5 @@
     {{^vendorExtensions.x-not-nullable}}data == null ? null : data.copyWith(){{/vendorExtensions.x-not-nullable}}
   {{/isModel}}
   {{#isPrimitiveType}}data{{/isPrimitiveType}}
+  {{#isAnyType}}data{{/isAnyType}}
 {{/items}}

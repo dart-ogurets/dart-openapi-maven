@@ -51,7 +51,7 @@
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>5.1.0</version>
+        <version>5.2.1</version>
         <dependencies>
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>

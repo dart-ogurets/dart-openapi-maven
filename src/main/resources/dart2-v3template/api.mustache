@@ -136,8 +136,8 @@ part of {{pubName}}.api;
           if({{paramName}} != null) {
       {{/required}}
         queryParams.addAll(convertParametersForCollectionFormat(
-      {{#nullSafe}}(p) => {{/nullSafe}}
-      {{#isDateTime}}openApiDateTimeParameterToString{{#nullSafe}}(p){{/nullSafe}}{{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString{{#nullSafe}}(p){{/nullSafe}}{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{#nullSafe}}(p)!{{/nullSafe}}{{/isDate}}{{/isDateTime}},
+      (p) =>
+      {{#isDateTime}}openApiDateTimeParameterToString(p, false){{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString(p, false){{/isDate}}{{^isDate}}LocalApiClient.parameterToString(p)!{{/isDate}}{{/isDateTime}},
           '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
       {{^required}}
           }

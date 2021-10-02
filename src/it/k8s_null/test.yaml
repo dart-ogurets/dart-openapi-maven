@@ -68,6 +68,12 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: queryDateTime
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
       operationId: getSampleWithAllTypes
       tags:
         - ControlService
