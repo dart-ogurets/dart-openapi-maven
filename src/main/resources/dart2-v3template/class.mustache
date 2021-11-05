@@ -109,6 +109,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{#isPrimitiveType}}
           json[r'{{baseName}}'] = {{{name}}};
         {{/isPrimitiveType}}
+        {{#isAnyType}}
+          json[r'{{baseName}}'] = {{{name}}};
+        {{/isAnyType}}
       {{/items}}
       {{^required}}
     } {{#generateNullValuesToJson}}else {

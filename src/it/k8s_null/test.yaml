@@ -593,3 +593,17 @@ components:
             items:
               type: number
               format: double
+    PatchDocument:
+      type: object
+      properties:
+        value:
+          nullable: true
+        path:
+          type: string
+          nullable: true
+        op:
+          type: string
+          nullable: true
+        from:
+          type: string
+          nullable: true
