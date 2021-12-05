@@ -109,9 +109,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{#isPrimitiveType}}
           json[r'{{baseName}}'] = {{{name}}};
         {{/isPrimitiveType}}
-        {{#isAnyType}}
+        {{#isAnyType}}{{^isModel}}
           json[r'{{baseName}}'] = {{{name}}};
-        {{/isAnyType}}
+        {{/isModel}}{{/isAnyType}}
       {{/items}}
       {{^required}}
     } {{#generateNullValuesToJson}}else {
@@ -155,7 +155,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{/-last}}
         {{/isMap}}
         {{^isMap}}
-          {{{name}}} == __other.{{{name}}}{{^-last}} && // __other
+          this.{{{name}}} == __other.{{{name}}}{{^-last}} && // __other
         {{/-last}}
         {{/isMap}}
       {{/isArray}}
@@ -165,7 +165,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{/-last}}
     {{/isArray}}
     {{^isArray}}
-     {{{name}}} == __other.{{{name}}}{{^-last}} &&
+      this.{{{name}}} == __other.{{{name}}}{{^-last}} &&
     {{/-last}}
     {{/isArray}}
   {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}

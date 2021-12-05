@@ -247,14 +247,14 @@ public class DartV3ApiGenerator extends DartClientCodegen {
           @SuppressWarnings("rawtypes") // cannot be fixed unless upstream changes its signatures to Schema<?>
           List<Schema> anyOfArray = composedSchema.getAnyOf();
           if (allOfArray.size() == 1 && anyOfArray == null || anyOfArray.isEmpty() && oneOfArray == null
-              || oneOfArray.isEmpty()) {
+            || oneOfArray.isEmpty()) {
             String singleRef = allOfArray.get(0).get$ref();
             if (singleRef != null) {
               Matcher extractLastPathComponent = Pattern.compile("#\\/components\\/schemas\\/([a-zA-Z0-9\\.\\-_]+)")
-                  .matcher(singleRef);
+                .matcher(singleRef);
               if (extractLastPathComponent.matches()) {
                 List<?> referencedEnum = openAPI.getComponents().getSchemas().get(extractLastPathComponent.group(1))
-                    .getEnum();
+                  .getEnum();
                 if (referencedEnum != null && !referencedEnum.isEmpty()) {
                   isComposedEnum = true;
                   cp.isModel = false;
@@ -265,8 +265,8 @@ public class DartV3ApiGenerator extends DartClientCodegen {
         }
       } catch (Exception e) {
         log.error(
-            "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
-            model.name, e.toString());
+          "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
+          model.name, e.toString());
         // continue Execution
       }
     }
@@ -486,14 +486,14 @@ public class DartV3ApiGenerator extends DartClientCodegen {
     processPubspecMappings();
 
     final Map<String, Object> som = super.postProcessOperationsWithModels(objs, allModels);
-      @SuppressWarnings("unchecked") // type-unsafe upstream api
+    @SuppressWarnings("unchecked") // type-unsafe upstream api
     final List<CodegenOperation> ops = (List<CodegenOperation>) ((Map<String, Object>) objs.get("operations")).get(
       "operation");
 
     // at this point, all the model files have actually already been generated to disk, that horse has bolted. What
     // we need to do is figured out which models are "form" based and are not required. Basically anything that is
     // directly used by by a form post
-      @SuppressWarnings("unchecked") // type-unsafe upstream api
+    @SuppressWarnings("unchecked") // type-unsafe upstream api
     final List<Map<String, Object>> models = allModels.stream().map(m -> (Map<String, Object>)m).collect(Collectors.toList());
     Map<String, CodegenModel> modelMap = new HashMap<>();
     Map<String, Map<String, Object>> modelMetaMap = new HashMap<>();
@@ -513,26 +513,26 @@ public class DartV3ApiGenerator extends DartClientCodegen {
         (co.consumes != null && co.consumes.size() == 1 && "application/octet-stream".equals(co.consumes.get(0).get(
           "mediaType")));
 
-        if (co.bodyParam != null) {
-          CodegenModel cm = modelMap.get(co.bodyParam.baseType);
-          if (cm != null) {
-            cm.vendorExtensions.put("isUsedModel", "true");
-            modelFilesNotToDeleted.add(cm.classFilename + ".dart");
-            modelMetaMap.get(co.bodyParam.baseType).put("isUsedModel", "true");
-          }
+      if (co.bodyParam != null) {
+        CodegenModel cm = modelMap.get(co.bodyParam.baseType);
+        if (cm != null) {
+          cm.vendorExtensions.put("isUsedModel", "true");
+          modelFilesNotToDeleted.add(cm.classFilename + ".dart");
+          modelMetaMap.get(co.bodyParam.baseType).put("isUsedModel", "true");
         }
+      }
 
-        co.allParams.forEach((p) -> {
-          if (p.isFile || p.isBinary || (p.isBodyParam && bodyIsFile)) {
-            if (p.isArray) {
-              p.dataType = "List<MultipartFile>";
-            } else {
-              p.dataType = "MultipartFile";
-            }
-
-            p.baseType = p.dataType;
+      co.allParams.forEach((p) -> {
+        if (p.isFile || p.isBinary || (p.isBodyParam && bodyIsFile)) {
+          if (p.isArray) {
+            p.dataType = "List<MultipartFile>";
+          } else {
+            p.dataType = "MultipartFile";
           }
-        });
+
+          p.baseType = p.dataType;
+        }
+      });
     }
 
 
@@ -637,6 +637,7 @@ public class DartV3ApiGenerator extends DartClientCodegen {
         .filter(Files::isRegularFile)
         .forEach(p -> {
           String modelFilename = p.toFile().getAbsolutePath().substring(stripLen);
+//          String modelFilename = p.getFileName().toString();
           if (!modelFilesNotToDeleted.contains(modelFilename)) {
             p.toFile().delete();
           }
