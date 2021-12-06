@@ -637,7 +637,6 @@ public class DartV3ApiGenerator extends DartClientCodegen {
         .filter(Files::isRegularFile)
         .forEach(p -> {
           String modelFilename = p.toFile().getAbsolutePath().substring(stripLen);
-//          String modelFilename = p.getFileName().toString();
           if (!modelFilesNotToDeleted.contains(modelFilename)) {
             p.toFile().delete();
           }
