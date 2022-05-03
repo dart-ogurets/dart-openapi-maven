@@ -1,0 +1,108 @@
+openapi: 3.0.1
+info:
+  title: Inheritance examples
+  version: 1.0.0
+paths:
+  /inheritance:
+    get:
+      tags:
+        - InheritanceService
+      operationId: "inheritance"
+      responses:
+        "200":
+          description: "Description"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity4"
+
+        "201":
+          description: "Description"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+components:
+  schemas:
+    Entity:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+        name:
+          type: string
+          nullable: true
+      discriminator:
+        propertyName: type
+      additionalProperties: false
+
+    Entity2:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Entity'
+      properties:
+        description:
+          type: string
+          nullable: true
+      additionalProperties: false
+
+    Entity3:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Entity2'
+      properties:
+        summary:
+          type: string
+          nullable: true
+      additionalProperties: false
+
+    Entity4:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Entity3'
+      properties:
+        notes:
+          type: string
+          nullable: true
+        moreNotes:
+          type: string
+          nullable: true
+      additionalProperties: false
+
+    Empty:
+      type: object
+      discriminator:
+        propertyName: type
+      allOf:
+        - type: object
+
+      additionalProperties: false
+
+    Empty2:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Empty'
+      additionalProperties: false
+
+    Empty3:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Empty2'
+      additionalProperties: false
+
+    EmptyEntity:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Entity'
+      additionalProperties: false
+
+    Named:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Empty3'
+      properties:
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false

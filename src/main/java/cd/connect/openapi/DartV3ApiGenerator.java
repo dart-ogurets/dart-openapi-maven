@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -454,8 +455,23 @@ public class DartV3ApiGenerator extends DartClientCodegen {
 
 
 
-  // TODO: check with multiple levels of hierarchy
   private void updateModelsWithAllOfInheritance(Map<String, CodegenModel> models) {
+    // Workaround for https://github.com/OpenAPITools/openapi-generator/issues/11846
+    for (CodegenModel cm : models.values()) {
+      CodegenModel parent = cm;
+      Set<String> properties = cm.vars.stream().map(CodegenProperty::getName).collect(Collectors.toSet());
+      while ((parent = parent.parentModel) != null) {
+        for (CodegenProperty cp : parent.vars) {
+          if (!properties.contains(cp.getName())) {
+            properties.add(cp.getName());
+
+            cm.vars.add(cp.clone());
+            cm.hasVars = true;
+          }
+        }
+      }
+    }
+
     for (CodegenModel cm : models.values()) {
       if (cm.getParent() != null) {
         CodegenModel parent = models.get(cm.getParent());
@@ -473,7 +489,13 @@ public class DartV3ApiGenerator extends DartClientCodegen {
             v.vendorExtensions.put("x-dart-inherited", Boolean.TRUE);
           }
         });
+        Comparator<CodegenProperty> cmp = Comparator.comparing(cp -> cp.vendorExtensions.containsKey("x-dart-inherited"));
+        cm.getVars().sort(cmp.reversed());
       }
+
+      List<CodegenProperty> ownVars = cm.getVars().stream().filter(cp -> !cp.vendorExtensions.containsKey("x-dart-inherited")).collect(Collectors.toList());
+      cm.vendorExtensions.put("x-dart-ownVars", ownVars);
+      cm.vendorExtensions.put("x-dart-hasOwnVars", !ownVars.isEmpty());
     }
   }
 
