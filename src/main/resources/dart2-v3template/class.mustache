@@ -24,11 +24,13 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     {{/allowableValues}}
   {{/vendorExtensions.x-dart-inherited}}
 {{/vars}}
-{{^hasVars}}
+{{^hasVars}}{{^parent}}
   {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{/required}} json;
-{{/hasVars}}
-{{classname}}({ {{#vars}}{{#required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}required {{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}this.{{{name}}}{{/vendorExtensions.x-ns-default-val}},
-    {{/vars}} }){{#vendorExtensions.x-has-ns-default-vals}} : {{#vendorExtensions.x-ns-default-vals}}this.{{{name}}} = {{{name}}} ?? []{{^-last}}, {{/-last}}{{/vendorExtensions.x-ns-default-vals}}{{/vendorExtensions.x-has-ns-default-vals}};
+{{/parent}}{{/hasVars}}
+{{classname}}({{#hasVars}}{ {{#vars}}{{#required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}required {{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-dart-inherited}}this.{{/vendorExtensions.x-dart-inherited}}{{{name}}}{{/vendorExtensions.x-ns-default-val}},
+    {{/vars}} }{{/hasVars}}){{#vendorExtensions.x-has-ns-default-vals}} : {{#vendorExtensions.x-ns-default-vals}}{{^vendorExtensions.x-dart-inherited}}this.{{/vendorExtensions.x-dart-inherited}}{{{name}}} = {{{name}}} ?? []{{^-last}}, {{/-last}}{{/vendorExtensions.x-ns-default-vals}}{{/vendorExtensions.x-has-ns-default-vals}}
+{{#parent}} : super({{#vars}}{{#vendorExtensions.x-dart-inherited}}{{name}}: {{name}},{{/vendorExtensions.x-dart-inherited}}{{/vars}}) {{/parent}}
+;
 
   @override
   String toString() {
@@ -48,7 +50,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 {{#hasVars}}
   fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     if (json == null) return;
-  {{#parent}}super.fromJson(json);{{/parent}}
+  {{#parentModel}}{{#hasVars}}super{{/hasVars}}{{^hasVars}}{{classname}}{{/hasVars}}.fromJson(json);{{/parentModel}}
   {{#nullSafe}}
     {{#vars}}
       {{^vendorExtensions.x-dart-inherited}}
@@ -75,7 +77,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   }
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
+    final json = {{#parent}}super.toJson();{{/parent}}{{^parent}}<String, dynamic>{};{{/parent}}
     {{#vars}}
       {{^vendorExtensions.x-dart-inherited}}
         {{^required}}
@@ -142,8 +144,8 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     }
 
     if (__other is {{classname}} && runtimeType == __other.runtimeType) {
-  {{#hasVars}}
-    return {{^hasVars}}json?.equals(__other.json);{{/hasVars}}{{#vars}}{{^vendorExtensions.x-dart-inherited}}
+
+  {{#hasVars}}return {{#vendorExtensions.x-dart-ownVars}}
     {{#complexType}}
       {{#isArray}}
         const ListEquality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
@@ -168,10 +170,10 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
      {{{name}}} == __other.{{{name}}}{{^-last}} &&
     {{/-last}}
     {{/isArray}}
-  {{/complexType}}{{/vendorExtensions.x-dart-inherited}}{{/vars}}
-    {{#parent}} &&
+  {{/complexType}}{{/vendorExtensions.x-dart-ownVars}}
+    {{#parent}} {{#vendorExtensions.x-dart-hasOwnVars}}&&{{/vendorExtensions.x-dart-hasOwnVars}}
     super==__other{{/parent}};{{/hasVars}}{{^hasVars}}
-    return {{#parent}}super==__other{{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+    return {{#parent}}super==__other{{/parent}}{{^parent}}json?.equals(__other.json){{/parent}};{{/hasVars}}
     }
 
     return false;
@@ -179,7 +181,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
   @override
   int get hashCode {
-    var hashCode = runtimeType.hashCode;
+    var hashCode = {{#parent}}super.hashCode{{/parent}}{{^parent}}runtimeType.hashCode{{/parent}};
 
   {{#hasVars}}
     {{#vars}}{{^vendorExtensions.x-dart-inherited}}
@@ -213,9 +215,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
         {{/nullSafe}}
       {{/vendorExtensions.x-ns-default-val}}
 
-    {{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/hasVars}}
+    {{/vendorExtensions.x-dart-inherited}}{{/vars}}{{/hasVars}}{{^hasVars}}{{^parent}}if (json != null) { hashCode = hashCode ^ json.hashCode; }{{/parent}}{{/hasVars}}
 
-    return hashCode{{#parent}} ^ super.hashCode{{/parent}};
+    return hashCode;
   }
 
   {{classname}} copyWith({{#hasVars}}{
@@ -224,10 +226,11 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
      {{/vars}}
     }{{/hasVars}}) {
 
-  {{#vars}}{{^vendorExtensions.x-dart-inherited}}{{{name}}} ??= this.{{{name}}};
-  {{/vendorExtensions.x-dart-inherited}}{{/vars}}
   {{#vars}}
-  {{^vendorExtensions.x-dart-inherited}}
+    {{{name}}} ??= this.{{{name}}};
+  {{/vars}}
+
+  {{#vars}}
   {{#nullSafe}}
   {{#required}}
     {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}.copyWith(){{/isModel}};{{/items}}
@@ -244,7 +247,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^nullSafe}}
     {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
   {{/nullSafe}}
-  {{/vendorExtensions.x-dart-inherited}}{{/vars}}
+  {{/vars}}
 
     return {{{classname}}}(
       {{#vars}}{{{name}}}: _copy_{{{name}}},{{/vars}});
