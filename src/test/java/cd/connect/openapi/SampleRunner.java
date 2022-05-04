@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class SampleRunner {
   @Test
   public void runGenerator() {
-    String location = getClass().getResource("/test.yaml").getFile();
+    String location = getClass().getResource("/copy-with.yaml").getFile();
 //    String location = getClass().getResource("/k8s_null_test.yml").getFile();
 //    OpenAPIGenerator.main(Arrays.asList("help", "generate").toArray(new String[0]));
 
@@ -20,6 +20,7 @@ public class SampleRunner {
       "--generator-name", "dart2-api",
       "--enable-post-process-file",
       "--additional-properties", "pubName=sample_app",
+//      "--additional-properties", "disableCopyWith",
 //      "--type-mappings", "int-or-string=IntOrString",
 //      "--import-mappings", "IntOrString=./int_or_string.dart",
 //      "--global-property", "skipFormModel=false",

@@ -668,7 +668,8 @@ public class DartV3ApiGenerator extends DartClientCodegen {
     if (flutterDir != null && isEnablePostProcessFile()) {
 //      String dartPostProcessFixFile = String.format("%s/bin/cache/dart-sdk/bin/dart fix --apply %s", flutterDir,
 //        getOutputDir());
-      String dartPostProcessFile = String.format("%s/bin/cache/dart-sdk/bin/dartfmt -w %s", flutterDir, getOutputDir());
+      String dartPostProcessFile = String.format("%s/bin/cache/dart-sdk/bin/dart format -o write %s", flutterDir,
+        getOutputDir());
 
       try {
 //        log.info("auto-fixing generated issues");
@@ -680,7 +681,7 @@ public class DartV3ApiGenerator extends DartClientCodegen {
         outputStreamToConsole(fmt);
         fmt.waitFor();
       } catch (Exception e) {
-        log.error("Unable to run dart fix command");
+        log.error("Unable to run dart fix command", e);
       }
     }
   }

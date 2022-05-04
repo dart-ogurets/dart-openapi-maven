@@ -25,7 +25,9 @@ extension {{classname}}Extension on {{classname}} {
   static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) =>
     json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList(){{#nullSafe}}.fromNull(){{/nullSafe}};
 
+  {{^disableCopyWith}}
   static {{classname}} copyWith({{classname}} instance) => instance;
+  {{/disableCopyWith}}
 
   static Map<String, {{classname}}> mapFromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     final map = <String, {{classname}}>{};

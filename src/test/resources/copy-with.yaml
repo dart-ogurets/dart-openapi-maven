@@ -1,0 +1,64 @@
+openapi: 3.0.1
+info:
+  title: Copy-With problem issue 76
+  version: 1.0.0
+paths:
+  /inheritance:
+    get:
+      tags:
+        - MapService
+      operationId: "inheritance"
+      responses:
+        "200":
+          description: "Description"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchParams"
+components:
+  schemas:
+    SearchParams:
+      type: object
+      additionalProperties: false
+      properties:
+        phrase:
+          type: string
+          nullable: true
+        virtualCategory:
+          type: string
+          nullable: true
+        inDescription:
+          type: boolean
+          nullable: true
+          default: false
+        sorting:
+          type: string
+          nullable: true
+        filters:
+          type: object
+          nullable: true
+          default: {}
+          additionalProperties:
+            "$ref": "#/components/schemas/FilterQuery"
+        categoryId:
+          type: integer
+          nullable: true
+          default: 0
+        slug:
+          type: string
+          nullable: true
+    FilterQuery:
+      type: object
+      additionalProperties: false
+      properties:
+        values:
+          type: string
+          nullable: true
+        from:
+          type: number
+          format: float
+          nullable: true
+        to:
+          type: number
+          format: float
+          nullable: true

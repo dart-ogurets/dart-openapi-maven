@@ -220,6 +220,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     return hashCode;
   }
 
+  {{^disableCopyWith}}
   {{classname}} copyWith({{#hasVars}}{
      {{#vars}}
          {{{dataType}}}{{#required}}{{#nullSafe}}?{{/nullSafe}}{{/required}}{{^required}}{{#vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}} {{{name}}},
@@ -252,6 +253,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     return {{{classname}}}(
       {{#vars}}{{{name}}}: _copy_{{{name}}},{{/vars}});
   }
+  {{/disableCopyWith}}
 }
 
   {{#vars}}

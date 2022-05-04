@@ -96,6 +96,8 @@ openApiGenerate {
 
 Please refer to the article https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[on Medium].
 
+Please not the versions of all the libraries have moved on since then.
+
 ==== Additional Properties
 
 Additional properties allow you to customise how code is generated and we honour 2 of them above the normal ones.
@@ -108,6 +110,7 @@ of Dart to 2.12 and generate null safe code. Using the nullSafe-array-default, i
 as being `required` in your OpenAPI "required" but making them always generate a default value of `[]`. This ends up
 being considerably easier to use.
 - `listAnyOf=false` - this will turn _off_ AnyOf support. This would be a bit weird, but you can do it if you want.
+- `disableCopyWith` - if this is specified, then the copyWith functionality will be disabled. On complex OpenAPI definitions, the combinations of null safety and nested classes can cause incomplete or invalid code to be generated. We recommend disabling the generation of the copy-with code for that purpose. It is simply a convenience for coding and is not required as part of the API.
 
 the normal ones include:
 
@@ -247,6 +250,126 @@ behind as you generate.
       </plugin>
 ----
 
+=== I need to do something special with the Dio layer!
+
+The DioClientDelegate we provide can be fully overridden - in Dart all classes are also interfaces so if you wish
+to do special things in the underlying "guts" of the Dio library you can easily do so. Caching is an example, one
+of our users has an https://gist.github.com/Maczuga/255e822a09f8d3dd8284096e5cda3003[example]:
+
+Ensure you include 304 as a valid return type for cached APIs.
+
+[source,dart]
+----
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:openapi_dart_common/openapi.dart';
+import 'package:xxxx/api_delegate.dart'; // The file below
+
+final _cacheOptions = CacheOptions(
+  store: MemCacheStore(),
+  hitCacheOnErrorExcept: [401, 403],
+  maxStale: const Duration(days: 7),
+);
+
+class API extends ApiClient {
+    API._internal() : super(basePath: "https://xxxxxx/api") {
+    apiClientDelegate = CustomDioClientDelegate();
+    final dioDelegate = apiClientDelegate as CustomDioClientDelegate;
+    dioDelegate.client.interceptors.add(DioCacheInterceptor(options: _cacheOptions));
+  }
+}
+----
+
+[source,dart]
+----
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:openapi_dart_common/openapi.dart';
+
+class CustomDioClientDelegate implements DioClientDelegate {
+  @override
+  final Dio client;
+
+  CustomDioClientDelegate([Dio? client]) : client = client ?? Dio();
+
+  @override
+  Future<ApiResponse> invokeAPI(
+      String basePath, String path, Iterable<QueryParam> queryParams, Object? body, Options options,
+      {bool passErrorsAsApiResponses = false}) async {
+    final String url = basePath + path;
+
+    // fill in query parameters
+    final Map<String, String> qParams = _convertQueryParams(queryParams);
+
+    options.responseType = ResponseType.plain;
+    options.receiveDataWhenStatusError = true;
+
+    // Dio can't cope with this in both places, it just adds them together in a stupid way
+    if (options.headers != null && options.headers!['Content-Type'] != null) {
+      options.contentType = options.headers!['Content-Type']?.toString();
+      options.headers!.remove('Content-Type');
+    }
+
+    try {
+      Response<String> response;
+
+      if (['GET', 'HEAD', 'DELETE'].contains(options.method)) {
+        response = await client.request<String>(url, options: options, queryParameters: qParams);
+      } else {
+        response = await client.request<String>(url, options: options, data: body, queryParameters: qParams);
+      }
+
+      final stream = _jsonToStream(response.data);
+      return ApiResponse(response.statusCode ?? 500, _convertHeaders(response.headers), stream);
+    } catch (ex, stack) {
+      if (ex is! DioError) rethrow;
+
+      if (passErrorsAsApiResponses) {
+        if (ex.response == null) {
+          return ApiResponse(500, {}, null)
+            ..innerException = ex
+            ..stackTrace = stack;
+        }
+
+        // if (e.response.data)
+        if (ex.response!.data is String?) {
+          final response = ex.response!;
+          final json = response.data as String;
+
+          return ApiResponse(response.statusCode ?? 500, _convertHeaders(response.headers), _jsonToStream(json));
+        } else {
+          print(
+              "ex is not 'String?' ${ex.response.runtimeType.toString()} ${ex.response!.data?.runtimeType.toString() ?? ''}");
+        }
+      }
+
+      if (ex.response == null) {
+        throw ApiException.withInner(500, 'Connection error', ex, stack);
+      } else {
+        throw ApiException.withInner(ex.response?.statusCode ?? 500, ex.response?.data as String?, ex, stack);
+      }
+    }
+  }
+
+  Map<String, String> _convertQueryParams(Iterable<QueryParam> queryParams) {
+    final Map<String, String> qp = {};
+    for (final q in queryParams) {
+      qp[q.name] = q.value;
+    }
+    return qp;
+  }
+
+  Map<String, List<String>> _convertHeaders(Headers headers) {
+    final Map<String, List<String>> res = {};
+    headers.forEach((k, v) => res[k] = v);
+    return res;
+  }
+
+  Stream<List<int>> _jsonToStream(String? json) {
+    return Stream<List<int>>.value(utf8.encode(json ?? ""));
+  }
+}
+----
 === Testing
 
 If you are trying to make changes to the repository, I recommend adding a new test to "SampleRunner"
@@ -273,6 +396,7 @@ The source for the tests is located in src/k8s** folders. The generated test out
 
 ==== Changelog
 
+- 5.13 - ability to disable the copyWith generation (see above)
 - 5.12 - contributed fixes for inherited types (via https://github.com/roald-di)
 - 5.11 - fix date/datetime strings in queries to not be encoded. Updated to use 5.2.1 of OpenAPI. Fixed a bunch
 of templating issues that arose because of it.
@@ -352,3 +476,13 @@ won't change method calls when you are only passing one type.
 - We will wrap exceptions that have generated models
 - We intend to be generating server side code for supporting Dart server side applications.
 - We are considering memoization
+
+
+==== Known Issues
+
+- When you have a nullable Map type with a default value (e.g. {}), e.g. Map<String, Filter>? then the copyWith does
+not function correctly because `{} as Map<String, Filter>?` is not correct and `Map<String, Filter>?.from({})` is not
+valid syntax. We will need to use the Dart 2.16 functionality to create a new type for this map and then we can resolve
+the issue.
+- nullable: true is being removed from OpenAPI is not part of the standard form 3.1 onwards. You *can* specify a field
+as being required and being nullable: true, but this generator expects that required fields are not nullable.

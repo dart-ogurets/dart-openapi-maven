@@ -78,12 +78,14 @@ class {{classname}} {
     return hashCode;
   }
 
+{{^disableCopyWith}}
   {{classname}} copyWith() {
     final copy = {{classname}}();
     copy._value = _value.copyWith();
     copy._discriminator = _discriminator;
     return copy;
   }
+{{/disableCopyWith}}
 
   static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
     return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
