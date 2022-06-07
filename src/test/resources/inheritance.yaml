@@ -106,3 +106,74 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+
+    WithList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+          nullable: false
+        nullableList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+          nullable: true
+      discriminator:
+        propertyName: type
+      additionalProperties: false
+
+    WithListDerived:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Entity'
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+          nullable: false
+        nullableList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+          nullable: true
+      additionalProperties: false
+
+    WithListDerived2:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/WithList'
+      properties:
+        list2:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+          nullable: false
+        nullableList2:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+          nullable: true
+      additionalProperties: false
+
+    WithListDerived3:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/WithList'
+      properties:
+        someString:
+          type: string
+          nullable: false
+      additionalProperties: false
+
+    WithListDerived4:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/WithListDerived'
+      properties:
+        someString:
+          type: string
+          nullable: false
+      additionalProperties: false

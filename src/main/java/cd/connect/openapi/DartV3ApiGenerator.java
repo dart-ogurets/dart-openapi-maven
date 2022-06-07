@@ -496,6 +496,10 @@ public class DartV3ApiGenerator extends DartClientCodegen {
       List<CodegenProperty> ownVars = cm.getVars().stream().filter(cp -> !cp.vendorExtensions.containsKey("x-dart-inherited")).collect(Collectors.toList());
       cm.vendorExtensions.put("x-dart-ownVars", ownVars);
       cm.vendorExtensions.put("x-dart-hasOwnVars", !ownVars.isEmpty());
+
+      List<CodegenProperty> ownDefaultVals = ownVars.stream().filter(cp -> cp.vendorExtensions.containsKey("x-ns-default-val")).collect(Collectors.toList());
+      cm.vendorExtensions.put("x-own-ns-default-vals", ownDefaultVals);
+      cm.vendorExtensions.put("x-has-own-ns-default-vals", !ownDefaultVals.isEmpty());
     }
   }
 
