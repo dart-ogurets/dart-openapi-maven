@@ -26,8 +26,8 @@ def runCommand = { strList ->
   assert !proc.exitValue()
 }
 
-runCommand("pub get")
-runCommand("dartanalyzer lib")
-runCommand("pub run test test/api_tests.dart")
+runCommand("dart pub get")
+runCommand("dart analyze lib")
+runCommand("dart test test/api_tests.dart")
 
 //System.exit(0)
