@@ -23,12 +23,12 @@ To use it, do something like this:
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>5.2.1</version>
+        <version>6.0.1</version>
         <dependencies>
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>5.12</version>
+            <version>6.1</version>
           </dependency>
         </dependencies>
         <executions>
@@ -395,7 +395,7 @@ mvn clean verify
 The source for the tests is located in src/k8s** folders. The generated test output will be in target/it/k8s**.
 
 ==== Changelog
-
+- 6.1 - migrate to the *6.0.1* version of OpenAPI, move to Java 11, swap to Kotlin. This is advertised as a breaking change and has led to some classes changing their names, adding new classes which didn't exist before. 
 - 5.13 - ability to disable the copyWith generation (see above)
 - 5.12 - contributed fixes for inherited types (via https://github.com/roald-di)
 - 5.11 - fix date/datetime strings in queries to not be encoded. Updated to use 5.2.1 of OpenAPI. Fixed a bunch

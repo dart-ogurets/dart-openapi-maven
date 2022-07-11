@@ -53,6 +53,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#parentModel}}{{#hasVars}}super{{/hasVars}}{{^hasVars}}{{classname}}{{/hasVars}}.fromJson(json);{{/parentModel}}
   {{#nullSafe}}
     {{#vars}}
+      {{^vendorExtensions.x-var-is-binary}}
       {{^vendorExtensions.x-dart-inherited}}
         {{#required}}
           {
@@ -62,13 +63,14 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
           }{{/required}}
 
         {{^required}}{{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{>_simple_from_json}}{{/items}}{{/required}}
-      {{/vendorExtensions.x-dart-inherited}}{{/vars}}
+      {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}{{/vars}}
   {{/nullSafe}}
   {{^nullSafe}}
   {{#vars}}
+    {{^vendorExtensions.x-var-is-binary}}
     {{^vendorExtensions.x-dart-inherited}}
     {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{{name}}} = (json[r'{{{baseName}}}'] == null) ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{>_simple_from_json}};{{/items}}
-    {{/vendorExtensions.x-dart-inherited}}{{/vars}}
+    {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}{{/vars}}
   {{/nullSafe}}
   }
 
@@ -79,6 +81,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
   Map<String, dynamic> toJson() {
     final json = {{#parent}}super.toJson();{{/parent}}{{^parent}}<String, dynamic>{};{{/parent}}
     {{#vars}}
+      {{^vendorExtensions.x-var-is-binary}}
       {{^vendorExtensions.x-dart-inherited}}
         {{^required}}
 {{#vendorExtensions.x-ns-default-val}}
@@ -121,6 +124,7 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
     }{{/generateNullValuesToJson}}
         {{/required}}
       {{/vendorExtensions.x-dart-inherited}}
+      {{/vendorExtensions.x-var-is-binary}}
     {{/vars}}
     return json;
   }
@@ -145,6 +149,9 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 
     if (__other is {{classname}} && runtimeType == __other.runtimeType) {
 
+  /*
+   this should be here {{{vendorExtensions.x-dart-ownVars}}}
+  */
   {{#hasVars}}return {{#vendorExtensions.x-dart-ownVars}}
     {{#complexType}}
       {{#isArray}}
