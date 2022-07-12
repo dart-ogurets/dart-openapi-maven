@@ -220,47 +220,10 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.vendorExtensions.put("x-var-is-binary", "true")
     }
 
-    // detect wether the schema follows the pattern:
-    // "{ "nullable" : true, "allOf" : [ { "$ref" : <SomeEnum> } ]}",
-    // if yes, treat it like an enum.
-    // this is a fix for https://github.com/dart-ogurets/dart-openapi-maven/issues/48
-    var isComposedEnum = false
-
-    if (cp.isModel) {
-      try {
-        val schemaNode = ObjectMapperFactory.createJson().readTree(cp.jsonSchema) as ObjectNode
-        val parsedSchema = OpenAPIDeserializer().getSchema(schemaNode, "", null)
-        if (parsedSchema is ComposedSchema) {
-          val allOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
-            = parsedSchema.allOf
-          val oneOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
-            = parsedSchema.oneOf
-          val anyOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
-            = parsedSchema.anyOf
-          if (allOfArray.size == 1 && anyOfArray == null || anyOfArray!!.isEmpty() && oneOfArray == null || oneOfArray!!.isEmpty()) {
-            val singleRef = allOfArray[0].`$ref`
-            if (singleRef != null) {
-              val extractLastPathComponent = Pattern.compile("#/components\\/schemas\\/([a-zA-Z\\d\\.\\-_]+)")
-                .matcher(singleRef)
-              if (extractLastPathComponent.matches()) {
-                val referencedEnum = openAPI.components.schemas[extractLastPathComponent.group(1)]!!.enum
-                if (referencedEnum != null && referencedEnum.isNotEmpty()) {
-                  isComposedEnum = true
-                  cp.isModel = false
-                  cp.isEnum = true
-                  cp.isAnyType = false
-                }
-              }
-            }
-          }
-        }
-      } catch (e: Exception) {
-        log.error(
-          "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
-          model.name, e.toString()
-        )
-        // continue Execution
-      }
+    var isComposedEnum = if (cp.isModel) {
+      detectHiddenEnum(cp, model)
+    } else {
+      false
     }
 
     if (cp.allowableValues != null && cp.allowableValues["enumVars"] != null || isComposedEnum) {
@@ -319,9 +282,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
       cp.vendorExtensions["x-innerType"] = cp.dataType
     }
-    if (classLevelField && cp.items == null) {
-      cp.vendorExtensions["x-not-nullable"] = cp.required || !cp.isNullable
-    }
 
     // if we have a weird format which is a String/int/etc with an unknown format
     if (cp.isString && cp.complexType != null) {
@@ -334,9 +294,22 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
     }
 
+    if (cp.required && cp.defaultValue == null) {
+      cp.vendorExtensions["x-dart-required"] = "true"
+    }
+
+    if ((cp.defaultValue == "[]" && cp.isArray) || (cp.defaultValue == "{}" && cp.isMap)) {
+      cp.defaultValue = "const " + cp.defaultValue
+    }
+
+    if (!cp.required && cp.isNullable) {
+      cp.vendorExtensions["x-dart-nullcheck-tojson"] = "true"
+    }
+
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
     // it affects the constructor and defaults of top level fields
     if (classLevelField && cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null) {
+      cp.defaultValue = "const []"
       cp.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
       if (cp.items != null) { // it should be not null, its an array
         cp.items.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
@@ -354,6 +327,52 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
+  // detect whether the schema follows the pattern:
+  // "{ "nullable" : true, "allOf" : [ { "$ref" : <SomeEnum> } ]}",
+  // if yes, treat it like an enum.
+  // this is a fix for https://github.com/dart-ogurets/dart-openapi-maven/issues/48
+  private fun detectHiddenEnum(
+      cp: CodegenProperty,
+      model: CodegenModel
+  ): Boolean {
+    var isComposedEnum = false
+    try {
+      val schemaNode = ObjectMapperFactory.createJson().readTree(cp.jsonSchema) as ObjectNode
+      val parsedSchema = OpenAPIDeserializer().getSchema(schemaNode, "", null)
+      if (parsedSchema is ComposedSchema) {
+        val allOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
+          = parsedSchema.allOf
+        val oneOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
+          = parsedSchema.oneOf
+        val anyOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
+          = parsedSchema.anyOf
+        if (allOfArray.size == 1 && anyOfArray == null || anyOfArray!!.isEmpty() && oneOfArray == null || oneOfArray!!.isEmpty()) {
+          val singleRef = allOfArray[0].`$ref`
+          if (singleRef != null) {
+            val extractLastPathComponent = Pattern.compile("#/components\\/schemas\\/([a-zA-Z\\d\\.\\-_]+)")
+              .matcher(singleRef)
+            if (extractLastPathComponent.matches()) {
+              val referencedEnum = openAPI.components.schemas[extractLastPathComponent.group(1)]!!.enum
+              if (referencedEnum != null && referencedEnum.isNotEmpty()) {
+                isComposedEnum = true
+                cp.isModel = false
+                cp.isEnum = true
+                cp.isAnyType = false
+              }
+            }
+          }
+        }
+      }
+    } catch (e: Exception) {
+      log.error(
+        "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
+        model.name, e.toString()
+      )
+      // continue Execution
+    }
+    return isComposedEnum
+  }
+
   private fun nullGenChild(cp: CodegenProperty): String {
     val `val`: String
     if (cp.isMap) {
@@ -366,7 +385,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
     } else {
       `val` = cp.dataType + listOrMapSuffix(cp)
-      cp.vendorExtensions["x-not-nullable"] = cp.required || !cp.isNullable
+//      cp.vendorExtensions["x-not-nullable"] = cp.required || !cp.isNullable
     }
     cp.vendorExtensions["x-innerType"] = `val`
     return `val`

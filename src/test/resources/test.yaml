@@ -539,6 +539,13 @@ components:
       description: "can be anything, no properties"
     SecondJsonType:
       description: "can be anything, no properties"
+    UsesTimeTypeAsRequired:
+      type: object
+      required:
+        - time
+      properties:
+        time:
+          $ref: "#/components/schemas/TimeType"
     TimeType:
       type: string
       format: date-time

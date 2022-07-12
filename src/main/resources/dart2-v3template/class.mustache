@@ -27,8 +27,15 @@ class {{classname}}{{#parent}} extends {{parent}}{{/parent}} {
 {{^hasVars}}{{^parent}}
   {{#required}}{{#nullSafe}}late {{/nullSafe}}{{/required}}dynamic{{^required}}{{/required}} json;
 {{/parent}}{{/hasVars}}
-{{classname}}({{#hasVars}}{ {{#vars}}{{#required}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}required {{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/required}}{{#vendorExtensions.x-ns-default-val}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{/vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-ns-default-val}}{{^vendorExtensions.x-dart-inherited}}this.{{/vendorExtensions.x-dart-inherited}}{{{name}}}{{/vendorExtensions.x-ns-default-val}},
-    {{/vars}} }{{/hasVars}}){{#vendorExtensions.x-has-own-ns-default-vals}} : {{#vendorExtensions.x-own-ns-default-vals}}this.{{{name}}} = {{{name}}} ?? []{{^-last}}, {{/-last}}{{/vendorExtensions.x-own-ns-default-vals}}{{/vendorExtensions.x-has-own-ns-default-vals}}
+{{classname}}(
+{{#hasVars}}{
+  {{#vars}}
+    {{#required}}
+      {{#nullSafe}}{{#vendorExtensions.x-dart-required}}required {{/vendorExtensions.x-dart-required}}{{/nullSafe}}
+    {{/required}}
+    this.{{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{^-last}}, {{/-last}}
+    {{/vars}} }{{/hasVars}}
+)
 {{#parent}} {{#vendorExtensions.x-has-own-ns-default-vals}},{{/vendorExtensions.x-has-own-ns-default-vals}}{{^vendorExtensions.x-has-own-ns-default-vals}}:{{/vendorExtensions.x-has-own-ns-default-vals}} super({{#vars}}{{#vendorExtensions.x-dart-inherited}}{{name}}: {{name}},{{/vendorExtensions.x-dart-inherited}}{{/vars}}) {{/parent}}
 ;
 
