@@ -6,7 +6,7 @@
     data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
-    {{^isModel}}
+    {{^isModel}} // z1 {{vendorExtensions.x-list-null}}
       data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.toList()
     {{/isModel}}
     {{#isModel}}

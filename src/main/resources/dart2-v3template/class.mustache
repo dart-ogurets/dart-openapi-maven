@@ -31,7 +31,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 {{#hasVars}}{
   {{#vars}}
     {{#nullSafe}}{{#vendorExtensions.x-dart-required}}required {{/vendorExtensions.x-dart-required}}{{/nullSafe}}
-    this.{{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{^-last}}, {{/-last}}
+    this.{{{name}}}{{^vendorExtensions.x-dart-required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/vendorExtensions.x-dart-required}}{{^-last}}, {{/-last}}
     {{/vars}} }{{/hasVars}}
 )
 {{#parent}} {{#vendorExtensions.x-has-own-ns-default-vals}},{{/vendorExtensions.x-has-own-ns-default-vals}}{{^vendorExtensions.x-has-own-ns-default-vals}}:{{/vendorExtensions.x-has-own-ns-default-vals}} super({{#vars}}{{#vendorExtensions.x-dart-inherited}}{{name}}: {{name}},{{/vendorExtensions.x-dart-inherited}}{{/vars}}) {{/parent}}
@@ -55,7 +55,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 
 {{#hasVars}}
   {{#vars}}
-    static {{{dataType}}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}} fromJson_{{name}}(Map<String, dynamic> json) {
+    static {{{dataType}}} fromJson_{{name}}(Map<String, dynamic> json) {
   {{#nullSafe}}
       {{^vendorExtensions.x-var-is-binary}}
         {{^vendorExtensions.x-dart-inherited}}
@@ -74,6 +74,12 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
           {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{{name}}} = (json[r'{{{baseName}}}'] == null) ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{>_simple_from_json}};{{/items}}
         {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}
   {{/nullSafe}}
+    {{#vendorExtensions.x-var-is-binary}}
+      {{^isNullable}}
+      return {{#isArray}}const []{{/isArray}}{{#isMap}}const {}{{/isMap}}{{^isArray}}{{^isMap}}MultipartFile.fromBytes([]){{/isMap}}{{/isArray}};
+      {{/isNullable}}
+      {{#isNullable}}return null;{{/isNullable}}
+  {{/vendorExtensions.x-var-is-binary}}
   }
   {{/vars}}
 
@@ -91,11 +97,11 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   if ({{{name}}} != null) {
         {{/x-dont-tojson-null}}
       {{#isArray}}
-        json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/nullSafe}}{{/isNullable}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
+        json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
       {{/isArray}}
       {{#isMap}}
-        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#nullSafe}}!{{/nullSafe}}.keys,
-          {{{name}}}{{#nullSafe}}!{{/nullSafe}}.values.map((v) => LocalApiClient.serialize(v)));
+        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#isNullable}}{{#nullSafe}}!{{/nullSafe}}{{/isNullable}}.keys,
+          {{{name}}}{{#isNullable}}{{#nullSafe}}!{{/nullSafe}}{{/isNullable}}.values.map((v) => LocalApiClient.serialize(v)));
       {{/isMap}}
       {{^items}}
         {{#isDateTime}}
@@ -187,7 +193,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#hasVars}}
     {{#vars}}{{^vendorExtensions.x-dart-inherited}}
         {{#vendorExtensions.x-ns-default-val}}
-          if ({{{name}}}.isNotEmpty) {
+          if ({{{name}}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.isNotEmpty{{#isNullable}}{{#nullSafe}} == true{{/nullSafe}}{{/isNullable}}) {
         {{/vendorExtensions.x-ns-default-val}}
         {{^vendorExtensions.x-ns-default-val}}
           {{#nullSafe}}
@@ -224,31 +230,29 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^disableCopyWith}}
     {{{classname}}} copyWith({{#hasVars}}{
      {{#vars}}
-         {{{dataType}}}{{^isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}{{#isNullable}}{{#vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}} {{{name}}},
+       {{{dataType}}}{{^vendorExtensions.x-simpledynamic}}{{^vendorExtensions.x-datatype-nullable}}?{{/vendorExtensions.x-datatype-nullable}}{{/vendorExtensions.x-simpledynamic}} {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
 
   {{#vars}}
-    {{{name}}} ??= this.{{{name}}};
-  {{/vars}}
-
-  {{#vars}}
-  {{#nullSafe}}
+    final _copy_{{{name}}} = {{{name}}} ??
+    {{#nullSafe}}
   {{^isNullable}}
-    {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}.copyWith(){{/isModel}};{{/items}}
+    {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}{{^isModel}}this.{{{name}}}{{/isModel}}{{#isModel}}this.{{{name}}}.copyWith(){{/isModel}};{{/items}}
   {{/isNullable}}
   {{#isNullable}}
     {{#vendorExtensions.x-ns-default-val}}
-      {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}.copyWith(){{/isModel}};{{/items}}
+      {{#isArray}}{{>_complex_copy_required}}{{/isArray}}{{#isMap}}{{>_complex_copy_required}}{{/isMap}}{{^items}}{{^isModel}}this.{{{name}}}{{/isModel}}{{#isModel}}this.{{{name}}}.copyWith(){{/isModel}};{{/items}}
     {{/vendorExtensions.x-ns-default-val}}
     {{^vendorExtensions.x-ns-default-val}}
-      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
+      {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}{{^isModel}}this.{{{name}}}{{/isModel}}{{#isModel}}this.{{{name}}}?.copyWith(){{/isModel}};{{/items}}
     {{/vendorExtensions.x-ns-default-val}}
   {{/isNullable}}
   {{/nullSafe}}
   {{^nullSafe}}
-    {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}final _copy_{{{name}}} = {{^isModel}}{{{name}}}{{/isModel}}{{#isModel}}{{{name}}}?.copyWith(){{/isModel}};{{/items}}
+    {{#isArray}}{{>_complex_copy}}{{/isArray}}{{#isMap}}{{>_complex_copy}}{{/isMap}}{{^items}}{{^isModel}}this.{{{name}}}{{/isModel}}{{#isModel}}this.{{{name}}}?.copyWith(){{/isModel}};{{/items}}
   {{/nullSafe}}
+
   {{/vars}}
 
     return {{{classname}}}(

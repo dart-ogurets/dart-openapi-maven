@@ -1,1 +1,1 @@
-final _copy_{{{name}}} = ({{{name}}} == null) ? {{#defaultValue}}{{{defaultValue}}} as {{{dataType}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : (({{{dataType}}} data) { return {{>_copy}}; }({{{name}}}));
+(({{{name}}} == null) ? {{#defaultValue}}{{{defaultValue}}} as {{{dataType}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : (({{{dataType}}} data) { return {{>_copy}}; }(this.{{{name}}})));

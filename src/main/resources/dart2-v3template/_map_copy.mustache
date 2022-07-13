@@ -1,11 +1,12 @@
+data{{#nullSafe}}{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}{{/nullSafe}}.map((String key,
 {{#items}}
   {{#isMap}}
-    data{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
+    {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
   {{/isMap}}
   {{#isArray}}
-    data{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, ({{{vendorExtensions.x-innerType}}} data) { return {{>_copy}}; }(data) ))
+    {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, ({{{vendorExtensions.x-innerType}}} data) { return {{>_copy}}; }(data) ))
   {{/isArray}}
   {{^items}}
-    data{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_copy}} ))
+    {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_copy}} ))
   {{/items}}
 {{/items}}

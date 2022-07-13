@@ -217,6 +217,10 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.isPrimitiveType = true
     }
 
+    if ("dynamic" == cp.dataType) {
+      cp.vendorExtensions["x-simpledynamic"] = "t"
+    }
+
     // if the var is binary, fix it to be a MultipartFile
     if (correctPropertyForBinary(model, cp, classLevelField)) {
       cp.vendorExtensions.put("x-var-is-binary", "true")
@@ -271,8 +275,8 @@ class DartV3ApiGenerator : DartClientCodegen() {
         val inner = nullGenChild(cp.items)
         cp.dataType =
           "List<" + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
-        if (!isNullSafeEnabled || !(!cp.isNullable || arraysThatHaveADefaultAreNullSafe)) {
-          cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
+        if (isNullSafeEnabled && cp.isNullable && cp.items != null) {
+          cp.items.vendorExtensions["x-list-null"] = "true"
         }
       } else if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) {
         cp.dataType = cp.dataType + "?"
@@ -325,6 +329,11 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     if ((cp.required || cp.defaultValue == null) && !cp.isNullable) {
       cp.vendorExtensions["x-dart-required"] = "true"
+    }
+
+    // we need to know if we have already nulled it so we don't add an extra one with the copyWIth
+    if (cp.dataType?.endsWith("?") == true) {
+      cp.vendorExtensions["x-datatype-nullable"] = "true"
     }
   }
 

@@ -412,6 +412,7 @@ components:
           type: string
         title:
           type: string
+          nullable: true
         img:
           type: string
         imageUrl:
@@ -439,6 +440,7 @@ components:
           additionalProperties:
             items:
               type: string
+              nullable: true
             type: array
           description: "used extensively in k8s api and generates weird code"
         yet_other_things:
@@ -452,10 +454,12 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
         groups:
+          nullable: true
           type: array
           description: "names groups this user is part of"
           items:
             type: string
+            nullable: true
         name:
           type: string
         mess$age:
@@ -553,6 +557,7 @@ components:
       nullable: true
     Messages:
       type: object
+      nullable: true
       additionalProperties:
         $ref: '#/components/schemas/Message'
     Message:
@@ -614,6 +619,7 @@ components:
         opType:
           type: string
           default: equal
+          nullable: true
           enum:
             - less_or_equal
             - greater^equal
