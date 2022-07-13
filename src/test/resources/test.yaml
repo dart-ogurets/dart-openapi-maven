@@ -323,7 +323,53 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
+  /pagination:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/start-date'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      tags:
+        - TestService
+      operationId: pagination
+      responses:
+        "200":
+          description: "Resulting API"
 components:
+  parameters:
+    start-date:
+      name: start-date
+      in: query
+      description: the start date to apply to the request
+      required: false
+      schema:
+        type: string
+        format: date
+        maxLength: 10
+        example: '2020-06-30'
+    page:
+      name: page
+      in: query
+      description: Current page number
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+        maximum: 32768
+    limit:
+      name: limit
+      in: query
+      description: Limits the number of returned items
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 20
+        minimum: 10
+        maximum: 1000
+        multipleOf: 10
   schemas:
     GeocodedWaypoint:
       type: object
