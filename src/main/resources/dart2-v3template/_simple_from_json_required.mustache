@@ -1,10 +1,10 @@
-{{#isEnum}}{{#required}}
+{{#isEnum}}{{^isNullable}}
 final _enumVal = {{enumName}}Extension.fromJson(_jsonData);
-if (_enumVal == null) throw DeserialisationError(json, r'{{{baseName}}}', r'{{{className}}}', '{{enumName}} has no valid translation from $_enumVal');{{/required}}
+if (_enumVal == null) throw DeserialisationError(json, r'{{{baseName}}}', r'{{{className}}}', '{{enumName}} has no valid translation from $_enumVal');{{/isNullable}}
 {{/isEnum}}
-{{{name}}} = {{#isEnum}}
-  {{#required}}_enumVal;{{/required}}
-  {{^required}}{{enumName}}Extension.fromJson(_jsonData);{{/required}}
+return {{#isEnum}}
+  {{^isNullable}}_enumVal;{{/isNullable}}
+  {{#isNullable}}{{enumName}}Extension.fromJson(_jsonData);{{/isNullable}}
 {{/isEnum}}
 {{#isDateTime}}DateTime.parse(_jsonData);{{/isDateTime}}
 {{#isDate}}DateTime.parse(_jsonData + 'T00:00:00.000Z');{{/isDate}}

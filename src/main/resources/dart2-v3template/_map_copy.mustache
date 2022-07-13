@@ -1,11 +1,11 @@
 {{#items}}
   {{#isMap}}
-    data{{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
+    data{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))
   {{/isMap}}
   {{#isArray}}
-    data{{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, ({{{vendorExtensions.x-innerType}}} data) { return {{>_copy}}; }(data) ))
+    data{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, ({{{vendorExtensions.x-innerType}}} data) { return {{>_copy}}; }(data) ))
   {{/isArray}}
   {{^items}}
-    data{{^required}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/required}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_copy}} ))
+    data{{#isNullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/isNullable}}.map((String key, {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_copy}} ))
   {{/items}}
 {{/items}}

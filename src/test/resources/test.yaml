@@ -368,6 +368,7 @@ components:
           type: integer
         error_msg:
           type: string
+          nullable: true
         listofNumbers:
           type: array
           items:

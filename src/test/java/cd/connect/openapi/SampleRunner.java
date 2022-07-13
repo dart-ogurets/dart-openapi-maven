@@ -24,6 +24,7 @@ public class SampleRunner {
 //      "--type-mappings", "int-or-string=IntOrString",
 //      "--import-mappings", "IntOrString=./int_or_string.dart",
 //      "--global-property", "skipFormModel=false",
+//      "--additional-properties", "x-use-5x-nullable=true",
       "--additional-properties", "nullSafe=true",
       "--additional-properties", "nullSafe-array-default=true",
         "--additional-properties", "listAnyOf=true",

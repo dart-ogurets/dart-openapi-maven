@@ -35,6 +35,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
   private var extraAnyOfClasses: MutableMap<String, AnyOfClass> = HashMap()
   private var extraAnyParts: MutableSet<String> = HashSet()
   private var listAnyOf = false
+  private var use5xStyleNullable = false
 
   companion object {
     private const val LIBRARY_NAME = "dart2-api"
@@ -99,6 +100,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     isNullSafeEnabled = additionalProperties.containsKey("nullSafe")
     additionalProperties["x-dart-anyparts"] = extraAnyParts
     listAnyOf = additionalProperties.containsKey(LIST_ANY_OF)
+    use5xStyleNullable = additionalProperties.containsKey("x-use-5x-nullable")
   }
 
   /**
@@ -235,7 +237,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
         } else if (cp.isMap) {
           cp.dataType = "Map<String, " + cp.enumName + listOrMapSuffix(cp) + ">"
         } else {
-          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (cp.required) "" else "?") else ""
+          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
           if (cp.defaultValue != null) {
             if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
               cp.defaultValue = cp.defaultValue.substring(1, cp.defaultValue.length - 1)
@@ -251,7 +253,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       } else {
         cp.enumName = cp.complexType
         if (isNullSafeEnabled) {
-          cp.dataType = cp.enumName + if (cp.required) "" else "?"
+          cp.dataType = cp.enumName + if (cp.isNullable) "?" else ""
         }
       }
       cp.datatypeWithEnum = cp.dataType
@@ -259,25 +261,20 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.isPrimitiveType = false
     }
 
-    // now push the required down to items if it is on the parent
-    if (cp.required && cp.items != null) {
-      cp.items.required = true
-    }
-
     // rewrite the entire map/list thing
     if (classLevelField && !cp.isEnum) {
       if (cp.isMap && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.vendorExtensions["x-innerMapType"] = inner
-        cp.dataType = "Map<String, " + inner + ">" + if (isNullSafeEnabled) (if (cp.required) "" else "?") else ""
+        cp.dataType = "Map<String, " + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
       } else if (cp.isArray && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.dataType =
-          "List<" + inner + ">" + if (isNullSafeEnabled) (if (cp.required || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
-        if (!isNullSafeEnabled || !(cp.required || arraysThatHaveADefaultAreNullSafe)) {
+          "List<" + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
+        if (!isNullSafeEnabled || !(!cp.isNullable || arraysThatHaveADefaultAreNullSafe)) {
           cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
         }
-      } else if (!cp.required && isNullSafeEnabled && "dynamic" != cp.dataType) {
+      } else if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) {
         cp.dataType = cp.dataType + "?"
       }
       cp.vendorExtensions["x-innerType"] = cp.dataType
@@ -294,16 +291,16 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
     }
 
-    if (cp.required && cp.defaultValue == null) {
-      cp.vendorExtensions["x-dart-required"] = "true"
-    }
-
     if ((cp.defaultValue == "[]" && cp.isArray) || (cp.defaultValue == "{}" && cp.isMap)) {
       cp.defaultValue = "const " + cp.defaultValue
     }
 
+    if (use5xStyleNullable && !cp.required) {
+      cp.isNullable = true
+    }
+
     if (!cp.required && cp.isNullable) {
-      cp.vendorExtensions["x-dart-nullcheck-tojson"] = "true"
+      cp.vendorExtensions["x-dont-tojson-null"] = "true"
     }
 
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
@@ -324,6 +321,10 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
 
       props.add(cp)
+    }
+
+    if ((cp.required || cp.defaultValue == null) && !cp.isNullable) {
+      cp.vendorExtensions["x-dart-required"] = "true"
     }
   }
 
@@ -379,13 +380,12 @@ class DartV3ApiGenerator : DartClientCodegen() {
       `val` = "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else if (cp.isArray) {
       `val` =
-        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (cp.required || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
+        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (!cp.isNullable || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
       if (!isNullSafeEnabled) {
         cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
       }
     } else {
       `val` = cp.dataType + listOrMapSuffix(cp)
-//      cp.vendorExtensions["x-not-nullable"] = cp.required || !cp.isNullable
     }
     cp.vendorExtensions["x-innerType"] = `val`
     return `val`
