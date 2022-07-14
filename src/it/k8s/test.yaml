@@ -398,6 +398,7 @@ components:
           type: string
         readings:
           type: object
+          nullable: true
           additionalProperties:
             type: number
             format: decimal
@@ -409,28 +410,33 @@ components:
               $ref: "#/components/schemas/TimeType"
         dependencies:
           type: object
+          nullable: true
           additionalProperties:
             type: array
             items:
               $ref: "#/components/schemas/JSONType"
         otherDeps:
           type: object
+          nullable: true
           additionalProperties:
             $ref: "#/components/schemas/SecondJsonType"
         yetMoreAdditional:
           type: object
+          nullable: true
           additionalProperties:
             type: array
             items:
               type: string
         mapWithComplexObject:
           type: object
+          nullable: true
           additionalProperties:
             type: array
             items:
               $ref: "#/components/schemas/Event"
         mapWithEnums:
           type: object
+          nullable: true
           additionalProperties:
             type: array
             items:
@@ -562,6 +568,7 @@ components:
           type: number
     NumericAndSpacedEnum:
       type: string
+      nullable: true
       enum:
         - Ahoy There
         - 18 Spaces Here
@@ -593,3 +600,17 @@ components:
             items:
               type: number
               format: double
+    PatchDocument:
+      type: object
+      properties:
+        value:
+          nullable: true
+        path:
+          type: string
+          nullable: true
+        op:
+          type: string
+          nullable: true
+        from:
+          type: string
+          nullable: true

@@ -11,8 +11,8 @@ import java.util.Arrays;
 public class SampleRunner {
   @Test
   public void runGenerator() {
-    String location = getClass().getResource("/test.yaml").getFile();
-//    String location = getClass().getResource("/featurehub.yaml").getFile();
+//    String location = getClass().getResource("/test.yaml").getFile();
+    String location = getClass().getResource("/integration_test.yaml").getFile();
 //    OpenAPIGenerator.main(Arrays.asList("help", "generate").toArray(new String[0]));
 
     OpenAPIGenerator.main(Arrays.asList("generate",

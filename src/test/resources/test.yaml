@@ -196,6 +196,10 @@ paths:
                 dt:
                   type: string
                   format: date-time
+                nullableDateTime:
+                  type: string
+                  format: date-time
+                  nullable: true
                 d:
                   type: string
                   format: date
@@ -437,6 +441,13 @@ components:
           items:
             type: string
             format: date
+        whenEventsDontHappen:
+          type: string
+          nullable: true
+          format: date-time
+        whenEventsHappenToHappen:
+          type: string
+          format: date-time
         whenEventsHappen:
           type: array
           items:
@@ -688,7 +699,9 @@ components:
       properties:
         owner:
           type: string
+          nullable: true
         fruits:
+          nullable: true
           items:
             # https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
             anyOf:

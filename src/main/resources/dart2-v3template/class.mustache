@@ -61,17 +61,30 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
         {{^vendorExtensions.x-dart-inherited}}
           {{^isNullable}}
             final _jsonData = json[r'{{{baseName}}}'];
-            if (_jsonData == null) throw DeserialisationError(json, r'{{{baseName}}}', r'{{{className}}}', '{{{name}}} field is null and is required to have a value');
-            {{#isArray}}{{>_complex_from_json_required}}{{/isArray}}{{#isMap}}{{>_complex_from_json_required}}{{/isMap}}{{^items}}{{>_simple_from_json_required}}{{/items}}
-            {{/isNullable}}
+            if (_jsonData == null) {
+              {{#required}}
+              {{> _deserialisation_error }}
+              {{/required}}
+              {{^required}}
+                {{#defaultValue}} return {{{defaultValue}}};{{/defaultValue}}
+                {{^defaultValue}}{{> _deserialisation_error }}{{/defaultValue}}
+              {{/required}}
+            }
+            {{#isArray}}{{>_complex_from_json_required}}{{/isArray}}
+            {{#isMap}}{{>_complex_from_json_required}}{{/isMap}}
+            {{^items}}{{>_simple_from_json_required}}{{/items}}
+          {{/isNullable}}
 
-          {{#isNullable}}{{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{>_simple_from_json}}{{/items}}{{/isNullable}}
+          {{#isNullable}}
+            {{#isArray}}{{>_complex_from_json}}{{/isArray}}
+            {{#isMap}}{{>_complex_from_json}}{{/isMap}}
+            {{^items}}{{>_simple_from_json}}{{/items}}{{/isNullable}}
         {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}
   {{/nullSafe}}
   {{^nullSafe}}
       {{^vendorExtensions.x-var-is-binary}}
         {{^vendorExtensions.x-dart-inherited}}
-          {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{{name}}} = (json[r'{{{baseName}}}'] == null) ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{>_simple_from_json}};{{/items}}
+          {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{>_simple_from_json}}{{/items}}
         {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}
   {{/nullSafe}}
     {{#vendorExtensions.x-var-is-binary}}
@@ -89,59 +102,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
     {{/vars}};
 
   Map<String, dynamic> toJson() {
-    final json = {{#parent}}super.toJson();{{/parent}}{{^parent}}<String, dynamic>{};{{/parent}}
-    {{#vars}}
-      {{^vendorExtensions.x-var-is-binary}}
-      {{^vendorExtensions.x-dart-inherited}}
-        {{#x-dont-tojson-null}}
-  if ({{{name}}} != null) {
-        {{/x-dont-tojson-null}}
-      {{#isArray}}
-        {{#vendorExtensions.x-ns-default-val}}
-          if ({{{name}}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.isNotEmpty{{#isNullable}}{{#nullSafe}} == true{{/nullSafe}}{{/isNullable}}) {
-        {{/vendorExtensions.x-ns-default-val}}
-
-        json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
-        {{#vendorExtensions.x-ns-default-val}}
-          }
-        {{/vendorExtensions.x-ns-default-val}}
-
-      {{/isArray}}
-      {{#isMap}}
-        {{#isNullable}}if ({{{name}}}{{#nullSafe}}?{{/nullSafe}}.isNotEmpty{{#nullSafe}} == true{{/nullSafe}}) { {{/isNullable}}
-        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#isNullable}}{{#nullSafe}}!{{/nullSafe}}{{/isNullable}}.keys,
-          {{{name}}}{{#isNullable}}{{#nullSafe}}!{{/nullSafe}}{{/isNullable}}.values.map((v) => LocalApiClient.serialize(v)));
-        {{#isNullable}} } {{/isNullable}}
-      {{/isMap}}
-      {{^items}}
-        {{#isNullable}}{{#nullSafe}}if ({{{name}}} != null) { {{/nullSafe}}{{/isNullable}}
-        {{#isDateTime}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toUtc().toIso8601String();
-        {{/isDateTime}}
-        {{#isDate}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toDateString();
-        {{/isDate}}
-        {{#isEnum}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toJson();
-        {{/isEnum}}
-        {{#isModel}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toJson();
-        {{/isModel}}
-        {{#isPrimitiveType}}
-          json[r'{{baseName}}'] = {{{name}}};
-        {{/isPrimitiveType}}
-        {{#isAnyType}}
-          json[r'{{baseName}}'] = {{{name}}};
-        {{/isAnyType}}
-        {{#isNullable}}{{#nullSafe}} } {{/nullSafe}}{{/isNullable}}
-      {{/items}}
-    {{#x-dont-tojson-null}} } {{#generateNullValuesToJson}} else {
-    json[r'{{baseName}}'] = null;
-    }{{/generateNullValuesToJson}}{{/x-dont-tojson-null}}
-      {{/vendorExtensions.x-dart-inherited}}
-      {{/vendorExtensions.x-var-is-binary}}
-    {{/vars}}
-    return json;
+    {{> _class_to_json }}
   }
 {{/hasVars}}
   static List<{{{classname}}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
@@ -242,7 +203,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^disableCopyWith}}
     {{{classname}}} copyWith({{#hasVars}}{
      {{#vars}}
-       {{{dataType}}}{{^vendorExtensions.x-simpledynamic}}{{^vendorExtensions.x-datatype-nullable}}?{{/vendorExtensions.x-datatype-nullable}}{{/vendorExtensions.x-simpledynamic}} {{{name}}},
+       {{{dataType}}}{{^vendorExtensions.x-simpledynamic}}{{^vendorExtensions.x-datatype-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-datatype-nullable}}{{/vendorExtensions.x-simpledynamic}} {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
 
