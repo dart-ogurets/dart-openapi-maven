@@ -35,6 +35,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
   private var extraAnyOfClasses: MutableMap<String, AnyOfClass> = HashMap()
   private var extraAnyParts: MutableSet<String> = HashSet()
   private var listAnyOf = false
+  private var use5xStyleNullable = false
 
   companion object {
     private const val LIBRARY_NAME = "dart2-api"
@@ -99,6 +100,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     isNullSafeEnabled = additionalProperties.containsKey("nullSafe")
     additionalProperties["x-dart-anyparts"] = extraAnyParts
     listAnyOf = additionalProperties.containsKey(LIST_ANY_OF)
+    use5xStyleNullable = additionalProperties.containsKey("x-use-5x-nullable")
   }
 
   /**
@@ -215,52 +217,19 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.isPrimitiveType = true
     }
 
+    if ("dynamic" == cp.dataType) {
+      cp.vendorExtensions["x-simpledynamic"] = "t"
+    }
+
     // if the var is binary, fix it to be a MultipartFile
     if (correctPropertyForBinary(model, cp, classLevelField)) {
       cp.vendorExtensions.put("x-var-is-binary", "true")
     }
 
-    // detect wether the schema follows the pattern:
-    // "{ "nullable" : true, "allOf" : [ { "$ref" : <SomeEnum> } ]}",
-    // if yes, treat it like an enum.
-    // this is a fix for https://github.com/dart-ogurets/dart-openapi-maven/issues/48
-    var isComposedEnum = false
-
-    if (cp.isModel) {
-      try {
-        val schemaNode = ObjectMapperFactory.createJson().readTree(cp.jsonSchema) as ObjectNode
-        val parsedSchema = OpenAPIDeserializer().getSchema(schemaNode, "", null)
-        if (parsedSchema is ComposedSchema) {
-          val allOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
-            = parsedSchema.allOf
-          val oneOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
-            = parsedSchema.oneOf
-          val anyOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
-            = parsedSchema.anyOf
-          if (allOfArray.size == 1 && anyOfArray == null || anyOfArray!!.isEmpty() && oneOfArray == null || oneOfArray!!.isEmpty()) {
-            val singleRef = allOfArray[0].`$ref`
-            if (singleRef != null) {
-              val extractLastPathComponent = Pattern.compile("#/components\\/schemas\\/([a-zA-Z\\d\\.\\-_]+)")
-                .matcher(singleRef)
-              if (extractLastPathComponent.matches()) {
-                val referencedEnum = openAPI.components.schemas[extractLastPathComponent.group(1)]!!.enum
-                if (referencedEnum != null && referencedEnum.isNotEmpty()) {
-                  isComposedEnum = true
-                  cp.isModel = false
-                  cp.isEnum = true
-                  cp.isAnyType = false
-                }
-              }
-            }
-          }
-        }
-      } catch (e: Exception) {
-        log.error(
-          "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
-          model.name, e.toString()
-        )
-        // continue Execution
-      }
+    var isComposedEnum = if (cp.isModel) {
+      detectHiddenEnum(cp, model)
+    } else {
+      false
     }
 
     if (cp.allowableValues != null && cp.allowableValues["enumVars"] != null || isComposedEnum) {
@@ -272,7 +241,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
         } else if (cp.isMap) {
           cp.dataType = "Map<String, " + cp.enumName + listOrMapSuffix(cp) + ">"
         } else {
-          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (cp.required) "" else "?") else ""
+          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
           if (cp.defaultValue != null) {
             if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
               cp.defaultValue = cp.defaultValue.substring(1, cp.defaultValue.length - 1)
@@ -288,7 +257,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       } else {
         cp.enumName = cp.complexType
         if (isNullSafeEnabled) {
-          cp.dataType = cp.enumName + if (cp.required) "" else "?"
+          cp.dataType = cp.enumName + if (cp.isNullable) "?" else ""
         }
       }
       cp.datatypeWithEnum = cp.dataType
@@ -296,31 +265,23 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.isPrimitiveType = false
     }
 
-    // now push the required down to items if it is on the parent
-    if (cp.required && cp.items != null) {
-      cp.items.required = true
-    }
-
     // rewrite the entire map/list thing
     if (classLevelField && !cp.isEnum) {
       if (cp.isMap && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.vendorExtensions["x-innerMapType"] = inner
-        cp.dataType = "Map<String, " + inner + ">" + if (isNullSafeEnabled) (if (cp.required) "" else "?") else ""
+        cp.dataType = "Map<String, " + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
       } else if (cp.isArray && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.dataType =
-          "List<" + inner + ">" + if (isNullSafeEnabled) (if (cp.required || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
-        if (!isNullSafeEnabled || !(cp.required || arraysThatHaveADefaultAreNullSafe)) {
-          cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
+          "List<" + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
+        if (isNullSafeEnabled && cp.isNullable && cp.items != null) {
+          cp.items.vendorExtensions["x-list-null"] = "true"
         }
-      } else if (!cp.required && isNullSafeEnabled && "dynamic" != cp.dataType) {
+      } else if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) {
         cp.dataType = cp.dataType + "?"
       }
       cp.vendorExtensions["x-innerType"] = cp.dataType
-    }
-    if (classLevelField && cp.items == null) {
-      cp.vendorExtensions["x-not-nullable"] = cp.required || !cp.isNullable
     }
 
     // if we have a weird format which is a String/int/etc with an unknown format
@@ -334,9 +295,22 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
     }
 
+    if ((cp.defaultValue == "[]" && cp.isArray) || (cp.defaultValue == "{}" && cp.isMap)) {
+      cp.defaultValue = "const " + cp.defaultValue
+    }
+
+    if (use5xStyleNullable && !cp.required) {
+      cp.isNullable = true
+    }
+
+    if (!cp.required && cp.isNullable) {
+      cp.vendorExtensions["x-dont-tojson-null"] = "true"
+    }
+
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
     // it affects the constructor and defaults of top level fields
     if (classLevelField && cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null) {
+      cp.defaultValue = "const []"
       cp.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
       if (cp.items != null) { // it should be not null, its an array
         cp.items.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
@@ -352,6 +326,61 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
       props.add(cp)
     }
+
+    if ((cp.required || cp.defaultValue == null) && !cp.isNullable) {
+      cp.vendorExtensions["x-dart-required"] = "true"
+    }
+
+    // we need to know if we have already nulled it so we don't add an extra one with the copyWIth
+    if (cp.dataType?.endsWith("?") == true) {
+      cp.vendorExtensions["x-datatype-nullable"] = "true"
+    }
+  }
+
+  // detect whether the schema follows the pattern:
+  // "{ "nullable" : true, "allOf" : [ { "$ref" : <SomeEnum> } ]}",
+  // if yes, treat it like an enum.
+  // this is a fix for https://github.com/dart-ogurets/dart-openapi-maven/issues/48
+  private fun detectHiddenEnum(
+      cp: CodegenProperty,
+      model: CodegenModel
+  ): Boolean {
+    var isComposedEnum = false
+    try {
+      val schemaNode = ObjectMapperFactory.createJson().readTree(cp.jsonSchema) as ObjectNode
+      val parsedSchema = OpenAPIDeserializer().getSchema(schemaNode, "", null)
+      if (parsedSchema is ComposedSchema) {
+        val allOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
+          = parsedSchema.allOf
+        val oneOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
+          = parsedSchema.oneOf
+        val anyOfArray// cannot be fixed unless upstream changes its signatures to Schema<?>
+          = parsedSchema.anyOf
+        if (allOfArray.size == 1 && anyOfArray == null || anyOfArray!!.isEmpty() && oneOfArray == null || oneOfArray!!.isEmpty()) {
+          val singleRef = allOfArray[0].`$ref`
+          if (singleRef != null) {
+            val extractLastPathComponent = Pattern.compile("#/components\\/schemas\\/([a-zA-Z\\d\\.\\-_]+)")
+              .matcher(singleRef)
+            if (extractLastPathComponent.matches()) {
+              val referencedEnum = openAPI.components.schemas[extractLastPathComponent.group(1)]!!.enum
+              if (referencedEnum != null && referencedEnum.isNotEmpty()) {
+                isComposedEnum = true
+                cp.isModel = false
+                cp.isEnum = true
+                cp.isAnyType = false
+              }
+            }
+          }
+        }
+      }
+    } catch (e: Exception) {
+      log.error(
+        "An Exception was thrown attempting to determine if model {} is an enum wrapped in an allOf composition: {}",
+        model.name, e.toString()
+      )
+      // continue Execution
+    }
+    return isComposedEnum
   }
 
   private fun nullGenChild(cp: CodegenProperty): String {
@@ -360,13 +389,12 @@ class DartV3ApiGenerator : DartClientCodegen() {
       `val` = "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else if (cp.isArray) {
       `val` =
-        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (cp.required || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
+        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (!cp.isNullable || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
       if (!isNullSafeEnabled) {
         cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
       }
     } else {
       `val` = cp.dataType + listOrMapSuffix(cp)
-      cp.vendorExtensions["x-not-nullable"] = cp.required || !cp.isNullable
     }
     cp.vendorExtensions["x-innerType"] = `val`
     return `val`

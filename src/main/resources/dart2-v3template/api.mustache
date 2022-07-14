@@ -137,7 +137,7 @@ part of {{pubName}}.api;
       {{/required}}
         queryParams.addAll(convertParametersForCollectionFormat(
       (p) =>
-      {{#isDateTime}}openApiDateTimeParameterToString(p, false){{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString(p, false){{/isDate}}{{^isDate}}LocalApiClient.parameterToString(p)!{{/isDate}}{{/isDateTime}},
+      {{#isDateTime}}openApiDateTimeParameterToString(p, false){{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString(p, false){{/isDate}}{{^isDate}}LocalApiClient.parameterToString(p){{#nullSafe}}!{{/nullSafe}}{{/isDate}}{{/isDateTime}},
           '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
       {{^required}}
           }
@@ -180,13 +180,13 @@ part of {{pubName}}.api;
         final postBody = <String, dynamic>{ {{#formParams}}
           {{^isFile}}
         {{^isArray}}
-          '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+          '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc(){{^nullSafe}}?{{/nullSafe}}.toIso8601String(){{/isDateTime}}
                           {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
         {{/isArray}}
         {{#isArray}}
             '{{baseName}}': {{paramName}}{{^required}}?{{/required}}{{#nullSafe}}.whereNotNull(){{/nullSafe}}{{^nullSafe}}.where((p) => p != null){{/nullSafe}}
-                .map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
-          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
+                {{^nullSafe}}?{{/nullSafe}}.map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}){{^nullSafe}}?{{/nullSafe}}.toList(),
         {{/isArray}}
           {{/isFile}}
         {{/formParams}} }.entries.where((me) => me.value != null).map((me) => me.key + "=" + Uri.encodeComponent(me.value)).join("&");
@@ -206,8 +206,8 @@ part of {{pubName}}.api;
             {{/isArray}}
             {{#isArray}}
                 '{{baseName}}': {{paramName}}{{^required}}?{{/required}}{{#nullSafe}}.whereNotNull(){{/nullSafe}}{{^nullSafe}}.where((p) => p != null){{/nullSafe}}
-                .map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
-              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
+              {{^nullSafe}}?{{/nullSafe}}.map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
+              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}){{^nullSafe}}?{{/nullSafe}}.toList(),
             {{/isArray}}
           {{/isFile}}
           {{#isFile}}

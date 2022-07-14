@@ -196,6 +196,10 @@ paths:
                 dt:
                   type: string
                   format: date-time
+                nullableDateTime:
+                  type: string
+                  format: date-time
+                  nullable: true
                 d:
                   type: string
                   format: date
@@ -323,7 +327,53 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
+  /pagination:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/start-date'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      tags:
+        - TestService
+      operationId: pagination
+      responses:
+        "200":
+          description: "Resulting API"
 components:
+  parameters:
+    start-date:
+      name: start-date
+      in: query
+      description: the start date to apply to the request
+      required: false
+      schema:
+        type: string
+        format: date
+        maxLength: 10
+        example: '2020-06-30'
+    page:
+      name: page
+      in: query
+      description: Current page number
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+        maximum: 32768
+    limit:
+      name: limit
+      in: query
+      description: Limits the number of returned items
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 20
+        minimum: 10
+        maximum: 1000
+        multipleOf: 10
   schemas:
     GeocodedWaypoint:
       type: object
@@ -368,6 +418,7 @@ components:
           type: integer
         error_msg:
           type: string
+          nullable: true
         listofNumbers:
           type: array
           items:
@@ -390,6 +441,13 @@ components:
           items:
             type: string
             format: date
+        whenEventsDontHappen:
+          type: string
+          nullable: true
+          format: date-time
+        whenEventsHappenToHappen:
+          type: string
+          format: date-time
         whenEventsHappen:
           type: array
           items:
@@ -411,6 +469,7 @@ components:
           type: string
         title:
           type: string
+          nullable: true
         img:
           type: string
         imageUrl:
@@ -438,6 +497,7 @@ components:
           additionalProperties:
             items:
               type: string
+              nullable: true
             type: array
           description: "used extensively in k8s api and generates weird code"
         yet_other_things:
@@ -451,10 +511,12 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
         groups:
+          nullable: true
           type: array
           description: "names groups this user is part of"
           items:
             type: string
+            nullable: true
         name:
           type: string
         mess$age:
@@ -539,12 +601,20 @@ components:
       description: "can be anything, no properties"
     SecondJsonType:
       description: "can be anything, no properties"
+    UsesTimeTypeAsRequired:
+      type: object
+      required:
+        - time
+      properties:
+        time:
+          $ref: "#/components/schemas/TimeType"
     TimeType:
       type: string
       format: date-time
       nullable: true
     Messages:
       type: object
+      nullable: true
       additionalProperties:
         $ref: '#/components/schemas/Message'
     Message:
@@ -606,6 +676,7 @@ components:
         opType:
           type: string
           default: equal
+          nullable: true
           enum:
             - less_or_equal
             - greater^equal
@@ -628,7 +699,9 @@ components:
       properties:
         owner:
           type: string
+          nullable: true
         fruits:
+          nullable: true
           items:
             # https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
             anyOf:
