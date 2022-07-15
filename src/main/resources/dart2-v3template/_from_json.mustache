@@ -45,7 +45,11 @@
     {{/vendorExtensions.x-dart-nullable}}
   {{/isModel}}
   {{#isPrimitiveType}}
-    data as {{{dataType}}}
+    {{#isInteger}}data.round(){{/isInteger}}
+    {{^isInteger}}
+      {{#isNumeric}}data.toDouble(){{/isNumeric}}
+      {{^isNumeric}}data as {{{dataType}}}{{/isNumeric}}
+    {{/isInteger}}
   {{/isPrimitiveType}}
   {{#isAnyType}}data{{/isAnyType}}
 {{/items}}

@@ -360,6 +360,15 @@ components:
             items:
               type: integer
             type: array
+        mapOfIntegers:
+          type: object
+          additionalProperties:
+            type: integer
+        mapOfDoubles:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
         dependencies:
           type: object
           additionalProperties:

@@ -228,9 +228,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
    * classLevelField: is this actually a field at the top level, sub-fields may not have transforms applied.
    */
   private fun correctInternals(model: CodegenModel, cp: CodegenProperty, classLevelField: Boolean) {
-    if (model.name == "com.bluetrainsoftware.AddProps1" && cp.name == "dependencies") {
-      print("hello")
-    }
     if (nullable(cp)) {
       cp.vendorExtensions["x-dart-nullable"] = "1"
     }

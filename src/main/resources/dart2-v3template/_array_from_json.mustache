@@ -23,7 +23,17 @@
           (data as List<dynamic>)?.cast<{{{dataType}}}>()
       {{/nullSafe}}
       {{#nullSafe}}
-          (data as List<dynamic>?)?.cast<{{{dataType}}}>() ?? <{{{dataType}}}>[]
+          {{#isInteger}}
+              (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.map((n) => (n as num).toInt()).toList()
+          {{/isInteger}}
+          {{^isInteger}}
+            {{#isNumeric}}
+                (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.map((n) => (n as num).toDouble()).toList()
+            {{/isNumeric}}
+            {{^isNumeric}}
+                (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.cast<{{{dataType}}}>(){{#x-dart-nullable}} ?? <{{{dataType}}}>[]{{/x-dart-nullable}}
+            {{/isNumeric}}
+          {{/isInteger}}
       {{/nullSafe}}
     {{/isPrimitiveType}}
     {{#isAnyType}}data{{/isAnyType}}
