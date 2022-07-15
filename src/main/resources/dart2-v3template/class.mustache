@@ -76,6 +76,10 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
           {{/vendorExtensions.x-dart-nullable}}
 
           {{#vendorExtensions.x-dart-nullable}}
+            {{#required}}
+              // required but nullable, has to be passed
+              if (!json.containsKey(r'{{{baseName}}}')) { {{> _deserialisation_error }}  }
+            {{/required}}
             {{#isArray}}{{>_complex_from_json}}{{/isArray}}
             {{#isMap}}{{>_complex_from_json}}{{/isMap}}
             {{^items}}{{>_simple_from_json}}{{/items}}{{/vendorExtensions.x-dart-nullable}}
@@ -203,7 +207,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^disableCopyWith}}
     {{{classname}}} copyWith({{#hasVars}}{
      {{#vars}}
-       {{{dataType}}}{{^vendorExtensions.x-simpledynamic}}{{^vendorExtensions.x-datatype-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-datatype-nullable}}{{/vendorExtensions.x-simpledynamic}} {{{name}}},
+       {{{dataType}}}{{^vendorExtensions.x-simpledynamic}}{{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}{{/vendorExtensions.x-simpledynamic}} {{{name}}},
      {{/vars}}
     }{{/hasVars}}) {
 

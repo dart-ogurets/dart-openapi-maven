@@ -7,13 +7,12 @@
         {{/x-dont-tojson-null}}
       {{#isArray}}
         {{#vendorExtensions.x-ns-default-val}}
-          // x-dart-nullable {{vendorExtensions.x-dart-nullable}}
           if ({{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.isNotEmpty{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}} == true{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}) {
         {{/vendorExtensions.x-ns-default-val}}
 
         json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
         {{#vendorExtensions.x-ns-default-val}}
-          }
+          }{{> __class_to_json_required_null }}
         {{/vendorExtensions.x-ns-default-val}}
 
       {{/isArray}}
@@ -21,7 +20,9 @@
         {{#vendorExtensions.x-dart-nullable}}if ({{{name}}}{{#nullSafe}}?{{/nullSafe}}.isNotEmpty{{#nullSafe}} == true{{/nullSafe}}) { {{/vendorExtensions.x-dart-nullable}}
         json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}!{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.keys,
           {{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}!{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.values.map((v) => LocalApiClient.serialize(v)));
-        {{#vendorExtensions.x-dart-nullable}} } {{/vendorExtensions.x-dart-nullable}}
+        {{#vendorExtensions.x-dart-nullable}}
+          }{{> __class_to_json_required_null }}
+        {{/vendorExtensions.x-dart-nullable}}
       {{/isMap}}
       {{^items}}
         {{#x-dont-tojson-null}}
@@ -46,7 +47,7 @@
           json[r'{{baseName}}'] = {{{name}}};
         {{/isAnyType}}
         {{#x-dont-tojson-null}}
-          }
+          }{{> __class_to_json_required_null }}
         {{/x-dont-tojson-null}}
 
       {{/items}}

@@ -211,7 +211,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
   }
 
   private fun nullable(cp: CodegenProperty): Boolean {
-    if (vendorExtensions.containsKey("x-inner")) {
+    if (cp.vendorExtensions.containsKey("x-inner")) {
       //  the default for nullable is true, so if it is false we should always honour it
       return cp.isNullable
     }
@@ -228,10 +228,9 @@ class DartV3ApiGenerator : DartClientCodegen() {
    * classLevelField: is this actually a field at the top level, sub-fields may not have transforms applied.
    */
   private fun correctInternals(model: CodegenModel, cp: CodegenProperty, classLevelField: Boolean) {
-    if (!classLevelField) {
-      cp.vendorExtensions["x-inner"] = "1"
+    if (model.name == "com.bluetrainsoftware.AddProps1" && cp.name == "dependencies") {
+      print("hello")
     }
-
     if (nullable(cp)) {
       cp.vendorExtensions["x-dart-nullable"] = "1"
     }
@@ -358,11 +357,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
     if ((cp.required || cp.defaultValue == null) && !nullable(cp)) {
       cp.vendorExtensions["x-dart-required"] = "true"
     }
-
-    // we need to know if we have already nulled it so we don't add an extra one with the copyWIth
-    if (cp.dataType?.endsWith("?") == true) {
-      cp.vendorExtensions["x-datatype-nullable"] = "true"
-    }
   }
 
   // detect whether the schema follows the pattern:
@@ -422,7 +416,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
         cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
       }
     } else {
-      `val` = cp.dataType + listOrMapSuffix(cp)
+      `val` = cp.dataType + propertyListOrMapSuffix(cp)
     }
     cp.vendorExtensions["x-innerType"] = `val`
     return `val`
@@ -486,6 +480,21 @@ class DartV3ApiGenerator : DartClientCodegen() {
         cm.vars.forEach { cp: CodegenProperty ->
           var correctingSettings: CodegenProperty? = cp
           var classLevelField = true
+
+          // cycle down from the top, so we know that the top is the top and the
+          // rest all the way down aren't, before we start doing any kind of field correction
+          while (correctingSettings != null) {
+            if (!classLevelField) {
+              correctingSettings.vendorExtensions["x-inner"] = "1"
+            }
+            classLevelField = false
+
+            correctingSettings = correctingSettings.items
+          }
+
+          // now we will correct fields
+          correctingSettings = cp
+          classLevelField = true
 
           while (correctingSettings != null) {
             correctInternals(cm, correctingSettings, classLevelField)

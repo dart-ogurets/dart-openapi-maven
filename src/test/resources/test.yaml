@@ -413,6 +413,7 @@ components:
     EventResponse:
       required:
         - mandatoryList
+        - listofNumbers
       properties:
         error:
           type: integer
@@ -421,6 +422,7 @@ components:
           nullable: true
         listofNumbers:
           type: array
+          nullable: true
           items:
             type: number
         mandatoryList:
