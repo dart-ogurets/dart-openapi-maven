@@ -1,16 +1,18 @@
 {{#items}}
+  data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.
   {{#isArray}}
-    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { return (({{{dataType}}} data) { return {{>_copy}};})(data); }).toList()
+    map((data) { return (({{{dataType}}} data) {
+    return {{>_copy}};})(data); }){{^nullSafe}}{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}{{/nullSafe}}.toList()
   {{/isArray}}
   {{#isMap}}
-    data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) { ((data) { return {{>_copy}};})(data); }).toList()
+    map((data) { ((data) { return {{>_copy}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
     {{^isModel}}
-      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.toList()
+      toList()
     {{/isModel}}
     {{#isModel}}
-      data{{#vendorExtensions.x-list-null}}?{{/vendorExtensions.x-list-null}}.map((data) => {{>_copy}}).toList()
+      map((data) => {{>_copy}}).toList()
     {{/isModel}}
   {{/items}}
 {{/items}}

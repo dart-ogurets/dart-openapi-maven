@@ -1,12 +1,19 @@
-{{#isEnum}}{{^isNullable}}
+{{#isEnum}}{{^vendorExtensions.x-dart-nullable}}
 final _enumVal = {{enumName}}Extension.fromJson(_jsonData);
-if (_enumVal == null) throw DeserialisationError(json, r'{{{baseName}}}', r'{{{className}}}', '{{enumName}} has no valid translation from $_enumVal');{{/isNullable}}
+if (_enumVal == null) {{> _deserialisation_error }}{{/vendorExtensions.x-dart-nullable}}
 {{/isEnum}}
 return {{#isEnum}}
-  {{^isNullable}}_enumVal;{{/isNullable}}
-  {{#isNullable}}{{enumName}}Extension.fromJson(_jsonData);{{/isNullable}}
+  {{^vendorExtensions.x-dart-nullable}}_enumVal;{{/vendorExtensions.x-dart-nullable}}
+  {{#vendorExtensions.x-dart-nullable}}{{enumName}}Extension.fromJson(_jsonData);{{/vendorExtensions.x-dart-nullable}}
 {{/isEnum}}
 {{#isDateTime}}DateTime.parse(_jsonData);{{/isDateTime}}
 {{#isDate}}DateTime.parse(_jsonData + 'T00:00:00.000Z');{{/isDate}}
 {{#isModel}}{{{complexType}}}.fromJson(_jsonData);{{/isModel}}
-{{#isPrimitiveType}}(_jsonData as {{{dataType}}});{{/isPrimitiveType}}
+{{#isPrimitiveType}}(
+  {{#isInteger}}json[r'{{{baseName}}}'].toInt(){{/isInteger}}
+  {{^isInteger}}
+    {{#isNumeric}}json[r'{{{baseName}}}'].toDouble(){{/isNumeric}}
+    {{^isNumeric}}json[r'{{{baseName}}}'] as {{{dataType}}}{{/isNumeric}}
+  {{/isInteger}})
+  ; // sausage
+{{/isPrimitiveType}}

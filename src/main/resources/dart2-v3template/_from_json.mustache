@@ -9,43 +9,47 @@
     {{enumName}}Extension.fromJson(data)
   {{/isEnum}}
   {{#isDateTime}}
-    {{^isNullable}}{{#nullSafe}}
+    {{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}
       DateTime.parse(data!)
     {{/nullSafe}}
     {{^nullSafe}}
       data == null ? null : DateTime.parse(data)
     {{/nullSafe}}
-    {{/isNullable}}
-    {{#isNullable}}
+    {{/vendorExtensions.x-dart-nullable}}
+    {{#vendorExtensions.x-dart-nullable}}
       data == null ? null : DateTime.parse(data)
-    {{/isNullable}}
+    {{/vendorExtensions.x-dart-nullable}}
   {{/isDateTime}}
   {{#isDate}}
-    {{^isNullable}}{{#nullSafe}}
+    {{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}
       DateTime.parse(data! + 'T00:00:00.000Z')
     {{/nullSafe}}
     {{^nullSafe}}
       data == null ? null : DateTime.parse(data + 'T00:00:00.000Z')
     {{/nullSafe}}
-    {{/isNullable}}
-    {{#isNullable}}
+    {{/vendorExtensions.x-dart-nullable}}
+    {{#vendorExtensions.x-dart-nullable}}
       data == null ? null : DateTime.parse(data + 'T00:00:00.000Z')
-    {{/isNullable}}
+    {{/vendorExtensions.x-dart-nullable}}
   {{/isDate}}
   {{#isModel}}
-    {{^isNullable}}{{#nullSafe}}
+    {{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}
       {{{complexType}}}.fromJson(data)
     {{/nullSafe}}
     {{^nullSafe}}
       data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
     {{/nullSafe}}
-    {{/isNullable}}
-    {{#isNullable}}
+    {{/vendorExtensions.x-dart-nullable}}
+    {{#vendorExtensions.x-dart-nullable}}
       data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
-    {{/isNullable}}
+    {{/vendorExtensions.x-dart-nullable}}
   {{/isModel}}
   {{#isPrimitiveType}}
-    data as {{{dataType}}}
+    {{#isInteger}}data.toInt(){{/isInteger}}
+    {{^isInteger}}
+      {{#isNumeric}}data.toDouble(){{/isNumeric}}
+      {{^isNumeric}}data as {{{dataType}}}{{/isNumeric}}
+    {{/isInteger}}
   {{/isPrimitiveType}}
   {{#isAnyType}}data{{/isAnyType}}
 {{/items}}

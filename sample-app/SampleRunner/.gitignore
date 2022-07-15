@@ -1,0 +1,7 @@
+.idea
+.openapi-generator-ignore
+.openapi-generator
+lib
+pubspec.yaml
+.packages
+pubspec.lock

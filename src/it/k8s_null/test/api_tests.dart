@@ -111,6 +111,24 @@ main() {
         expect(items[1].asMyBanana().type, "banana");
         expect(items[1].asMyBanana().count, 42);
       });
+  test('double with ints in them tests and vs versa', () {
+    const testData = {
+      'basicInt': 2.6,
+      'basicDouble': 1,
+      'intList': [1, 2.6],
+      'intMap': {'one': 1, 'two': 2.7},
+      'doubleList': [1, 2.6],
+      'doubleMap': {'one': 1, 'two': 2.7},
+    };
+
+    final data = DoubleAndIntConversion.fromJson(testData);
+    expect(data.basicDouble, 1.0);
+    expect(data.basicInt, 2);
+    expect(data.intList, [1, 2]);
+    expect(data.intMap, {'one': 1, 'two': 2});
+    expect(data.doubleList, [1.0, 2.6]);
+    expect(data.doubleMap, {'one': 1.0, 'two': 2.7});
+  });
   test("int enums being generated with correct type", () {
     expect(IntTypeEnum.number1.toJson(), 1);
     expect(IntTypeEnum.number1, IntTypeEnumExtension.fromJson(1));
@@ -132,10 +150,10 @@ main() {
     };
     final geometry = PointGeometry.fromJson(json);
     expect(geometry.coordinates, hasLength(2));
-    final firstPair = geometry.coordinates.first;
+    final firstPair = geometry.coordinates?.first;
     expect(firstPair, hasLength(2));
-    expect(firstPair[0], -27.6307582);
-    expect(firstPair[1], 153.0401564);
+    expect(firstPair?[0], -27.6307582);
+    expect(firstPair?[1], 153.0401564);
   });
 }
 

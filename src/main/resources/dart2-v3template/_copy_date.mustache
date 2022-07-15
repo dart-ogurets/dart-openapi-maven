@@ -1,2 +1,2 @@
-{{^isNullable}}data.add(Duration()){{/isNullable}}
-{{#isNullable}}data == null ? null : data.add(Duration()){{/isNullable}}
+{{^vendorExtensions.x-dart-nullable}}data.add(Duration()){{/vendorExtensions.x-dart-nullable}}
+{{#vendorExtensions.x-dart-nullable}}data == null ? null : data.add(Duration()){{/vendorExtensions.x-dart-nullable}}

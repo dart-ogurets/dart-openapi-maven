@@ -345,6 +345,35 @@ components:
         - CLOSED
         - PENDING
         - ARCHIVING
+    DoubleAndIntConversion:
+      type: object
+      required:
+        - basicDouble
+        - basicInt
+      properties:
+        basicInt:
+          type: integer
+        basicDouble:
+          type: number
+          format: double
+        intList:
+          type: array
+          items:
+            type: integer
+        intMap:
+          type: object
+          additionalProperties:
+            type: integer
+        doubleList:
+          type: array
+          items:
+            type: number
+            format: double
+        doubleMap:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
     "com.bluetrainsoftware.AddProps1":
       properties:
         extra:
@@ -360,6 +389,15 @@ components:
             items:
               type: integer
             type: array
+        mapOfIntegers:
+          type: object
+          additionalProperties:
+            type: integer
+        mapOfDoubles:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
         dependencies:
           type: object
           additionalProperties:
@@ -571,8 +609,8 @@ components:
       nullable: true
       enum:
         - Ahoy There
-        - 18 Spaces Here
         - application+json
+        - 18 Spaces Here
         - 667
     IntTypeEnum:
       type: integer

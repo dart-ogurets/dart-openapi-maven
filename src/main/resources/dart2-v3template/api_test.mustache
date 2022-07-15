@@ -18,7 +18,7 @@ void main() {
     // {{{.}}}
     //
     {{/notes}}
-    //{{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future {{/returnType}}{{operationId}}({{#allParams}}{{^isNullable}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/isNullable}}{{/allParams}}{{#hasOptionalParams}}{ {{#allParams}}{{#isNullable}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/isNullable}}{{/allParams}} }{{/hasOptionalParams}}) async
+    //{{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future {{/returnType}}{{operationId}}({{#allParams}}{{^vendorExtensions.x-dart-nullable}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-dart-nullable}}{{/allParams}}{{#hasOptionalParams}}{ {{#allParams}}{{#vendorExtensions.x-dart-nullable}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-dart-nullable}}{{/allParams}} }{{/hasOptionalParams}}) async
     test('test {{operationId}}', () async {
       // TODO
     });

@@ -19,12 +19,20 @@
       {{complexType}}.listFromJson(data)
     {{/isModel}}
     {{#isPrimitiveType}}
-      {{^nullSafe}}
-          (data as List<dynamic>)?.cast<{{{dataType}}}>()
-      {{/nullSafe}}
-      {{#nullSafe}}
-          (data as List<dynamic>?)?.cast<{{{dataType}}}>() ?? <{{{dataType}}}>[]
-      {{/nullSafe}}
+      {{#isNumeric}}
+          (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.map((n) => (n as num).
+        {{#isInteger}}toInt(){{/isInteger}}
+        {{^isInteger}}toDouble(){{/isInteger}}
+          ).toList()
+      {{/isNumeric}}
+      {{^isNumeric}}
+        {{^nullSafe}}
+            (data as List<dynamic>)?.cast<{{{dataType}}}>()
+        {{/nullSafe}}
+        {{#nullSafe}}
+            (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.cast<{{{dataType}}}>(){{#x-dart-nullable}} ?? <{{{dataType}}}>[]{{/x-dart-nullable}}
+        {{/nullSafe}}
+      {{/isNumeric}}
     {{/isPrimitiveType}}
     {{#isAnyType}}data{{/isAnyType}}
   {{/items}}

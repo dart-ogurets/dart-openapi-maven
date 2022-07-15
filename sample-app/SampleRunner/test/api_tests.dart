@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:k8s_api/api.dart';
+import 'package:sample_app/api.dart';
 import 'package:test/test.dart';
 
 main() {

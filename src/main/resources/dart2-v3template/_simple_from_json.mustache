@@ -1,1 +1,24 @@
-return {{#isAnyType}}json[r'{{{baseName}}}'];{{/isAnyType}}{{^isAnyType}} (json[r'{{{baseName}}}'] == null) ? null : {{#isEnum}}{{enumName}}Extension.fromJson(json[r'{{{baseName}}}']);{{/isEnum}}{{#isDateTime}}DateTime.parse(json[r'{{{baseName}}}']);{{/isDateTime}}{{#isDate}}DateTime.parse(json[r'{{{baseName}}}'] + 'T00:00:00.000Z');{{/isDate}}{{#isModel}}{{{complexType}}}.fromJson(json[r'{{{baseName}}}']);{{/isModel}}{{#isPrimitiveType}}(json[r'{{{baseName}}}'] as {{{dataType}}});{{/isPrimitiveType}}{{/isAnyType}}
+return
+{{#isAnyType}}json[r'{{{baseName}}}']{{/isAnyType}}
+{{^isAnyType}}
+  (json[r'{{{baseName}}}'] == null) ? null :
+  {{#isEnum}}
+    {{enumName}}Extension.fromJson(json[r'{{{baseName}}}'])
+  {{/isEnum}}
+  {{#isDateTime}}
+      DateTime.parse(json[r'{{{baseName}}}']!)
+  {{/isDateTime}}
+  {{#isDate}}
+      DateTime.parse(json[r'{{{baseName}}}']{{#nullSafe}}!{{/nullSafe}} + 'T00:00:00.000Z')
+  {{/isDate}}
+  {{#isModel}}
+    {{{complexType}}}.fromJson(json[r'{{{baseName}}}'])
+  {{/isModel}}
+  {{#isPrimitiveType}}
+    {{#isInteger}}json[r'{{{baseName}}}'].toInt(){{/isInteger}}
+    {{^isInteger}}
+      {{#isNumeric}}json[r'{{{baseName}}}'].toDouble(){{/isNumeric}}
+      {{^isNumeric}}json[r'{{{baseName}}}'] as {{{dataType}}}{{/isNumeric}}
+    {{/isInteger}}
+  {{/isPrimitiveType}}
+{{/isAnyType}};
