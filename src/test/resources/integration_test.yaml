@@ -345,6 +345,27 @@ components:
         - CLOSED
         - PENDING
         - ARCHIVING
+    DoubleAndIntConversion:
+      type: object
+      properties:
+        intList:
+          type: array
+          items:
+            type: integer
+        intMap:
+          type: object
+          additionalProperties:
+            type: integer
+        doubleList:
+          type: array
+          items:
+            type: number
+            format: double
+        doubleMap:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
     "com.bluetrainsoftware.AddProps1":
       properties:
         extra:

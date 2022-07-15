@@ -19,7 +19,15 @@
       (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isModel}}
     {{#isPrimitiveType}}
-      (data as Map).cast<String, {{{dataType}}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}
+      {{#isNumeric}}
+        (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((key, value) => MapEntry(key, (value as num).
+        {{#isInteger}}toInt(){{/isInteger}}
+        {{^isInteger}}toDouble(){{/isInteger}}
+        ))
+      {{/isNumeric}}
+      {{^isNumeric}}
+        (data as Map).cast<String, {{{dataType}}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}
+      {{/isNumeric}}
     {{/isPrimitiveType}}
     {{#isAnyType}}
       (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}
