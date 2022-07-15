@@ -37,15 +37,15 @@ main() {
   // it wouldn't change the hash
   test(
       'hashing an object which has two fields of the same type is still different',
-          () {
-        var ht = HashTest()
-          ..fieldOne = false
-          ..fieldTwo = true;
-        var ht1 = HashTest()
-          ..fieldOne = true
-          ..fieldTwo = false;
-        expect(false, ht.hashCode == ht1.hashCode);
-      });
+      () {
+    var ht = HashTest()
+      ..fieldOne = false
+      ..fieldTwo = true;
+    var ht1 = HashTest()
+      ..fieldOne = true
+      ..fieldTwo = false;
+    expect(false, ht.hashCode == ht1.hashCode);
+  });
 
   test('additional properties mappings', () {
     const addProp = {
@@ -103,20 +103,22 @@ main() {
   });
 
   test("List<AnyOf<MyApple,MyBanana>> - parsing json array with discriminator",
-          () {
-        final items =
+      () {
+    final items =
         AnyOfMyAppleMyBanana.listFromJson(jsonDecode(_dummyDiscriminatorJson));
 
-        expect(items, hasLength(2));
-        expect(items[0].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyApple);
-        expect(items[0].asMyApple().type, "apple");
-        expect(items[0].asMyApple().kind, "Foxwhelp");
-        expect(items[1].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyBanana);
-        expect(items[1].asMyBanana().type, "banana");
-        expect(items[1].asMyBanana().count, 42);
-      });
+    expect(items, hasLength(2));
+    expect(items[0].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyApple);
+    expect(items[0].asMyApple().type, "apple");
+    expect(items[0].asMyApple().kind, "Foxwhelp");
+    expect(items[1].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyBanana);
+    expect(items[1].asMyBanana().type, "banana");
+    expect(items[1].asMyBanana().count, 42);
+  });
   test('double with ints in them tests and vs versa', () {
     const testData = {
+      'basicInt': 2.6,
+      'basicDouble': 1,
       'intList': [1, 2.6],
       'intMap': {'one': 1, 'two': 2.7},
       'doubleList': [1, 2.6],
@@ -124,6 +126,8 @@ main() {
     };
 
     final data = DoubleAndIntConversion.fromJson(testData);
+    expect(data.basicDouble, 1.0);
+    expect(data.basicInt, 2);
     expect(data.intList, [1, 2]);
     expect(data.intMap, {'one': 1, 'two': 2});
     expect(data.doubleList, [1.0, 2.6]);
@@ -135,7 +139,7 @@ main() {
   });
   test(
       "enums included in a model via allOf with reference will be treated as"
-          "enums and generate valid code ", () {
+      "enums and generate valid code ", () {
     final testO = ObjectContainingEnum.fromJson(
         {"name": "foobar", "enumFieldAllOf": "667"});
     expect(testO.name, "foobar");

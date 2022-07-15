@@ -347,7 +347,15 @@ components:
         - ARCHIVING
     DoubleAndIntConversion:
       type: object
+      required:
+        - basicDouble
+        - basicInt
       properties:
+        basicInt:
+          type: integer
+        basicDouble:
+          type: number
+          format: double
         intList:
           type: array
           items:

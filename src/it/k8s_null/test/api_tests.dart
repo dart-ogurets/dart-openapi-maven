@@ -113,6 +113,8 @@ main() {
       });
   test('double with ints in them tests and vs versa', () {
     const testData = {
+      'basicInt': 2.6,
+      'basicDouble': 1,
       'intList': [1, 2.6],
       'intMap': {'one': 1, 'two': 2.7},
       'doubleList': [1, 2.6],
@@ -120,6 +122,8 @@ main() {
     };
 
     final data = DoubleAndIntConversion.fromJson(testData);
+    expect(data.basicDouble, 1.0);
+    expect(data.basicInt, 2);
     expect(data.intList, [1, 2]);
     expect(data.intMap, {'one': 1, 'two': 2});
     expect(data.doubleList, [1.0, 2.6]);
