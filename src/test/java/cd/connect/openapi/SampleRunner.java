@@ -11,8 +11,8 @@ import java.util.Arrays;
 public class SampleRunner {
   @Test
   public void runGenerator() {
-    String location = getClass().getResource("/test.yaml").getFile();
-//    String location = getClass().getResource("/integration_test.yaml").getFile();
+//    String location = getClass().getResource("/test.yaml").getFile();
+    String location = getClass().getResource("/integration_test.yaml").getFile();
 //    OpenAPIGenerator.main(Arrays.asList("help", "generate").toArray(new String[0]));
 
     OpenAPIGenerator.main(Arrays.asList("generate",
@@ -25,8 +25,8 @@ public class SampleRunner {
 //      "--import-mappings", "IntOrString=./int_or_string.dart",
 //      "--global-property", "skipFormModel=false",
 //      "--additional-properties", "x-use-5x-nullable=true",
-      "--additional-properties", "nullSafe=true",
-      "--additional-properties", "nullSafe-array-default=true",
+//      "--additional-properties", "nullSafe=true",
+//      "--additional-properties", "nullSafe-array-default=true",
         "--additional-properties", "listAnyOf=true",
       "--output", "sample-app/" + getClass().getSimpleName())
       .toArray(new String[0]));

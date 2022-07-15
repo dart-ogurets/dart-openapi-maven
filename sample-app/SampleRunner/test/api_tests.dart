@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:k8s_api/api.dart';
+import 'package:sample_app/api.dart';
 import 'package:test/test.dart';
 
 main() {
@@ -37,11 +37,15 @@ main() {
   // it wouldn't change the hash
   test(
       'hashing an object which has two fields of the same type is still different',
-          () {
-        var ht = HashTest(fieldOne: false, fieldTwo: true);
-        var ht1 = HashTest(fieldOne: true, fieldTwo: false);
-        expect(false, ht.hashCode == ht1.hashCode);
-      });
+      () {
+    var ht = HashTest()
+      ..fieldOne = false
+      ..fieldTwo = true;
+    var ht1 = HashTest()
+      ..fieldOne = true
+      ..fieldTwo = false;
+    expect(false, ht.hashCode == ht1.hashCode);
+  });
 
   test('additional properties mappings', () {
     const addProp = {
@@ -77,47 +81,47 @@ main() {
 
     var ap = AddProps3.fromJson(addProp);
     expect(ap.discrim, 'fred');
-    expect(ap.readings?.length, 2);
-    expect(ap.readings?['one'], 1);
-    expect(ap.readings?['two'], 2.3);
-    expect(ap.dependencies?['deps1'], ['a', 34.2, true]);
-    expect(ap.dependencies?['deps2'], [17.8, false, 'b']);
-    expect(ap.otherDeps?['name'], ['tom', 'dick', 'harry']);
-    expect(ap.otherDeps?['height'], [1.7, 1.3, 1.4]);
-    expect(ap.otherDeps?['info'], 'this is top secret');
-    expect(ap.yetMoreAdditional?['sList'], ['a', 'b', 'c']);
+    expect(ap.readings.length, 2);
+    expect(ap.readings['one'], 1);
+    expect(ap.readings['two'], 2.3);
+    expect(ap.dependencies['deps1'], ['a', 34.2, true]);
+    expect(ap.dependencies['deps2'], [17.8, false, 'b']);
+    expect(ap.otherDeps['name'], ['tom', 'dick', 'harry']);
+    expect(ap.otherDeps['height'], [1.7, 1.3, 1.4]);
+    expect(ap.otherDeps['info'], 'this is top secret');
+    expect(ap.yetMoreAdditional['sList'], ['a', 'b', 'c']);
     expect(
-        ap.mapWithComplexObject?['c1']?[0],
-        Event(
-            status: EventStatus.STREAMING,
-            id: 'xx',
-            title: 'Scully',
-            img: 'img',
-            imageUrl: 'http://blah'));
-    expect(ap.mapWithEnums?['statuses'],
+        ap.mapWithComplexObject['c1'][0],
+        Event()
+          ..status = EventStatus.STREAMING
+          ..id = 'xx'
+          ..title = 'Scully'
+          ..img = 'img'
+          ..imageUrl = 'http://blah');
+    expect(ap.mapWithEnums['statuses'],
         [EventStatus.STREAMING, EventStatus.CLOSED]);
   });
 
   test("List<AnyOf<MyApple,MyBanana>> - parsing json array with discriminator",
-          () {
-        final items =
+      () {
+    final items =
         AnyOfMyAppleMyBanana.listFromJson(jsonDecode(_dummyDiscriminatorJson));
 
-        expect(items, hasLength(2));
-        expect(items[0].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyApple);
-        expect(items[0].asMyApple().type, "apple");
-        expect(items[0].asMyApple().kind, "Foxwhelp");
-        expect(items[1].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyBanana);
-        expect(items[1].asMyBanana().type, "banana");
-        expect(items[1].asMyBanana().count, 42);
-      });
+    expect(items, hasLength(2));
+    expect(items[0].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyApple);
+    expect(items[0].asMyApple().type, "apple");
+    expect(items[0].asMyApple().kind, "Foxwhelp");
+    expect(items[1].discriminator, AnyOfDiscriminatorMyAppleMyBanana.MyBanana);
+    expect(items[1].asMyBanana().type, "banana");
+    expect(items[1].asMyBanana().count, 42);
+  });
   test("int enums being generated with correct type", () {
     expect(IntTypeEnum.number1.toJson(), 1);
     expect(IntTypeEnum.number1, IntTypeEnumExtension.fromJson(1));
   });
   test(
       "enums included in a model via allOf with reference will be treated as"
-          "enums and generate valid code ", () {
+      "enums and generate valid code ", () {
     final testO = ObjectContainingEnum.fromJson(
         {"name": "foobar", "enumFieldAllOf": "667"});
     expect(testO.name, "foobar");
@@ -132,10 +136,10 @@ main() {
     };
     final geometry = PointGeometry.fromJson(json);
     expect(geometry.coordinates, hasLength(2));
-    final firstPair = geometry.coordinates?.first;
+    final firstPair = geometry.coordinates.first;
     expect(firstPair, hasLength(2));
-    expect(firstPair?[0], -27.6307582);
-    expect(firstPair?[1], 153.0401564);
+    expect(firstPair[0], -27.6307582);
+    expect(firstPair[1], 153.0401564);
   });
 }
 
