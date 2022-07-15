@@ -597,6 +597,11 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/TimeType"
+        extraNullable:
+          type: object
+          nullable: true
+          additionalProperties:
+            $ref: "#/components/schemas/TimeType"
     JSONType:
       description: "can be anything, no properties"
     SecondJsonType:

@@ -9,8 +9,8 @@
   {{#isDateTime}}{{>_copy_date}}{{/isDateTime}}
   {{#isDate}}{{>_copy_date}}{{/isDate}}
   {{#isModel}}
-    {{^isNullable}}data.copyWith(){{/isNullable}}
-    {{#isNullable}}data == null ? null : data.copyWith(){{/isNullable}}
+    {{^vendorExtensions.x-dart-nullable}}data.copyWith(){{/vendorExtensions.x-dart-nullable}}
+    {{#vendorExtensions.x-dart-nullable}}data == null ? null : data.copyWith(){{/vendorExtensions.x-dart-nullable}}
   {{/isModel}}
   {{#isPrimitiveType}}data{{/isPrimitiveType}}
   {{#isAnyType}}data{{/isAnyType}}

@@ -185,10 +185,14 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
+  // use this one on the INSIDE of a List<X?> - where X is the inside type passed here
+  private fun propertyListOrMapSuffix(cp: CodegenProperty): String {
+    return if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) "?" else ""
+  }
+
+  // use this one on the OUTSIDE of a List<X>? where the outside type is passed here (not X)
   private fun listOrMapSuffix(cp: CodegenProperty): String {
-    return if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) {
-      "?"
-    } else ""
+    return if (nullable(cp) && isNullSafeEnabled && "dynamic" != cp.dataType) "?" else ""
   }
 
   private fun correctPropertyForBinary(model: CodegenModel, cp: CodegenProperty, classLevelField: Boolean): Boolean {
@@ -206,7 +210,32 @@ class DartV3ApiGenerator : DartClientCodegen() {
     return false
   }
 
+  private fun nullable(cp: CodegenProperty): Boolean {
+    if (vendorExtensions.containsKey("x-inner")) {
+      //  the default for nullable is true, so if it is false we should always honour it
+      return cp.isNullable
+    }
+
+    return !cp.required || cp.isNullable
+  }
+
+  /**
+   * this is part of the process of walking all the way down the tree of the properties through all .items
+   * and correcting their data for Dart use.
+   *
+   * model: the model this property tree element is in
+   * cp: the property tree element
+   * classLevelField: is this actually a field at the top level, sub-fields may not have transforms applied.
+   */
   private fun correctInternals(model: CodegenModel, cp: CodegenProperty, classLevelField: Boolean) {
+    if (!classLevelField) {
+      cp.vendorExtensions["x-inner"] = "1"
+    }
+
+    if (nullable(cp)) {
+      cp.vendorExtensions["x-dart-nullable"] = "1"
+    }
+
     if (("DateTime" == cp.complexType) || ("Date" == cp.complexType)) {
       cp.isDateTime = "date-time" == cp.getDataFormat()
       cp.isDate = "date" == cp.getDataFormat()
@@ -237,11 +266,14 @@ class DartV3ApiGenerator : DartClientCodegen() {
       if (cp.getMin() == null && cp.complexType == null) {
         cp.enumName = model.classname + cp.nameInCamelCase + "Enum"
         if (cp.isArray) {
-          cp.dataType = "List<" + cp.enumName + listOrMapSuffix(cp) + ">"
+          cp.dataType = "List<" + cp.enumName + propertyListOrMapSuffix(cp.items) + ">"  + listOrMapSuffix(cp)
+          if (isNullSafeEnabled && nullable(cp) && cp.items != null) {
+            cp.items.vendorExtensions["x-list-null"] = "true"
+          }
         } else if (cp.isMap) {
-          cp.dataType = "Map<String, " + cp.enumName + listOrMapSuffix(cp) + ">"
+          cp.dataType = "Map<String, " + cp.enumName + propertyListOrMapSuffix(cp.items) + ">" + listOrMapSuffix(cp)
         } else {
-          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
+          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (nullable(cp)) "?" else "") else ""
           if (cp.defaultValue != null) {
             if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
               cp.defaultValue = cp.defaultValue.substring(1, cp.defaultValue.length - 1)
@@ -257,7 +289,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       } else {
         cp.enumName = cp.complexType
         if (isNullSafeEnabled) {
-          cp.dataType = cp.enumName + if (cp.isNullable) "?" else ""
+          cp.dataType = cp.enumName + if (nullable(cp)) "?" else ""
         }
       }
       cp.datatypeWithEnum = cp.dataType
@@ -270,15 +302,15 @@ class DartV3ApiGenerator : DartClientCodegen() {
       if (cp.isMap && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.vendorExtensions["x-innerMapType"] = inner
-        cp.dataType = "Map<String, " + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
+        cp.dataType = "Map<String, " + inner + ">" + listOrMapSuffix(cp)
       } else if (cp.isArray && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.dataType =
-          "List<" + inner + ">" + if (isNullSafeEnabled) (if (cp.isNullable) "?" else "") else ""
-        if (isNullSafeEnabled && cp.isNullable && cp.items != null) {
+          "List<" + inner + ">" + listOrMapSuffix(cp)
+        if (isNullSafeEnabled && nullable(cp) && cp.items != null) {
           cp.items.vendorExtensions["x-list-null"] = "true"
         }
-      } else if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) {
+      } else if (nullable(cp) && isNullSafeEnabled && "dynamic" != cp.dataType) {
         cp.dataType = cp.dataType + "?"
       }
       cp.vendorExtensions["x-innerType"] = cp.dataType
@@ -299,11 +331,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.defaultValue = "const " + cp.defaultValue
     }
 
-    if (use5xStyleNullable && !cp.required) {
-      cp.isNullable = true
-    }
-
-    if (!cp.required && cp.isNullable) {
+    if (!cp.required && nullable(cp)) {
       cp.vendorExtensions["x-dont-tojson-null"] = "true"
     }
 
@@ -327,7 +355,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       props.add(cp)
     }
 
-    if ((cp.required || cp.defaultValue == null) && !cp.isNullable) {
+    if ((cp.required || cp.defaultValue == null) && !nullable(cp)) {
       cp.vendorExtensions["x-dart-required"] = "true"
     }
 
@@ -389,7 +417,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       `val` = "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else if (cp.isArray) {
       `val` =
-        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (!cp.isNullable || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
+        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (!nullable(cp) || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
       if (!isNullSafeEnabled) {
         cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
       }

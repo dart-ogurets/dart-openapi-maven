@@ -7,36 +7,37 @@
         {{/x-dont-tojson-null}}
       {{#isArray}}
         {{#vendorExtensions.x-ns-default-val}}
-          if ({{{name}}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.isNotEmpty{{#isNullable}}{{#nullSafe}} == true{{/nullSafe}}{{/isNullable}}) {
+          // x-dart-nullable {{vendorExtensions.x-dart-nullable}}
+          if ({{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.isNotEmpty{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}} == true{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}) {
         {{/vendorExtensions.x-ns-default-val}}
 
-        json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
+        json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.map((v) => LocalApiClient.serialize(v)){{^nullSafe}}?{{/nullSafe}}.toList();
         {{#vendorExtensions.x-ns-default-val}}
           }
         {{/vendorExtensions.x-ns-default-val}}
 
       {{/isArray}}
       {{#isMap}}
-        {{#isNullable}}if ({{{name}}}{{#nullSafe}}?{{/nullSafe}}.isNotEmpty{{#nullSafe}} == true{{/nullSafe}}) { {{/isNullable}}
-        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#isNullable}}{{#nullSafe}}!{{/nullSafe}}{{/isNullable}}.keys,
-          {{{name}}}{{#isNullable}}{{#nullSafe}}!{{/nullSafe}}{{/isNullable}}.values.map((v) => LocalApiClient.serialize(v)));
-        {{#isNullable}} } {{/isNullable}}
+        {{#vendorExtensions.x-dart-nullable}}if ({{{name}}}{{#nullSafe}}?{{/nullSafe}}.isNotEmpty{{#nullSafe}} == true{{/nullSafe}}) { {{/vendorExtensions.x-dart-nullable}}
+        json[r'{{baseName}}'] = Map.fromIterables({{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}!{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.keys,
+          {{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}!{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.values.map((v) => LocalApiClient.serialize(v)));
+        {{#vendorExtensions.x-dart-nullable}} } {{/vendorExtensions.x-dart-nullable}}
       {{/isMap}}
       {{^items}}
         {{#x-dont-tojson-null}}
         if ({{{name}}} != null) {
         {{/x-dont-tojson-null}}
         {{#isDateTime}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toUtc(){{^nullSafe}}?{{/nullSafe}}.toIso8601String();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toUtc(){{^nullSafe}}?{{/nullSafe}}.toIso8601String();
         {{/isDateTime}}
         {{#isDate}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toDateString();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toDateString();
         {{/isDate}}
         {{#isEnum}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toJson();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toJson();
         {{/isEnum}}
         {{#isModel}}
-          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#isNullable}}{{#nullSafe}}?{{/nullSafe}}{{/isNullable}}.toJson();
+          json[r'{{baseName}}'] = {{{name}}}{{^nullSafe}}?{{/nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toJson();
         {{/isModel}}
         {{#isPrimitiveType}}
           json[r'{{baseName}}'] = {{{name}}};
