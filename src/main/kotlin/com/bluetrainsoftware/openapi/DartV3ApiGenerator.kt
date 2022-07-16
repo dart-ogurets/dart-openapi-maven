@@ -216,6 +216,12 @@ class DartV3ApiGenerator : DartClientCodegen() {
       return cp.isNullable
     }
 
+    // in arraysThatHaveADefaultAreNullSafe we force arrays to be non-null if they
+    // are optional - this does not affect required/optional serialisation
+    if ((cp.isArray || cp.isMap) && arraysThatHaveADefaultAreNullSafe) {
+      return false
+    }
+
     return !cp.required || cp.isNullable
   }
 
@@ -232,6 +238,9 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.vendorExtensions["x-dart-nullable"] = "1"
     }
 
+    if ("int" == cp.dataType) {
+      cp.isInteger = true // OpenAPI is saying int64 int is not an integer
+    }
     if (("DateTime" == cp.complexType) || ("Date" == cp.complexType)) {
       cp.isDateTime = "date-time" == cp.getDataFormat()
       cp.isDate = "date" == cp.getDataFormat()
@@ -325,10 +334,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     if ((cp.defaultValue == "[]" && cp.isArray) || (cp.defaultValue == "{}" && cp.isMap)) {
       cp.defaultValue = "const " + cp.defaultValue
-    }
-
-    if (!cp.required && nullable(cp)) {
-      cp.vendorExtensions["x-dont-tojson-null"] = "true"
     }
 
     // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
