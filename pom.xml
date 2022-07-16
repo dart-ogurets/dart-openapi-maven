@@ -4,7 +4,7 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>6.1-SNAPSHOT</version>
+	<version>6.1</version>
 
 	<description>
 		dart2 generator from openapi 3.x spec files. Changing to openapitools dependencies.
@@ -30,7 +30,7 @@
 		<connection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</connection>
 		<developerConnection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</developerConnection>
 		<url>git@github.com:dart-ogurets/dart-openapi-maven.git</url>
-		<tag>HEAD</tag>
+		<tag>openapi-dart-generator-6.1</tag>
 	</scm>
 
 	<properties>
@@ -168,13 +168,13 @@
           <execution>
             <id>default-compile</id>
             <phase>none</phase>
-            <configuration/>
+            <configuration />
           </execution>
           <!-- Replacing default-testCompile as it is treated specially by maven -->
           <execution>
             <id>default-testCompile</id>
             <phase>none</phase>
-            <configuration/>
+            <configuration />
           </execution>
           <execution>
             <id>java-compile</id>
