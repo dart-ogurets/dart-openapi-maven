@@ -129,6 +129,12 @@ main() {
     expect(data.doubleList, [1.0, 2.6]);
     expect(data.doubleMap, {'one': 1.0, 'two': 2.7});
   });
+  test('data serialisation', () {
+    final data = DoubleAndIntConversion(
+        basicInt: 43, basicDouble: 26.2, intList: [], doubleMap: {});
+    expect(data.toJson(),
+        {'basicInt': 43, 'basicDouble': 26.2, 'intList': [], 'doubleMap': {}});
+  });
   test("int enums being generated with correct type", () {
     expect(IntTypeEnum.number1.toJson(), 1);
     expect(IntTypeEnum.number1, IntTypeEnumExtension.fromJson(1));

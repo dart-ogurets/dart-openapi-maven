@@ -91,7 +91,7 @@ main() {
     expect(ap.otherDeps['info'], 'this is top secret');
     expect(ap.yetMoreAdditional['sList'], ['a', 'b', 'c']);
     expect(
-        ap.mapWithComplexObject['c1'][0],
+        ap.mapWithComplexObject['c1']?[0],
         Event()
           ..status = EventStatus.STREAMING
           ..id = 'xx'
@@ -132,6 +132,15 @@ main() {
     expect(data.intMap, {'one': 1, 'two': 2});
     expect(data.doubleList, [1.0, 2.6]);
     expect(data.doubleMap, {'one': 1.0, 'two': 2.7});
+  });
+  test('data serialisation', () {
+    final data = DoubleAndIntConversion(
+        basicInt: 43, basicDouble: 26.2, intList: [], doubleMap: {});
+    expect(data.toJson(), {
+      'basicInt': 43, 'basicDouble': 26.2, 'intList': [],
+      'doubleList': [], // because we can't tell between null and empty
+      'doubleMap': {}
+    });
   });
   test("int enums being generated with correct type", () {
     expect(IntTypeEnum.number1.toJson(), 1);

@@ -1,0 +1,41 @@
+{{#isArray}}
+  v{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.map((v) => {{#items}}{{> _to_json_serialise  }} {{/items}} ){{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toList()
+{{/isArray}}
+{{#isMap}}
+  Map.fromIterables({{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}!{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.keys,
+  {{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}!{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.values.map((v) => {{#items}} {{>  _to_json_serialise  }} {{/items}} ))
+{{/isMap}}
+{{^items}}
+{{#isModel}}
+  v.toJson()
+{{/isModel}}
+{{#isPrimitiveType}}
+  v
+{{/isPrimitiveType}}
+{{#isEnum}}
+  (v as {{{dataType}}}){{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toJson()
+{{/isEnum}}
+{{#isDate}}
+  v{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toUtc()
+  {{#vendorExtensions.x-dart-nullable}}{{^nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toIso8601String()
+  {{#vendorExtensions.x-dart-nullable}}{{^nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.substring(0, 10)
+{{/isDate}}
+{{#isDateTime}}
+  v{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toUtc()
+  {{#vendorExtensions.x-dart-nullable}}{{^nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toIso8601String()
+{{/isDateTime}}
+{{#isAnyType}}v{{/isAnyType}}
+{{^isModel}}
+  {{^isPrimitiveType}}
+    {{^isEnum}}
+      {{^isDateTime}}
+        {{^isDate}}
+          {{^isAnyType}}
+          --please report--register a YAML snippet that reproduces this error
+          {{/isAnyType}}
+        {{/isDate}}
+      {{/isDateTime}}
+    {{/isEnum}}
+  {{/isPrimitiveType}}
+{{/isModel}}
+{{/items}}

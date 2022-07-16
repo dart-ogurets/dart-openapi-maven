@@ -350,9 +350,14 @@ components:
       required:
         - basicDouble
         - basicInt
+        - intList
+        - doubleMap
       properties:
         basicInt:
           type: integer
+        int64Int:
+          type: integer
+          format: int64
         basicDouble:
           type: number
           format: double
