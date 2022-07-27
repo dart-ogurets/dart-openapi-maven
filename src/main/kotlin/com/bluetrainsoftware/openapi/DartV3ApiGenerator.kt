@@ -569,14 +569,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
       cm.vendorExtensions["x-dart-ownVars"] = ownVars
       cm.vendorExtensions["x-dart-hasOwnVars"] = ownVars.isNotEmpty()
-      val ownDefaultVals = ownVars.filter { cp: CodegenProperty ->
-        cp.vendorExtensions.containsKey(
-          "x-ns-default-val"
-        )
-      }
-
-      cm.vendorExtensions["x-own-ns-default-vals"] = ownDefaultVals
-      cm.vendorExtensions["x-has-own-ns-default-vals"] = ownDefaultVals.isNotEmpty()
     }
   }
 

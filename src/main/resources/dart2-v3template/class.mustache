@@ -31,10 +31,10 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 {{#hasVars}}{
   {{#vars}}
     {{#nullSafe}}{{#vendorExtensions.x-dart-required}}required {{/vendorExtensions.x-dart-required}}{{/nullSafe}}
-    this.{{{name}}}{{^vendorExtensions.x-dart-required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/vendorExtensions.x-dart-required}}{{^-last}}, {{/-last}}
+    {{#vendorExtensions.x-dart-inherited}}{{{dataType}}} {{/vendorExtensions.x-dart-inherited}}{{^vendorExtensions.x-dart-inherited}}this.{{/vendorExtensions.x-dart-inherited}}{{{name}}}{{^vendorExtensions.x-dart-required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/vendorExtensions.x-dart-required}}{{^-last}}, {{/-last}}
     {{/vars}} }{{/hasVars}}
 )
-{{#parent}} {{#vendorExtensions.x-has-own-ns-default-vals}},{{/vendorExtensions.x-has-own-ns-default-vals}}{{^vendorExtensions.x-has-own-ns-default-vals}}:{{/vendorExtensions.x-has-own-ns-default-vals}} super({{#vars}}{{#vendorExtensions.x-dart-inherited}}{{name}}: {{name}},{{/vendorExtensions.x-dart-inherited}}{{/vars}}) {{/parent}}
+{{#parent}} : super({{#vars}}{{#vendorExtensions.x-dart-inherited}}{{name}}: {{name}},{{/vendorExtensions.x-dart-inherited}}{{/vars}}) {{/parent}}
 ;
 
   @override
@@ -55,10 +55,10 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 
 {{#hasVars}}
   {{#vars}}
+    {{^vendorExtensions.x-dart-inherited}}
     static {{{dataType}}} fromJson_{{name}}(Map<String, dynamic> json) {
   {{#nullSafe}}
       {{^vendorExtensions.x-var-is-binary}}
-        {{^vendorExtensions.x-dart-inherited}}
           {{^vendorExtensions.x-dart-nullable}}
             final _jsonData = json[r'{{{baseName}}}'];
             if (_jsonData == null) {
@@ -83,13 +83,12 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
             {{#isArray}}{{>_complex_from_json}}{{/isArray}}
             {{#isMap}}{{>_complex_from_json}}{{/isMap}}
             {{^items}}{{>_simple_from_json}}{{/items}}{{/vendorExtensions.x-dart-nullable}}
-        {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}
+        {{/vendorExtensions.x-var-is-binary}}
   {{/nullSafe}}
   {{^nullSafe}}
       {{^vendorExtensions.x-var-is-binary}}
-        {{^vendorExtensions.x-dart-inherited}}
-          {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{>_simple_from_json}}{{/items}}
-        {{/vendorExtensions.x-dart-inherited}}{{/vendorExtensions.x-var-is-binary}}
+        {{#isArray}}{{>_complex_from_json}}{{/isArray}}{{#isMap}}{{>_complex_from_json}}{{/isMap}}{{^items}}{{>_simple_from_json}}{{/items}}
+      {{/vendorExtensions.x-var-is-binary}}
   {{/nullSafe}}
     {{#vendorExtensions.x-var-is-binary}}
       {{^vendorExtensions.x-dart-nullable}}
@@ -98,12 +97,13 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
       {{#vendorExtensions.x-dart-nullable}}return null;{{/vendorExtensions.x-dart-nullable}}
   {{/vendorExtensions.x-var-is-binary}}
   }
+  {{/vendorExtensions.x-dart-inherited}}
   {{/vars}}
 
   {{{classname}}}.fromJson(Map<String, dynamic> json) :
-    {{#vars}}
+    {{#vendorExtensions.x-dart-ownVars}}
       this.{{{name}}} = fromJson_{{name}}(json){{^-last}}, {{/-last}}
-    {{/vars}};
+    {{/vendorExtensions.x-dart-ownVars}}{{#parent}}{{#vendorExtensions.x-dart-hasOwnVars}}, {{/vendorExtensions.x-dart-hasOwnVars}}super.fromJson(json){{/parent}};
 
   Map<String, dynamic> toJson() {
     {{> _class_to_json }}
