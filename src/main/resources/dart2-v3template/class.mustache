@@ -31,10 +31,18 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 {{#hasVars}}{
   {{#vars}}
     {{#nullSafe}}{{#vendorExtensions.x-dart-required}}required {{/vendorExtensions.x-dart-required}}{{/nullSafe}}
-    this.{{{name}}}{{^vendorExtensions.x-dart-required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/vendorExtensions.x-dart-required}}{{^-last}}, {{/-last}}
+    {{#isArray}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{/isArray}}
+    {{#isMap}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{{name}}}{{/isMap}}
+    {{^isArray}}
+      {{^isMap}}
+        this.{{{name}}}{{^vendorExtensions.x-dart-required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/vendorExtensions.x-dart-required}}
+      {{/isMap}}
+    {{/isArray}}
+    {{^-last}}, {{/-last}}
     {{/vars}} }{{/hasVars}}
 )
 {{#parent}} {{#vendorExtensions.x-has-own-ns-default-vals}},{{/vendorExtensions.x-has-own-ns-default-vals}}{{^vendorExtensions.x-has-own-ns-default-vals}}:{{/vendorExtensions.x-has-own-ns-default-vals}} super({{#vars}}{{#vendorExtensions.x-dart-inherited}}{{name}}: {{name}},{{/vendorExtensions.x-dart-inherited}}{{/vars}}) {{/parent}}
+{{#vendorExtensions.x-has-opt-arrays}}: {{/vendorExtensions.x-has-opt-arrays}}{{#vendorExtensions.x-opt-arrays}}this.{{{name}}} = {{{name}}} ?? {{#isArray}}[]{{/isArray}}{{#isMap}}{}{{/isMap}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-opt-arrays}}
 ;
 
   @override

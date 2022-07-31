@@ -479,6 +479,8 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cm.vendorExtensions["dartClassName"] = StringUtils.camelize(cm.getClassname())
 
       if (cm.vars != null) {
+        val optionalArrayOrMaps = mutableListOf<CodegenProperty>()
+
         cm.vars.forEach { cp: CodegenProperty ->
           var correctingSettings: CodegenProperty? = cp
           var classLevelField = true
@@ -505,6 +507,15 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
             correctingSettings = correctingSettings.items
           }
+
+          if ((cp.isArray || cp.isMap) && !cp.required) {
+            optionalArrayOrMaps.add(cp);
+          }
+        }
+
+        if (optionalArrayOrMaps.isNotEmpty()) {
+          cm.vendorExtensions["x-opt-arrays"] = optionalArrayOrMaps
+          cm.vendorExtensions["x-has-opt-arrays"] = "true"
         }
       }
     }
