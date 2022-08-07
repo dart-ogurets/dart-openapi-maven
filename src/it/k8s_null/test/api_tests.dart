@@ -129,16 +129,31 @@ main() {
     expect(data.doubleList, [1.0, 2.6]);
     expect(data.doubleMap, {'one': 1.0, 'two': 2.7});
   });
+
+  test('basic inheritance', () {
+    final wld = WithListDerived.fromJson({
+      "list": [ {"id": 1, "name": "one"}, {"id": 2, "name": "two"} ],
+      "id": 7, "name": "entity",
+      "nullableList": []
+    });
+
+    expect(wld.id, 7);
+    expect(wld.name, "entity");
+    expect(wld.list.length, 2);
+  });
+
   test('data serialisation', () {
     final data = DoubleAndIntConversion(
         basicInt: 43, basicDouble: 26.2, intList: [], doubleMap: {});
     expect(data.toJson(),
         {'basicInt': 43, 'basicDouble': 26.2, 'intList': [], 'doubleMap': {}});
   });
+
   test("int enums being generated with correct type", () {
     expect(IntTypeEnum.number1.toJson(), 1);
     expect(IntTypeEnum.number1, IntTypeEnumExtension.fromJson(1));
   });
+
   test(
       "enums included in a model via allOf with reference will be treated as"
           "enums and generate valid code ", () {
@@ -147,6 +162,7 @@ main() {
     expect(testO.name, "foobar");
     expect(testO.enumFieldAllOf, NumericAndSpacedEnum.n667);
   });
+
   test("generating 2d array in a correct way", () {
     const json = {
       "coordinates": [

@@ -452,6 +452,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     updateModelsWithAllOfInheritance(allModels)
 
+
     return originalModels
   }
 
@@ -508,7 +509,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
             correctingSettings = correctingSettings.items
           }
 
-          if ((cp.isArray || cp.isMap) && !cp.required) {
+          if ((cp.isArray || cp.isMap) && !cp.required && varIsOwnedByThisClass(cp)) {
             optionalArrayOrMaps.add(cp);
           }
         }
@@ -520,7 +521,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
     }
   }
-
 
   private fun updateModelsWithAllOfInheritance(models: Map<String, CodegenModel>) {
     // Workaround for https://github.com/OpenAPITools/openapi-generator/issues/11846
@@ -568,27 +568,29 @@ class DartV3ApiGenerator : DartClientCodegen() {
         cm.vars.sortWith(cmp.reversed())
       }
 
-      if (cm.classname == "Application_allOf") {
-        print("hello")
-      }
-
-      val ownVars = cm.vars.filter { cp: CodegenProperty ->
-          !cp.vendorExtensions.containsKey(
-            "x-dart-inherited"
-          )
-        }
+      val ownVars = cm.vars.filter(::varIsOwnedByThisClass)
 
       cm.vendorExtensions["x-dart-ownVars"] = ownVars
       cm.vendorExtensions["x-dart-hasOwnVars"] = ownVars.isNotEmpty()
-      val ownDefaultVals = ownVars.filter { cp: CodegenProperty ->
-        cp.vendorExtensions.containsKey(
-          "x-ns-default-val"
-        )
-      }
 
-      cm.vendorExtensions["x-own-ns-default-vals"] = ownDefaultVals
-      cm.vendorExtensions["x-has-own-ns-default-vals"] = ownDefaultVals.isNotEmpty()
+      if (cm.vendorExtensions.containsKey("x-has-opt-arrays")) {
+        val optArrays = (cm.vendorExtensions["x-opt-arrays"] as List<CodegenProperty>)
+          .filter { cp -> ownVars.find { ov -> cp.name ==  ov.name } != null }
+          .toList()
+        if (optArrays.isEmpty()) { // none left
+          cm.vendorExtensions.remove("x-has-opt-arrays")
+          cm.vendorExtensions.remove("x-opt-arrays")
+        } else {
+          cm.vendorExtensions["x-opt-arrays"] = optArrays
+        }
+      }
     }
+  }
+
+  private fun varIsOwnedByThisClass(cp: CodegenProperty): Boolean {
+    return !cp.vendorExtensions.containsKey(
+      "x-dart-inherited"
+    )
   }
 
   // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been

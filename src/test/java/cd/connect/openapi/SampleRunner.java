@@ -12,6 +12,7 @@ public class SampleRunner {
   @Test
   public void runGenerator() {
 //    String location = getClass().getResource("/test.yaml").getFile();
+    // integration_test.yaml is the same as we release with, so tests must match
     String location = getClass().getResource("/integration_test.yaml").getFile();
 //    OpenAPIGenerator.main(Arrays.asList("help", "generate").toArray(new String[0]));
 

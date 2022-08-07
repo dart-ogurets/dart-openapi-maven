@@ -33,6 +33,18 @@ main() {
     expect(encodeDecode, w);
   });
 
+  test('basic inheritance', () {
+    final wld = WithListDerived.fromJson({
+      "list": [ {"id": 1, "name": "one"}, {"id": 2, "name": "two"} ],
+      "id": 7, "name": "entity",
+      "nullableList": []
+    });
+
+    expect(wld.id, 7);
+    expect(wld.name, "entity");
+    expect(wld.list.length, 2);
+  });
+
   // previous hashing mechanism if you swapped the adjacent field values
   // it wouldn't change the hash
   test(
