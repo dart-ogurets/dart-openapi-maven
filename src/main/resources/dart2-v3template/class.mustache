@@ -78,7 +78,8 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
             final _jsonData = json[r'{{{baseName}}}'];
             if (_jsonData == null) {
               {{#required}}
-              {{> _deserialisation_error }}
+                {{#defaultValue}} return {{{defaultValue}}};{{/defaultValue}}
+                {{^defaultValue}}{{> _deserialisation_error }}{{/defaultValue}}
               {{/required}}
               {{^required}}
                 {{#defaultValue}} return {{{defaultValue}}};{{/defaultValue}}
