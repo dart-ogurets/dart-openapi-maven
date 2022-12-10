@@ -4,7 +4,7 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>6.4-SNAPSHOT</version>
+	<version>7.1-SNAPSHOT</version>
 
 	<description>
 		dart2 generator from openapi 3.x spec files. Changing to openapitools dependencies.
@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<openapi-codegen-version>6.0.1</openapi-codegen-version>
+		<openapi-codegen-version>6.2.1</openapi-codegen-version>
     <maven.compiler.target>1.11</maven.compiler.target>
     <maven.compiler.source>1.11</maven.compiler.source>
     <kotlin.version>1.7.10</kotlin.version>

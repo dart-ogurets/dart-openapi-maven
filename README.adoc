@@ -3,7 +3,7 @@
 This plugin was originally designed for use by the OpenAPi v3 Maven Plugin, but works with the
 command line generator and the Gradle plugin. it generates _excellent_ Dart code and uses Dio.
 
-NOTE: we are currently using 6.0.1 of the OpenAPI Maven Plugin. 
+NOTE: we are currently using 6.2.1 of the OpenAPI Maven Plugin. 
 
 == Sponsors
 
@@ -23,12 +23,12 @@ To use it, do something like this:
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>6.0.1</version>
+        <version>6.2.1</version>
         <dependencies>
           <dependency>
             <groupId>com.bluetrainsoftware.maven</groupId>
             <artifactId>openapi-dart-generator</artifactId>
-            <version>6.3</version>
+            <version>7.1</version>
           </dependency>
         </dependencies>
         <executions>
@@ -70,7 +70,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:5.10"
+		classpath "com.bluetrainsoftware.maven:openapi-dart-generator:7.1"
 	}
 }
 ----

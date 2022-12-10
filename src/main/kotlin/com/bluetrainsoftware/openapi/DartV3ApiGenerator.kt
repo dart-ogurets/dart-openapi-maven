@@ -13,6 +13,7 @@ import org.openapitools.codegen.languages.DartClientCodegen
 import org.openapitools.codegen.model.ModelMap
 import org.openapitools.codegen.model.ModelsMap
 import org.openapitools.codegen.model.OperationsMap
+import org.openapitools.codegen.utils.CamelizeOption
 import org.openapitools.codegen.utils.ModelUtils
 import org.openapitools.codegen.utils.StringUtils
 import org.slf4j.LoggerFactory
@@ -163,7 +164,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       .replace("=".toRegex(), "__").trim { it <= ' ' }
 
     if (!name.matches("^[A-Z_]*$".toRegex())) {
-      name = StringUtils.camelize(name, true)
+      name = StringUtils.camelize(name, CamelizeOption.LOWERCASE_FIRST_CHAR)
       if (name.matches("^\\d.*".toRegex())) {
         name = "n$name"
       }
@@ -260,7 +261,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.vendorExtensions.put("x-var-is-binary", "true")
     }
 
-    var isComposedEnum = if (cp.isModel) {
+    val isComposedEnum = if (cp.isModel) {
       detectHiddenEnum(cp, model)
     } else {
       false
@@ -383,7 +384,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
         if (allOfArray.size == 1 && anyOfArray == null || anyOfArray!!.isEmpty() && oneOfArray == null || oneOfArray!!.isEmpty()) {
           val singleRef = allOfArray[0].`$ref`
           if (singleRef != null) {
-            val extractLastPathComponent = Pattern.compile("#/components\\/schemas\\/([a-zA-Z\\d\\.\\-_]+)")
+            val extractLastPathComponent = Pattern.compile("#/components/schemas/([a-zA-Z\\d.\\-_]+)")
               .matcher(singleRef)
             if (extractLastPathComponent.matches()) {
               val referencedEnum = openAPI.components.schemas[extractLastPathComponent.group(1)]!!.enum
@@ -510,7 +511,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
           }
 
           if ((cp.isArray || cp.isMap) && !cp.required && varIsOwnedByThisClass(cp)) {
-            optionalArrayOrMaps.add(cp);
+            optionalArrayOrMaps.add(cp)
           }
         }
 
@@ -821,7 +822,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     private val enumClassName: String,
     private val composedSchema: ComposedSchema
   ) {
-    val discriminatorProperty: Discriminator? = composedSchema.discriminator
+    private val discriminatorProperty: Discriminator? = composedSchema.discriminator
 
     init {
       assert(discriminatorProperty != null)
