@@ -1,5 +1,12 @@
 = Changelog
 
+== 7.x Series is based on OpenAPI 6.2
+
+The OpenAPI crew broke the API in weird ways in 6.2, so we go to a new major
+revision for supporting OpenAPI 6.2.
+
+- 7.1 - No new functionality, just operating against 6.2.1
+
 == 6.x Series is based on OpenAPI 6
 
 - 6.3 - fix issue with required parameters (broken by 6.2), adding back support for inheritance broken by 6.1 upgrade. Samples for inheritance now included in
