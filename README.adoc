@@ -96,12 +96,14 @@ openApiGenerate {
 
 Please refer to the article https://medium.com/@irinasouthwell_220/accelerate-flutter-development-with-openapi-and-dart-code-generation-1f16f8329a6a[on Medium].
 
-Please not the versions of all the libraries have moved on since then.
+Please note the versions of all the libraries have moved on since then.
 
 ==== Additional Properties
 
 Additional properties allow you to customise how code is generated and we honour 2 of them above the normal ones.
 
+- `useDio5`: this will make  the library use Dio5 and the associated OpenAPI common
+library associated with Dio5.
 - `pubspec-dependencies`: anything in this will be split on a command added to the dependencies section of your
 generated code.
 - `pubspec-dev-dependencies`: anything here will be added to the dev dependencies of your generated code.

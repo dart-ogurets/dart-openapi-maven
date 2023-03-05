@@ -28,6 +28,7 @@ public class SampleRunner {
 //      "--additional-properties", "x-use-5x-nullable=true",
       "--additional-properties", "nullSafe=true",
       "--additional-properties", "nullSafe-array-default=true",
+      "--additional-properties", "localDev=/Users/richard/projects/dart/openapi_dart_common",
         "--additional-properties", "listAnyOf=true",
       "--output", "sample-app/" + getClass().getSimpleName())
       .toArray(new String[0]));
