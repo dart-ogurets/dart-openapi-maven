@@ -35,8 +35,12 @@ main() {
 
   test('basic inheritance', () {
     final wld = WithListDerived.fromJson({
-      "list": [ {"id": 1, "name": "one"}, {"id": 2, "name": "two"} ],
-      "id": 7, "name": "entity",
+      "list": [
+        {"id": 1, "name": "one"},
+        {"id": 2, "name": "two"}
+      ],
+      "id": 7,
+      "name": "entity",
       "nullableList": []
     });
 

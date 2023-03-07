@@ -468,7 +468,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
       // if NOT an inline object we will definitely use it. Only BODY based inline
       // objects will be otherwise used.
-      if (!cm.getName().startsWith("inline_object")) {
+      if (!cm.getName().startsWith("inline_object") && cm.classFilename != null) {
         cm.vendorExtensions["isUsedModel"] = "true"
         modelMap["isUsedModel"] = "true"
         modelFilesNotToDeleted.add(cm.classFilename + ".dart")
@@ -828,6 +828,16 @@ class DartV3ApiGenerator : DartClientCodegen() {
       assert(discriminatorProperty != null)
     }
 
+    fun toCodegenModel(): CodegenModel {
+      val model = CodegenModel()
+
+      model.classname = className
+      model.name = className
+      model.isEnum = false
+
+      return model
+    }
+
     fun toModelMap(generator: DartV3ApiGenerator): ModelsMap {
       val data = ModelsMap()
       val innerTypes: MutableList<Map<String, Any?>> = ArrayList()
@@ -840,6 +850,13 @@ class DartV3ApiGenerator : DartClientCodegen() {
       data["discriminatorProperty"] = discriminatorProperty!!.propertyName
       data["innerTypes"] = innerTypes
       data["nullSafe"] = generator.additionalProperties["nullSafe"]
+
+      // 6.4.0+ needs this because otherwise it explodes
+      val model = ModelMap()
+      model.model = toCodegenModel()
+//      model.put("isUsedModel", "false")
+      model.put("importPath", "model.${className}")
+      data["models"] = mutableListOf(model)
 
       composedSchema.anyOf.forEach(Consumer { schema: Schema<*> ->
         val ref = schema.`$ref`

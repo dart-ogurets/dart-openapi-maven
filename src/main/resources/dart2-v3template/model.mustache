@@ -4,6 +4,7 @@ part of {{pubName}}.api;
 // log generation bugs on Github, as part of the license, you must not remove these headers from the Mustache templates.
 // this project is maintained as part of FeatureHub - please consider sponsoring us at https://github.com/featurehub-io
 
+{{^isAnyOfClass}}
 {{#models}}
 {{#model}}
 {{#isEnum}}
@@ -14,6 +15,7 @@ part of {{pubName}}.api;
 {{/isEnum}}
 {{/model}}
 {{/models}}
+{{/isAnyOfClass}}
 
 {{#isAnyOfClass}}
 {{>_any_of_class}}

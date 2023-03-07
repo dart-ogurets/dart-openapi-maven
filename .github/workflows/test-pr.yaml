@@ -21,10 +21,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: dart-lang/setup-dart@v1.4
         with:
-          sdk: 2.17.1
-
+          sdk: 2.19.3
       - name: Build with Maven using JDK11
         uses: actions/setup-java@v2
         with:
@@ -32,4 +31,8 @@ jobs:
           distribution: adopt
       - name: Build with Maven
         run: mvn -Dmaven.wagon.http.retryHandler.count=5 --batch-mode verify
-
+      - name: Upload build result
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration_tests_result.log
+          path: target/it/k8s_null/build.log
