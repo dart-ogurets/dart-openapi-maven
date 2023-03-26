@@ -5,7 +5,7 @@
 The OpenAPI crew broke the API in weird ways in 6.2, so we go to a new major
 revision for supporting OpenAPI 6.2.
 
-- 7.2 - Support for Dio5, Support for OpenAPI 6.4.0, start dropping support for Dart < 2.12
+- 7.2 - Support for Dio5, Support for OpenAPI 6.4.0, start dropping support for Dart < 2.12. Add an additional property `useDio5=true`. 
 - 7.1 - No new functionality, just operating against 6.2.1
 
 NOTE: in the next release we will be dropping support for the old-style nullable APIs
