@@ -1,69 +1,50 @@
     final json = {{#parent}}super.toJson();{{/parent}}{{^parent}}<String, dynamic>{};{{/parent}}
     {{#vars}}
       {{^vendorExtensions.x-var-is-binary}}
-      {{^vendorExtensions.x-dart-inherited}}
-      {{#isArray}}
-        {{^required}}
-        {{#vendorExtensions.x-ns-default-val}}
-          if ({{{name}}}{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.isNotEmpty{{#vendorExtensions.x-dart-nullable}}{{#nullSafe}} == true{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}) {
-        {{/vendorExtensions.x-ns-default-val}}
-        {{/required}}
-        json[r'{{baseName}}'] = ((v) => {{> _to_json_serialise }} )({{{name}}});
-        {{^required}}
-        {{#vendorExtensions.x-ns-default-val}}
-          }{{> __class_to_json_required_null }}
-        {{/vendorExtensions.x-ns-default-val}}
-        {{/required}}
-      {{/isArray}}
-      {{#isMap}}
-        {{#vendorExtensions.x-dart-nullable}}if ({{{name}}}{{#nullSafe}}?{{/nullSafe}}.isNotEmpty{{#nullSafe}} == true{{/nullSafe}}) { {{/vendorExtensions.x-dart-nullable}}
-        {{^required}}{{^vendorExtensions.x-dart-nullable}}if ({{{name}}}.isNotEmpty) { {{/vendorExtensions.x-dart-nullable}}{{/required}}
-        json[r'{{baseName}}'] = ((v) => {{> _to_json_serialise }} )({{{name}}});
-        {{#vendorExtensions.x-dart-nullable}}
-          }{{> __class_to_json_required_null }}
-        {{/vendorExtensions.x-dart-nullable}}
-        {{^required}}{{^vendorExtensions.x-dart-nullable}}
-          }{{> __class_to_json_required_null }}
-        {{/vendorExtensions.x-dart-nullable}}{{/required}}
-      {{/isMap}}
-      {{^items}}
-        {{^required}}
-          {{#vendorExtensions.x-dart-nullable}}
-            {{^generateNullValuesToJson}}
+      {{^isInherited}}
+        {{#isNullable}}
+          {{^required}}{{! don't send it if it isn't required and its null}}
             if ({{{name}}} != null) {
-            {{/generateNullValuesToJson}}
-          {{/vendorExtensions.x-dart-nullable}}
-        {{/required}}
-        json[r'{{baseName}}'] =
-        {{#isModel}}
-          {{{name}}}{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toJson()
-        {{/isModel}}
-        {{#isPrimitiveType}}
-          {{{name}}}
-        {{/isPrimitiveType}}
-        {{#isEnum}}
-          {{{name}}}{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toJson()
-        {{/isEnum}}
-        {{#isDate}}
-          {{{name}}}{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toUtc()
-          {{#vendorExtensions.x-dart-nullable}}{{^nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toIso8601String()
-          {{#vendorExtensions.x-dart-nullable}}{{^nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.substring(0, 10)
-        {{/isDate}}
-        {{#isDateTime}}
-          {{{name}}}{{#vendorExtensions.x-dart-nullable}}?{{/vendorExtensions.x-dart-nullable}}.toUtc()
-          {{#vendorExtensions.x-dart-nullable}}{{^nullSafe}}?{{/nullSafe}}{{/vendorExtensions.x-dart-nullable}}.toIso8601String()
-        {{/isDateTime}}
-        {{#isAnyType}}{{{name}}}{{/isAnyType}}
-        ;
-        {{^required}}
-          {{#vendorExtensions.x-dart-nullable}}
-            {{^generateNullValuesToJson}}
-              }
-            {{/generateNullValuesToJson}}
-          {{/vendorExtensions.x-dart-nullable}}
-        {{/required}}
-      {{/items}}
-      {{/vendorExtensions.x-dart-inherited}}
+          {{/required}}
+          {{#required}}
+            if ({{{name}}} == null) {
+              json[r'{{baseName}}'] = null;
+            } else {
+          {{/required}}
+        {{/isNullable}}
+        {{#isArray}}
+          json[r'{{baseName}}'] = ((v) => {{> _to_json_serialise }} )({{{name}}});
+        {{/isArray}}
+        {{#isMap}}
+          json[r'{{baseName}}'] = ((v) => {{> _to_json_serialise }} )({{{name}}});
+        {{/isMap}}
+        {{^items}}
+          json[r'{{baseName}}'] =
+          {{#isModel}}
+            {{{name}}}{{#isNullable}}?{{/isNullable}}.toJson()
+          {{/isModel}}
+          {{#isPrimitiveType}}
+            {{{name}}}
+          {{/isPrimitiveType}}
+          {{#isEnum}}
+            {{{name}}}{{#isNullable}}?{{/isNullable}}.toJson()
+          {{/isEnum}}
+          {{#isDate}}
+            {{{name}}}{{#isNullable}}?{{/isNullable}}.toUtc()
+            {{#isNullable}}?{{/isNullable}}.toIso8601String()
+            {{#isNullable}}?{{/isNullable}}.substring(0, 10)
+          {{/isDate}}
+          {{#isDateTime}}
+            {{{name}}}{{#isNullable}}?{{/isNullable}}.toUtc()
+            {{#isNullable}}?{{/isNullable}}.toIso8601String()
+          {{/isDateTime}}
+          {{#isAnyType}}{{{name}}}{{/isAnyType}}
+          ;
+        {{/items}}
+        {{#isNullable}}
+            }
+        {{/isNullable}}
+      {{/isInherited}}
       {{/vendorExtensions.x-var-is-binary}}
     {{/vars}}
     return json;

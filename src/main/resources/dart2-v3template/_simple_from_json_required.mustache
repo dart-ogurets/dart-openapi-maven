@@ -1,10 +1,10 @@
-{{#isEnum}}{{^vendorExtensions.x-dart-nullable}}
+{{#isEnum}}{{^isNullable}}
 final _enumVal = {{enumName}}Extension.fromJson(_jsonData);
-if (_enumVal == null) {{> _deserialisation_error }}{{/vendorExtensions.x-dart-nullable}}
+if (_enumVal == null) {{> _deserialisation_error }}{{/isNullable}}
 {{/isEnum}}
 return {{#isEnum}}
-  {{^vendorExtensions.x-dart-nullable}}_enumVal;{{/vendorExtensions.x-dart-nullable}}
-  {{#vendorExtensions.x-dart-nullable}}{{enumName}}Extension.fromJson(_jsonData);{{/vendorExtensions.x-dart-nullable}}
+  {{^isNullable}}_enumVal;{{/isNullable}}
+  {{#isNullable}}{{enumName}}Extension.fromJson(_jsonData);{{/isNullable}}
 {{/isEnum}}
 {{#isDateTime}}DateTime.parse(_jsonData);{{/isDateTime}}
 {{#isDate}}DateTime.parse(_jsonData + 'T00:00:00.000Z');{{/isDate}}

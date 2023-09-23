@@ -30,18 +30,13 @@ import java.util.regex.Pattern
 import java.util.stream.Collectors
 
 class DartV3ApiGenerator : DartClientCodegen() {
-  private var arraysThatHaveADefaultAreNullSafe = false
-  private var isNullSafeEnabled = false
-
   private var extraAnyOfClasses: MutableMap<String, AnyOfClass> = HashMap()
   private var extraAnyParts: MutableSet<String> = HashSet()
   private var listAnyOf = false
-  private var use5xStyleNullable = false
 
   companion object {
     private const val LIBRARY_NAME = "dart2-api"
     private const val DART2_TEMPLATE_FOLDER = "dart2-v3template"
-    private const val ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE = "nullSafe-array-default"
     private const val LIST_ANY_OF = "listAnyOf"
 
     private val log = LoggerFactory.getLogger(DartV3ApiGenerator::class.java)
@@ -97,11 +92,8 @@ class DartV3ApiGenerator : DartClientCodegen() {
     supportingFiles.add(SupportingFile("apilib.mustache", libFolder, "api.dart"))
     additionalProperties["x-internal-enums"] = extraInternalEnumProperties
     additionalProperties["x-external-formatters"] = extraPropertiesThatUseExternalFormatters
-    arraysThatHaveADefaultAreNullSafe = additionalProperties.containsKey(ARRAYS_WITH_DEFAULT_VALUES_ARE_NULLSAFE)
-    isNullSafeEnabled = additionalProperties.containsKey("nullSafe")
     additionalProperties["x-dart-anyparts"] = extraAnyParts
     listAnyOf = additionalProperties.containsKey(LIST_ANY_OF)
-    use5xStyleNullable = additionalProperties.containsKey("x-use-5x-nullable")
   }
 
   /**
@@ -144,7 +136,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
-  // don't just add stuff to the end of the name willy nilly, check it is a reserved word first
+  // don't just add stuff to the end of the name willy-nilly, check it is a reserved word first
   override fun escapeReservedWord(name: String): String {
     return if (isReservedWord(name)) name + "_" else name
   }
@@ -175,7 +167,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     return name
   }
 
-  override fun toModelFilename(name: String): String? {
+  override fun toModelFilename(name: String): String {
     return if (name.contains(".")) {
       val lastIndex = name.lastIndexOf(".")
       val path = name.substring(0, lastIndex).replace(".", File.separator).replace('-', '_')
@@ -188,12 +180,12 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
   // use this one on the INSIDE of a List<X?> - where X is the inside type passed here
   private fun propertyListOrMapSuffix(cp: CodegenProperty): String {
-    return if (cp.isNullable && isNullSafeEnabled && "dynamic" != cp.dataType) "?" else ""
+    return if (cp.isNullable && "dynamic" != cp.dataType) "?" else ""
   }
 
   // use this one on the OUTSIDE of a List<X>? where the outside type is passed here (not X)
   private fun listOrMapSuffix(cp: CodegenProperty): String {
-    return if (nullable(cp) && isNullSafeEnabled && "dynamic" != cp.dataType) "?" else ""
+    return if (cp.isNullable && "dynamic" != cp.dataType) "?" else ""
   }
 
   private fun correctPropertyForBinary(model: CodegenModel, cp: CodegenProperty, classLevelField: Boolean): Boolean {
@@ -215,12 +207,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
     if (cp.vendorExtensions.containsKey("x-inner")) {
       //  the default for nullable is true, so if it is false we should always honour it
       return cp.isNullable
-    }
-
-    // in arraysThatHaveADefaultAreNullSafe we force arrays to be non-null if they
-    // are optional - this does not affect required/optional serialisation
-    if ((cp.isArray || cp.isMap) && arraysThatHaveADefaultAreNullSafe) {
-      return false
     }
 
     return !cp.required || cp.isNullable
@@ -258,7 +244,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     // if the var is binary, fix it to be a MultipartFile
     if (correctPropertyForBinary(model, cp, classLevelField)) {
-      cp.vendorExtensions.put("x-var-is-binary", "true")
+      cp.vendorExtensions["x-var-is-binary"] = "true"
     }
 
     val isComposedEnum = if (cp.isModel) {
@@ -273,13 +259,13 @@ class DartV3ApiGenerator : DartClientCodegen() {
         cp.enumName = model.classname + cp.nameInCamelCase + "Enum"
         if (cp.isArray) {
           cp.dataType = "List<" + cp.enumName + propertyListOrMapSuffix(cp.items) + ">"  + listOrMapSuffix(cp)
-          if (isNullSafeEnabled && nullable(cp) && cp.items != null) {
+          if (cp.isNullable && cp.items != null) {
             cp.items.vendorExtensions["x-list-null"] = "true"
           }
         } else if (cp.isMap) {
           cp.dataType = "Map<String, " + cp.enumName + propertyListOrMapSuffix(cp.items) + ">" + listOrMapSuffix(cp)
         } else {
-          cp.dataType = cp.enumName + if (isNullSafeEnabled) (if (nullable(cp)) "?" else "") else ""
+          cp.dataType = cp.enumName + propertyListOrMapSuffix(cp)
           if (cp.defaultValue != null) {
             if (cp.defaultValue.startsWith("'") && cp.defaultValue.endsWith("'")) {
               cp.defaultValue = cp.defaultValue.substring(1, cp.defaultValue.length - 1)
@@ -294,9 +280,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
         }
       } else {
         cp.enumName = cp.complexType
-        if (isNullSafeEnabled) {
-          cp.dataType = cp.enumName + if (nullable(cp)) "?" else ""
-        }
+        cp.dataType = cp.enumName + if (cp.isNullable) "?" else ""
       }
       cp.datatypeWithEnum = cp.dataType
       cp.isEnum = true
@@ -313,11 +297,11 @@ class DartV3ApiGenerator : DartClientCodegen() {
         val inner = nullGenChild(cp.items)
         cp.dataType =
           "List<" + inner + ">" + listOrMapSuffix(cp)
-        if (isNullSafeEnabled && nullable(cp) && cp.items != null) {
+        if (cp.isNullable && cp.items != null) {
           cp.items.vendorExtensions["x-list-null"] = "true"
         }
-      } else if (nullable(cp) && isNullSafeEnabled && "dynamic" != cp.dataType) {
-        cp.dataType = cp.dataType + "?"
+      } else {
+        cp.dataType = cp.dataType + propertyListOrMapSuffix(cp)
       }
       cp.vendorExtensions["x-innerType"] = cp.dataType
     }
@@ -333,33 +317,35 @@ class DartV3ApiGenerator : DartClientCodegen() {
       }
     }
 
+    cp.vendorExtensions["original-default"] = cp.defaultValue
+
     if ((cp.defaultValue == "[]" && cp.isArray) || (cp.defaultValue == "{}" && cp.isMap)) {
       cp.defaultValue = "const " + cp.defaultValue
     }
 
-    // now allow arrays to be non nullable by making them empty. Only operates on 1st level because
-    // it affects the constructor and defaults of top level fields
-    if (classLevelField && cp.isArray && arraysThatHaveADefaultAreNullSafe && cp.defaultValue != null) {
-      cp.defaultValue = "const []"
-      cp.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
-      if (cp.items != null) { // it should be not null, its an array
-        cp.items.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
-      }
-      var props: MutableList<CodegenProperty>? // type-unsafe upstream api
-        = model.vendorExtensions["x-ns-default-vals"] as MutableList<CodegenProperty>?
+//    if (classLevelField && cp.isArray && cp.defaultValue != null && !cp.isNullable) {
+//      cp.defaultValue = "const []"
+//      cp.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
+//      if (cp.items != null) { // it should be not null, its an array
+//        cp.items.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
+//      }
+//      var props: MutableList<CodegenProperty>? // type-unsafe upstream api
+//        = model.vendorExtensions["x-ns-default-vals"] as MutableList<CodegenProperty>?
+//
+//      if (props == null) {
+//        props = mutableListOf()
+//        model.vendorExtensions["x-ns-default-vals"] = props
+//        model.vendorExtensions["x-has-ns-default-vals"] = java.lang.Boolean.TRUE
+//      }
+//
+//      props.add(cp)
+//    }
 
-      if (props == null) {
-        props = mutableListOf()
-        model.vendorExtensions["x-ns-default-vals"] = props
-        model.vendorExtensions["x-has-ns-default-vals"] = java.lang.Boolean.TRUE
-      }
-
-      props.add(cp)
+    if (cp.required || (cp.defaultValue == null && !cp.isNullable)) {
+      cp.required = true
     }
 
-    if ((cp.required || cp.defaultValue == null) && !nullable(cp)) {
-      cp.vendorExtensions["x-dart-required"] = "true"
-    }
+    cp.vendorExtensions["required-owned"] = (cp.required && !cp.isInherited)
   }
 
   // detect whether the schema follows the pattern:
@@ -409,20 +395,17 @@ class DartV3ApiGenerator : DartClientCodegen() {
   }
 
   private fun nullGenChild(cp: CodegenProperty): String {
-    val `val`: String
-    if (cp.isMap) {
-      `val` = "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
+    val value: String = if (cp.isMap) {
+      "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else if (cp.isArray) {
-      `val` =
-        "List<" + nullGenChild(cp.items) + ">" + if (isNullSafeEnabled) (if (!nullable(cp) || arraysThatHaveADefaultAreNullSafe) "" else "?") else ""
-      if (!isNullSafeEnabled) {
-        cp.vendorExtensions["x-list-null"] = java.lang.Boolean.TRUE
-      }
+      "List<" + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else {
-      `val` = cp.dataType + propertyListOrMapSuffix(cp)
+      cp.dataType + propertyListOrMapSuffix(cp)
     }
-    cp.vendorExtensions["x-innerType"] = `val`
-    return `val`
+
+    cp.vendorExtensions["x-innerType"] = value
+
+    return value
   }
 
   // this allows us to keep track of files to remove at the end
@@ -447,37 +430,21 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     originalModels.values.forEach { modelData: ModelsMap ->
       if (modelData.models != null) {
-        updateModelMaps(modelData.models, allModels)
+        determineInterestingModels(modelData.models, allModels)
       }
     }
-
+    // we need this one first
     updateModelsWithAllOfInheritance(allModels)
+    // this requires knowledge of inheritance
+    correctInternalsOfModels(allModels)
 
+    checkForOptionalArrays(allModels)
 
     return originalModels
   }
 
-  private fun updateModelMaps(models: List<ModelMap>, allModels: MutableMap<String, CodegenModel>) {
-    models.forEach { modelMap: ModelMap ->
-      val cm = modelMap.model ?: return@forEach
-
-      // there is no way way to detect these classes other than by name
-      if (cm.name.endsWith("_allOf") || cm.vendorExtensions.containsKey("x-skip-generation")) {
-        return@forEach // skip this one, it isn't used at all
-      }
-
-      // if NOT an inline object we will definitely use it. Only BODY based inline
-      // objects will be otherwise used.
-      if (!cm.getName().startsWith("inline_object") && cm.classFilename != null) {
-        cm.vendorExtensions["isUsedModel"] = "true"
-        modelMap["isUsedModel"] = "true"
-        modelFilesNotToDeleted.add(cm.classFilename + ".dart")
-      }
-
-      if (!cm.getName().endsWith("_allOf")) {
-        allModels[cm.getName()] = cm
-      }
-
+  private fun correctInternalsOfModels(allModels: MutableMap<String, CodegenModel>) {
+    allModels.values.forEach { cm ->
       cm.vendorExtensions["dartClassName"] = StringUtils.camelize(cm.getClassname())
 
       if (cm.vars != null) {
@@ -510,7 +477,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
             correctingSettings = correctingSettings.items
           }
 
-          if ((cp.isArray || cp.isMap) && !cp.required && varIsOwnedByThisClass(cp)) {
+          if ((cp.isArray || cp.isMap) && !cp.required && !cp.isInherited) {
             optionalArrayOrMaps.add(cp)
           }
         }
@@ -523,15 +490,41 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
+  private fun determineInterestingModels(models: List<ModelMap>, allModels: MutableMap<String, CodegenModel>) {
+    models.forEach { modelMap: ModelMap ->
+      val cm = modelMap.model ?: return@forEach
+
+      // there is no way to detect these classes other than by name
+      if (cm.name.endsWith("_allOf") || cm.vendorExtensions.containsKey("x-skip-generation")) {
+        return@forEach // skip this one, it isn't used at all
+      }
+
+      // if NOT an inline object we will definitely use it. Only BODY based inline
+      // objects will be otherwise used.
+      if (!cm.getName().startsWith("inline_object") && cm.classFilename != null) {
+        cm.vendorExtensions["isUsedModel"] = "true"
+        modelMap["isUsedModel"] = "true"
+        modelFilesNotToDeleted.add(cm.classFilename + ".dart")
+      }
+
+      if (!cm.name.endsWith("_allOf")) {
+        allModels[cm.getName()] = cm
+      }
+    }
+  }
+
   private fun updateModelsWithAllOfInheritance(models: Map<String, CodegenModel>) {
     // Workaround for https://github.com/OpenAPITools/openapi-generator/issues/11846
     for (cm in models.values) {
-      var parent: CodegenModel? = cm.parentModel
+      if (cm.name == "Entity2") {
+        println("blah")
+      }
 
-      val properties = cm.vars.map { obj: CodegenProperty -> obj.getName()!! }.toMutableSet()
+      var parent = cm.parentModel
+
+      val properties = cm.vars.map { it.name }.toMutableSet()
 
       while (parent != null) {
-
         for (cp in parent.vars) {
           if (!properties.contains(cp.getName())) {
             properties.add(cp.getName())
@@ -545,7 +538,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
 
     for (cm in models.values) {
-      if (cm.getParent() != null) {
+      if (cm.parent != null) {
         val parent = models[cm.getParent()]
         if (parent == null) {
           log.info("Cannot find parent for class {}:{}", cm.getName(), cm.getParent())
@@ -556,20 +549,23 @@ class DartV3ApiGenerator : DartClientCodegen() {
         cm.vars.forEach { property ->
           val matchingName = props[property.getName()]
           if (matchingName != null) {
-            property.vendorExtensions["x-dart-inherited"] = java.lang.Boolean.TRUE
+            property.vendorExtensions["x-dart-inherited"] = true
+            property.isInherited = true
           }
         }
 
         val cmp = Comparator.comparing { cp: CodegenProperty ->
-          cp.vendorExtensions.containsKey(
-            "x-dart-inherited"
-          )
+          cp.isInherited
         }
 
         cm.vars.sortWith(cmp.reversed())
       }
+    }
+  }
 
-      val ownVars = cm.vars.filter(::varIsOwnedByThisClass)
+  private fun checkForOptionalArrays(models: Map<String, CodegenModel>) {
+    for (cm in models.values) {
+      val ownVars = cm.vars.filter { v -> !v.isInherited }
 
       cm.vendorExtensions["x-dart-ownVars"] = ownVars
       cm.vendorExtensions["x-dart-hasOwnVars"] = ownVars.isNotEmpty()
@@ -588,12 +584,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
-  private fun varIsOwnedByThisClass(cp: CodegenProperty): Boolean {
-    return !cp.vendorExtensions.containsKey(
-      "x-dart-inherited"
-    )
-  }
-
   // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been
   // generated to the file
   // system
@@ -605,7 +595,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     // at this point, all the model files have actually already been generated to disk, that horse has bolted. What
     // we need to do is figured out which models are "form" based and are not required. Basically anything that is
-    // directly used by by a form post
+    // directly used by a form post
     val modelMap: MutableMap<String, CodegenModel> = HashMap()
     val modelMetaMap: MutableMap<String, ModelMap> = HashMap()
     models.forEach(Consumer { m: ModelMap ->
@@ -631,6 +621,12 @@ class DartV3ApiGenerator : DartClientCodegen() {
         }
       }
 
+      co.formParams.forEach { p ->
+        if (!p.required) {
+          p.isNullable = true  // because it is by default, it has to be
+        }
+      }
+
       co.allParams.forEach(Consumer { p: CodegenParameter ->
         if (p.isFile || p.isBinary || p.isBodyParam && bodyIsFile) {
           if (p.isArray) {
@@ -640,6 +636,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
           }
           p.baseType = p.dataType
         }
+
       })
     }
     return som
@@ -648,9 +645,9 @@ class DartV3ApiGenerator : DartClientCodegen() {
   override fun toDefaultValue(schema: Schema<*>): String? {
     // default inherited one uses const, and we can't use that anymore as they are inmodifiable
     return if (ModelUtils.isMapSchema(schema)) {
-      "{}"
+      schema.default?.toString()
     } else if (ModelUtils.isArraySchema(schema)) {
-      "[]"
+      schema.default?.toString()
     } else if (schema.default != null) {
       val s = if (ModelUtils.isStringSchema(schema)) "'" + schema.default.toString()
         .replace("'", "\\'") + "'" else schema.default.toString()
@@ -662,7 +659,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
   override fun addAdditionPropertiesToCodeGenModel(codegenModel: CodegenModel, schema: Schema<*>?) {
     //super.addAdditionPropertiesToCodeGenModel(codegenModel, schema);
-    codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(openAPI, schema))
+    codegenModel.additionalPropertiesType = getSchemaType(ModelUtils.getAdditionalProperties(schema))
     addImport(codegenModel, codegenModel.additionalPropertiesType)
   }
 
@@ -783,23 +780,22 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
-  override fun toAnyOfName(originalNames: List<String>, composedSchema: ComposedSchema): String? {
+  override fun toAnyOfName(originalNames: MutableList<String>?, composedSchema: Schema<*>?): String {
     val names = ArrayList(originalNames)
 
     if (listAnyOf) {
       // create models for List<anyOf> classes that have discriminator
-      if (composedSchema.discriminator != null) {
+      if (composedSchema?.discriminator != null) {
         names.sort()
-        val namesFilename = names.stream().map { name: String ->
-          toModelFilename(
-            name
-          )
-        }.collect(Collectors.toList())
-        val namesCapitalized = names.stream().map { str: String? ->
+        val namesFilename = names.map { name ->
+          toModelFilename(name)
+        }.toList()
+
+        val namesCapitalized = names.map { str: String? ->
           org.apache.commons.lang3.StringUtils.capitalize(
             str
           )
-        }.collect(Collectors.toList())
+        }
         val className = "AnyOf" + java.lang.String.join("", namesCapitalized)
         val enumClassName = "AnyOfDiscriminator" + java.lang.String.join("", namesCapitalized)
         val fileName = "any_of_" + java.lang.String.join("_", namesFilename)
@@ -820,9 +816,9 @@ class DartV3ApiGenerator : DartClientCodegen() {
     val fileName: String,
     private val className: String,
     private val enumClassName: String,
-    private val composedSchema: ComposedSchema
+    private val composedSchema: Schema<*>?
   ) {
-    private val discriminatorProperty: Discriminator? = composedSchema.discriminator
+    private val discriminatorProperty: Discriminator? = composedSchema?.discriminator
 
     init {
       assert(discriminatorProperty != null)
@@ -855,15 +851,15 @@ class DartV3ApiGenerator : DartClientCodegen() {
       val model = ModelMap()
       model.model = toCodegenModel()
 //      model.put("isUsedModel", "false")
-      model.put("importPath", "model.${className}")
+      model["importPath"] = "model.${className}"
       data["models"] = mutableListOf(model)
 
-      composedSchema.anyOf.forEach(Consumer { schema: Schema<*> ->
+      composedSchema?.anyOf?.forEach(Consumer { schema: Schema<*> ->
         val ref = schema.`$ref`
         val type = generator.getTypeDeclaration(schema)
         collectedTypes.add(type)
         var discriminatorValue = ModelUtils.getSimpleRef(ref)
-        // lookup discriminator mappings if there any
+        // lookup discriminator mappings if there are any
         if (discriminatorProperty.mapping != null) {
           for ((key, value) in discriminatorProperty.mapping) {
             if (value == ref) {

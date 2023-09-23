@@ -6,10 +6,10 @@ enum {{classname}} {
 }
 
 extension {{classname}}Extension on {{classname}} {
-  {{#isString}}String{{#nullSafe}}?{{/nullSafe}} get name => toMap[this]{{/isString}}{{#isInteger}}int{{#nullSafe}}?{{/nullSafe}} get asInt => toMap[this]{{/isInteger}};
+  {{#isString}}String? get name => toMap[this]{{/isString}}{{#isInteger}}int? get asInt => toMap[this]{{/isInteger}};
 
   // you have to call this extension class to use this as this is not yet supported
-  static {{classname}}{{#nullSafe}}?{{/nullSafe}} type({{dataType}} name) => fromMap[name];
+  static {{classname}}? type({{dataType}} name) => fromMap[name];
 
   static Map<{{dataType}}, {{classname}}> fromMap = {  {{#allowableValues}}
   {{#enumVars}}{{{value}}}:{{classname}}.{{{name}}}{{^-last}}, {{/-last}}{{/enumVars}}
@@ -18,18 +18,18 @@ extension {{classname}}Extension on {{classname}} {
   {{#enumVars}}{{classname}}.{{{name}}}:{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}
 {{/allowableValues}} };
 
-  static {{classname}}{{#nullSafe}}?{{/nullSafe}} fromJson(dynamic data) => data == null ? null : fromMap[data];
+  static {{classname}}? fromJson(dynamic data) => data == null ? null : fromMap[data];
 
   dynamic toJson() => toMap[this];
 
-  static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) =>
-    json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList(){{#nullSafe}}.fromNull(){{/nullSafe}};
+  static List<{{classname}}> listFromJson(List<dynamic>? json) =>
+    json == null ? <{{classname}}>[] : json.map((value) => fromJson(value)).toList().fromNull();
 
   {{^disableCopyWith}}
   static {{classname}} copyWith({{classname}} instance) => instance;
   {{/disableCopyWith}}
 
-  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+  static Map<String, {{classname}}> mapFromJson(Map<String, dynamic>? json) {
     final map = <String, {{classname}}>{};
     if (json != null && json.isNotEmpty) {
       json.forEach((String key, dynamic value) {

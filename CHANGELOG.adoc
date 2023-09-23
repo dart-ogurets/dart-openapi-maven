@@ -1,5 +1,13 @@
 = Changelog
 
+== 8.x Series is based on OpenAPI 7.x+
+
+- The OpenAPI base now shifts to version 7 and Java 11. 
+- It also shifts to a more strict interpretation of nullable (a field can have a null value) vs required (a field
+is required, but can be null or non null). A field is REQUIRED is it is marked as required, or if it is *not nullable*
+and has no default (otherwise Dart doesn't know what to do with it).
+- We drop support for pre-Dart 2.12 code
+
 == 7.x Series is based on OpenAPI 6.2+
 
 The OpenAPI crew broke the API in weird ways in 6.2, so we go to a new major

@@ -1,4 +1,4 @@
-data{{#nullSafe}}{{#vendorExtensions.x-dart-nullable}}{{^vendorExtensions.x-ns-default-val}}?{{/vendorExtensions.x-ns-default-val}}{{/vendorExtensions.x-dart-nullable}}{{/nullSafe}}.map((String key,
+data{{#isNullable}}?{{/isNullable}}.map((String key,
 {{#items}}
   {{#isMap}}
     {{{vendorExtensions.x-innerType}}} data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, (dynamic data) { return {{>_copy}}; }(data) ))

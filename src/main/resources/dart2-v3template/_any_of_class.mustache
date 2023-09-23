@@ -1,7 +1,7 @@
 class {{classname}} {
   {{classname}}();
 
-  {{#nullSafe}}late {{/nullSafe}}dynamic _value;
+  late dynamic _value;
   dynamic get value => _value;
   void set value(dynamic v) {
     {{#innerTypes}}
@@ -14,7 +14,7 @@ class {{classname}} {
     throw ArgumentError("${v.runtimeType} cannot be a value of AnyOf<{{anyOfTemplate}}>");
   }
 
-  {{#nullSafe}}late {{/nullSafe}}{{enumClassname}} _discriminator;
+  late {{enumClassname}} _discriminator;
   {{enumClassname}} get discriminator => _discriminator;
 
   @override
@@ -22,7 +22,7 @@ class {{classname}} {
     return 'AnyOf<{{anyOfTemplate}}>[value=$_value]';
   }
 
-  fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+  fromJson(Map<String, dynamic>? json) {
     if (json == null) return;
 
     final discriminatorStr = json[r'{{discriminatorProperty}}'];
@@ -41,7 +41,7 @@ class {{classname}} {
     }
   }
 
-  {{classname}}.fromJson(Map<String, dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+  {{classname}}.fromJson(Map<String, dynamic>? json) {
     fromJson(json); // allows child classes to call
   }
 
@@ -68,12 +68,7 @@ class {{classname}} {
       hashCode = hashCode * 31 + _value.hashCode;
     }
 
-    {{#nullSafe}}hashCode = hashCode * 31 + _discriminator.hashCode;{{/nullSafe}}
-    {{^nullSafe}}
-    if (_discriminator != null) {
-      hashCode = hashCode * 31 + _discriminator.hashCode;
-    }
-    {{/nullSafe}}
+    hashCode = hashCode * 31 + _discriminator.hashCode;
 
     return hashCode;
   }
@@ -87,7 +82,7 @@ class {{classname}} {
   }
 {{/disableCopyWith}}
 
-  static List<{{classname}}> listFromJson(List<dynamic>{{#nullSafe}}?{{/nullSafe}} json) {
+  static List<{{classname}}> listFromJson(List<dynamic>? json) {
     return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
   }
 

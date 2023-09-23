@@ -23,8 +23,9 @@ main() {
     print(w);
     print(x);
     print("codes ${w.hashCode} vs ${x.hashCode}");
+    expect(true, w.hashCode > 0, reason: '${w.hashCode} should be > 0');
     print("empty array -> ${[].hashCode}");
-    expect(true, w.hashCode == x.hashCode);
+    expect(true, w.hashCode == x.hashCode, reason: 'w hashcode: ${w.hashCode} should equal x hashcode: ${x.hashCode}');
     var z = w.copyWith(types: [GeocodedWaypointTypesEnum.ADDRESS]);
     expect(false, w == z);
     expect(false, w.hashCode == z.hashCode);
@@ -54,12 +55,8 @@ main() {
   test(
       'hashing an object which has two fields of the same type is still different',
       () {
-    var ht = HashTest()
-      ..fieldOne = false
-      ..fieldTwo = true;
-    var ht1 = HashTest()
-      ..fieldOne = true
-      ..fieldTwo = false;
+    var ht = HashTest(fieldOne: false, fieldTwo: true);
+    var ht1 = HashTest(fieldTwo: false, fieldOne: true);
     expect(false, ht.hashCode == ht1.hashCode);
   });
 
@@ -67,6 +64,7 @@ main() {
     const addProp = {
       'discrim': 'fred',
       'readings': {'one': 1, 'two': 2.3},
+      'extra': {},
       'dependencies': {
         'deps1': ['a', 34.2, true],
         'deps2': [17.8, false, 'b']
@@ -97,24 +95,24 @@ main() {
 
     var ap = AddProps3.fromJson(addProp);
     expect(ap.discrim, 'fred');
-    expect(ap.readings.length, 2);
-    expect(ap.readings['one'], 1);
-    expect(ap.readings['two'], 2.3);
-    expect(ap.dependencies['deps1'], ['a', 34.2, true]);
-    expect(ap.dependencies['deps2'], [17.8, false, 'b']);
-    expect(ap.otherDeps['name'], ['tom', 'dick', 'harry']);
-    expect(ap.otherDeps['height'], [1.7, 1.3, 1.4]);
-    expect(ap.otherDeps['info'], 'this is top secret');
-    expect(ap.yetMoreAdditional['sList'], ['a', 'b', 'c']);
+    expect(ap.readings!.length, 2);
+    expect(ap.readings!['one'], 1);
+    expect(ap.readings!['two'], 2.3);
+    expect(ap.dependencies!['deps1'], ['a', 34.2, true]);
+    expect(ap.dependencies!['deps2'], [17.8, false, 'b']);
+    expect(ap.otherDeps!['name'], ['tom', 'dick', 'harry']);
+    expect(ap.otherDeps!['height'], [1.7, 1.3, 1.4]);
+    expect(ap.otherDeps!['info'], 'this is top secret');
+    expect(ap.yetMoreAdditional!['sList'], ['a', 'b', 'c']);
     expect(
-        ap.mapWithComplexObject['c1']?[0],
-        Event()
-          ..status = EventStatus.STREAMING
-          ..id = 'xx'
-          ..title = 'Scully'
-          ..img = 'img'
-          ..imageUrl = 'http://blah');
-    expect(ap.mapWithEnums['statuses'],
+        ap.mapWithComplexObject!['c1']?[0],
+        Event(
+            status: EventStatus.STREAMING,
+            id: 'xx',
+            title: 'Scully',
+            img: 'img',
+            imageUrl: 'http://blah'));
+    expect(ap.mapWithEnums!['statuses'],
         [EventStatus.STREAMING, EventStatus.CLOSED]);
   });
 
@@ -136,6 +134,7 @@ main() {
       'basicInt': 2.6,
       'basicDouble': 1,
       'intList': [1, 2.6],
+      'int64Int': 33,
       'intMap': {'one': 1, 'two': 2.7},
       'doubleList': [1, 2.6],
       'doubleMap': {'one': 1, 'two': 2.7},
@@ -145,16 +144,26 @@ main() {
     expect(data.basicDouble, 1.0);
     expect(data.basicInt, 2);
     expect(data.intList, [1, 2]);
+    expect(data.int64Int, 33);
     expect(data.intMap, {'one': 1, 'two': 2});
     expect(data.doubleList, [1.0, 2.6]);
     expect(data.doubleMap, {'one': 1.0, 'two': 2.7});
   });
   test('data serialisation', () {
     final data = DoubleAndIntConversion(
-        basicInt: 43, basicDouble: 26.2, intList: [], doubleMap: {});
+        int64Int: 0,
+        intMap: {},
+        basicInt: 43,
+        basicDouble: 26.2,
+        intList: [],
+        doubleMap: {});
     expect(data.toJson(), {
-      'basicInt': 43, 'basicDouble': 26.2, 'intList': [],
-      'doubleList': [], // because we can't tell between null and empty
+      'basicInt': 43,
+      'int64Int': 0,
+      'basicDouble': 26.2,
+      'intList': [],
+      'intMap': {},
+      'doubleList': [], // because it is not nullable
       'doubleMap': {}
     });
   });

@@ -8,47 +8,23 @@ repository: {{{.}}}
 homepage: {{{.}}}
 {{/pubHomepage}}
 environment:
-{{#nullSafe}}
-  sdk: '>=2.15.0 <3.0.0'
-{{/nullSafe}}
-{{^nullSafe}}
-  sdk: '>=2.7.0 <3.0.0'
-{{/nullSafe}}
+  sdk: '>=2.15.0 <3.1.0'
 dependencies:
-{{#nullSafe}}
 {{#localDev}}
   openapi_dart_common:
     path: {{{localDev}}}
 {{/localDev}}
 {{^localDev}}
-{{#useDio5}}
   dio: '^5.0.1'
   openapi_dart_common: ^5.0.0
-{{/useDio5}}
-{{^useDio5}}
-  dio: '^4.0.0'
-  openapi_dart_common: ^4.1.1
-{{/useDio5}}
 {{/localDev}}
   collection: '^1.16.0'
-{{/nullSafe}}
-{{^nullSafe}}
-  dio: '>=3.0.10 <4.0.0'
-  openapi_dart_common: ^3.3.1
-  collection: ^1.14.11
-{{/nullSafe}}
   {{#x-dart-deps}}
   {{{.}}}
   {{/x-dart-deps}}
 dev_dependencies:
-{{#nullSafe}}
   test: ^1.23.1
   flutter_lints: ^2.0.1
-{{/nullSafe}}
-{{^nullSafe}}
-  test: ^1.3.0
-  pedantic: ^1.9.0
-{{/nullSafe}}
 {{#x-dart-devdeps}}
   {{{.}}}
 {{/x-dart-devdeps}}

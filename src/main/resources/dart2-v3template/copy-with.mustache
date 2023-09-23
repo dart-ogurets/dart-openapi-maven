@@ -12,7 +12,7 @@
   {{/isPrimitiveType}}
   {{^isPrimitiveType}}
     {{#isContainer}}
-     function(v{{#nullSafe}}?{{/nullSafe}}) {
+     function(v?) {
       var newVal;
       final fld = v;
       {{#items}}

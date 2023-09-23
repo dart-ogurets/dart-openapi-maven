@@ -9,40 +9,28 @@
     {{enumName}}Extension.fromJson(data)
   {{/isEnum}}
   {{#isDateTime}}
-    {{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}
+    {{^isNullable}}
       DateTime.parse(data!)
-    {{/nullSafe}}
-    {{^nullSafe}}
+    {{/isNullable}}
+    {{#isNullable}}
       data == null ? null : DateTime.parse(data)
-    {{/nullSafe}}
-    {{/vendorExtensions.x-dart-nullable}}
-    {{#vendorExtensions.x-dart-nullable}}
-      data == null ? null : DateTime.parse(data)
-    {{/vendorExtensions.x-dart-nullable}}
+    {{/isNullable}}
   {{/isDateTime}}
   {{#isDate}}
-    {{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}
+    {{^isNullable}}
       DateTime.parse(data! + 'T00:00:00.000Z')
-    {{/nullSafe}}
-    {{^nullSafe}}
+    {{/isNullable}}
+    {{#isNullable}}
       data == null ? null : DateTime.parse(data + 'T00:00:00.000Z')
-    {{/nullSafe}}
-    {{/vendorExtensions.x-dart-nullable}}
-    {{#vendorExtensions.x-dart-nullable}}
-      data == null ? null : DateTime.parse(data + 'T00:00:00.000Z')
-    {{/vendorExtensions.x-dart-nullable}}
+    {{/isNullable}}
   {{/isDate}}
   {{#isModel}}
-    {{^vendorExtensions.x-dart-nullable}}{{#nullSafe}}
+    {{^isNullable}}
       {{{complexType}}}.fromJson(data)
-    {{/nullSafe}}
-    {{^nullSafe}}
+    {{/isNullable}}
+    {{#isNullable}}
       data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
-    {{/nullSafe}}
-    {{/vendorExtensions.x-dart-nullable}}
-    {{#vendorExtensions.x-dart-nullable}}
-      data == null ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : {{{complexType}}}.fromJson(data)
-    {{/vendorExtensions.x-dart-nullable}}
+    {{/isNullable}}
   {{/isModel}}
   {{#isPrimitiveType}}
     {{#isInteger}}data.toInt(){{/isInteger}}
