@@ -1,6 +1,9 @@
 name: {{pubName}}
 version: {{pubVersion}}
 description: {{pubDescription}}
+{{#localDev}}
+publish_to: none
+{{/localDev}}
 {{#pubRepository}}
 repository: {{{.}}}
 {{/pubRepository}}

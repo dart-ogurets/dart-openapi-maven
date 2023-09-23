@@ -14,7 +14,7 @@ class IntOrString {
     return IntOrString()..value = this.value;
   }
 
-  dynamic? toJson() {
+  dynamic toJson() {
     return this.value;
   }
 

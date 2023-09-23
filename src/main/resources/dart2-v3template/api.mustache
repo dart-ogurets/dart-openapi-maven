@@ -184,8 +184,8 @@ part of {{pubName}}.api;
             {{/isArray}}
             {{#isArray}}
                 '{{baseName}}': {{paramName}}{{#isNullable}}?{{/isNullable}}.whereNotNull()
-              {{#isNullable}}?{{/isNullable}}.map({{#isDateTime}}{{paramName}}{{#isNullable}}?{{/isNullable}}.toUtc(){{#isNullable}}?{{/isNullable}}.toIso8601String(){{/isDateTime}}
-              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}){{#isNullable}}?{{/isNullable}}.toList(),
+              .map({{#isDateTime}}{{paramName}}.toUtc().toIso8601String(){{/isDateTime}}
+              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
             {{/isArray}}
           {{/isFile}}
           {{#isFile}}

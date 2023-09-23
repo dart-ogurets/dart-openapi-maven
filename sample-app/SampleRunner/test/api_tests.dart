@@ -25,7 +25,9 @@ main() {
     print("codes ${w.hashCode} vs ${x.hashCode}");
     expect(true, w.hashCode > 0, reason: '${w.hashCode} should be > 0');
     print("empty array -> ${[].hashCode}");
-    expect(true, w.hashCode == x.hashCode, reason: 'w hashcode: ${w.hashCode} should equal x hashcode: ${x.hashCode}');
+    expect(true, w.hashCode == x.hashCode,
+        reason:
+            'w hashcode: ${w.hashCode} should equal x hashcode: ${x.hashCode}');
     var z = w.copyWith(types: [GeocodedWaypointTypesEnum.ADDRESS]);
     expect(false, w == z);
     expect(false, w.hashCode == z.hashCode);

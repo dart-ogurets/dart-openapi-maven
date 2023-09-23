@@ -377,6 +377,7 @@ components:
         int64Int:
           type: integer
           format: int64
+          default: 0
         basicDouble:
           type: number
           format: double
@@ -390,6 +391,7 @@ components:
             type: integer
         doubleList:
           type: array
+          default: []
           items:
             type: number
             format: double

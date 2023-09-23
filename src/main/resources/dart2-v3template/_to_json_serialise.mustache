@@ -1,9 +1,9 @@
 {{#isArray}}
-  v{{#isNullable}}?{{/isNullable}}.map((v) => {{#items}}{{> _to_json_serialise  }} {{/items}} ){{#isNullable}}?{{/isNullable}}.toList()
+  v{{#isNullable}}?{{/isNullable}}.map({{#items}}({{{dataType}}} v) => {{> _to_json_serialise  }} {{/items}} ){{#isNullable}}?{{/isNullable}}.toList()
 {{/isArray}}
 {{#isMap}}
   Map.fromIterables({{{name}}}{{#isNullable}}!{{/isNullable}}.keys,
-  {{{name}}}{{#isNullable}}!{{/isNullable}}.values.map((v) => {{#items}} {{>  _to_json_serialise  }} {{/items}} ))
+  {{{name}}}{{#isNullable}}!{{/isNullable}}.values.map({{#items}}({{{dataType}}} v) => {{>  _to_json_serialise  }} {{/items}} ))
 {{/isMap}}
 {{^items}}
 {{#isModel}}
@@ -13,7 +13,7 @@
   v
 {{/isPrimitiveType}}
 {{#isEnum}}
-  (v as {{{dataType}}}){{#isNullable}}?{{/isNullable}}.toJson()
+  v{{#isNullable}}?{{/isNullable}}.toJson()
 {{/isEnum}}
 {{#isDate}}
   v{{#isNullable}}?{{/isNullable}}.toUtc()

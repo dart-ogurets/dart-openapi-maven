@@ -251,7 +251,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
             {{/allowableValues}} };
 
             String? toJson() => toMap[this];
-            static {{{enumName}}}? fromJson(String key) => {{^nullSafe}}key == null ? null : {{/nullSafe}}fromMap[key];
+            static {{{enumName}}}? fromJson(String key) => fromMap[key];
 
             static List<{{{enumName}}}> listFromJson(List<dynamic>? json) =>
               json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList().fromNull();
