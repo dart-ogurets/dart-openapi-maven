@@ -8,6 +8,26 @@ is required, but can be null or non null). A field is REQUIRED is it is marked a
 and has no default (otherwise Dart doesn't know what to do with it).
 - We drop support for pre-Dart 2.12 code
 
+If you want to support something like Person? then you need something like this:
+
+----
+   SomeClass:
+     properties:  
+        person: # do not include a description or the API changes code generation
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Person"
+----
+
+This text snippet does not change the API, you get a `Person? person` field. If you add a description,
+OpenAPI will automatically generate a new class which is outside of our control, and you will get a new
+class likely called `SomeClassPerson` so it can hold the description.
+
+If you put `nullable: true` on the definition of the object itself, it inherintly turns the object to
+always be nullable, so you  get things like `List<Person?> people`. 
+
+
+
 == 7.x Series is based on OpenAPI 6.2+
 
 The OpenAPI crew broke the API in weird ways in 6.2, so we go to a new major

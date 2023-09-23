@@ -323,24 +323,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cp.defaultValue = "const " + cp.defaultValue
     }
 
-//    if (classLevelField && cp.isArray && cp.defaultValue != null && !cp.isNullable) {
-//      cp.defaultValue = "const []"
-//      cp.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
-//      if (cp.items != null) { // it should be not null, its an array
-//        cp.items.vendorExtensions["x-ns-default-val"] = java.lang.Boolean.TRUE
-//      }
-//      var props: MutableList<CodegenProperty>? // type-unsafe upstream api
-//        = model.vendorExtensions["x-ns-default-vals"] as MutableList<CodegenProperty>?
-//
-//      if (props == null) {
-//        props = mutableListOf()
-//        model.vendorExtensions["x-ns-default-vals"] = props
-//        model.vendorExtensions["x-has-ns-default-vals"] = java.lang.Boolean.TRUE
-//      }
-//
-//      props.add(cp)
-//    }
-
     if (cp.required || (cp.defaultValue == null && !cp.isNullable)) {
       cp.required = true
     }
@@ -373,12 +355,14 @@ class DartV3ApiGenerator : DartClientCodegen() {
             val extractLastPathComponent = Pattern.compile("#/components/schemas/([a-zA-Z\\d.\\-_]+)")
               .matcher(singleRef)
             if (extractLastPathComponent.matches()) {
-              val referencedEnum = openAPI.components.schemas[extractLastPathComponent.group(1)]!!.enum
-              if (referencedEnum != null && referencedEnum.isNotEmpty()) {
-                isComposedEnum = true
-                cp.isModel = false
-                cp.isEnum = true
-                cp.isAnyType = false
+              openAPI.components.schemas[extractLastPathComponent.group(1)]?.let { schema ->
+                val referencedEnum = schema.enum
+                if (referencedEnum != null && referencedEnum.isNotEmpty()) {
+                  isComposedEnum = true
+                  cp.isModel = false
+                  cp.isEnum = true
+                  cp.isAnyType = false
+                }
               }
             }
           }
