@@ -33,6 +33,8 @@ class DartV3ApiGenerator : DartClientCodegen() {
   private var extraAnyOfClasses: MutableMap<String, AnyOfClass> = HashMap()
   private var extraAnyParts: MutableSet<String> = HashSet()
   private var listAnyOf = false
+  private var filterDeprecatedApis = false
+  private var filterDeprecatedModels = false
 
   companion object {
     private const val LIBRARY_NAME = "dart2-api"
@@ -93,6 +95,8 @@ class DartV3ApiGenerator : DartClientCodegen() {
     additionalProperties["x-internal-enums"] = extraInternalEnumProperties
     additionalProperties["x-external-formatters"] = extraPropertiesThatUseExternalFormatters
     additionalProperties["x-dart-anyparts"] = extraAnyParts
+    filterDeprecatedApis = additionalProperties["filter-deprecated-apis"] != null
+    filterDeprecatedModels = additionalProperties["filter-deprecated-models"] != null
     listAnyOf = additionalProperties.containsKey(LIST_ANY_OF)
   }
 
@@ -571,11 +575,20 @@ class DartV3ApiGenerator : DartClientCodegen() {
   // for debugging inevitable weirdness in the operations generated. DO NOT MODIFY THE MODEL - it has already been
   // generated to the file
   // system
-  override fun postProcessOperationsWithModels(operationsMap: OperationsMap, models: List<ModelMap>): OperationsMap? {
+  override fun postProcessOperationsWithModels(operationsMap: OperationsMap, models: MutableList<ModelMap>): OperationsMap? {
     processImportMappings()
     processPubspecMappings()
     val som = super.postProcessOperationsWithModels(operationsMap, models)
+
     val ops = operationsMap.operations.operation
+
+    if (filterDeprecatedApis) {
+      ops.removeIf { it.isDeprecated }
+    }
+
+    if (filterDeprecatedModels) {
+      models.removeIf { it.model.isDeprecated }
+    }
 
     // at this point, all the model files have actually already been generated to disk, that horse has bolted. What
     // we need to do is figured out which models are "form" based and are not required. Basically anything that is

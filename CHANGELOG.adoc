@@ -6,7 +6,10 @@
 - It also shifts to a more strict interpretation of nullable (a field can have a null value) vs required (a field
 is required, but can be null or non null). A field is REQUIRED is it is marked as required, or if it is *not nullable*
 and has no default (otherwise Dart doesn't know what to do with it).
-- We drop support for pre-Dart 2.12 code
+- We drop support for pre-Dart 2.12 code (i.e. non-null safe code)
+- We add the ability to drop deprecated APIs (additional property `filter-deprecated-apis`)
+- We add the ability to drop deprecated Models (additional property `filter-deprecated-models`)
+
 
 If you want to support something like Person? then you need something like this:
 
@@ -23,7 +26,7 @@ This text snippet does not change the API, you get a `Person? person` field. If 
 OpenAPI will automatically generate a new class which is outside of our control, and you will get a new
 class likely called `SomeClassPerson` so it can hold the description.
 
-If you put `nullable: true` on the definition of the object itself, it inherintly turns the object to
+If you put `nullable: true` on the definition of the object itself, it inherently turns the object to
 always be nullable, so you  get things like `List<Person?> people`. 
 
 
