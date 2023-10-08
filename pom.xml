@@ -4,7 +4,7 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>8.1-RC1</version>
+	<version>8.1-RC2-SNAPSHOT</version>
 
 	<description>
 		dart2 generator from openapi 3.x spec files.
@@ -30,7 +30,7 @@
 		<connection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</connection>
 		<developerConnection>scm:git:git@github.com:dart-ogurets/dart-openapi-maven.git</developerConnection>
 		<url>git@github.com:dart-ogurets/dart-openapi-maven.git</url>
-		<tag>openapi-dart-generator-8.1-RC1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<properties>
