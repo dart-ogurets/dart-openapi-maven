@@ -323,10 +323,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
 
     cp.vendorExtensions["original-default"] = cp.defaultValue
 
-    if ((cp.defaultValue == "[]" && cp.isArray) || (cp.defaultValue == "{}" && cp.isMap)) {
-      cp.defaultValue = "const " + cp.defaultValue
-    }
-
     if (cp.required || (cp.defaultValue == null && !cp.isNullable)) {
       cp.required = true
     }
@@ -434,7 +430,6 @@ class DartV3ApiGenerator : DartClientCodegen() {
   private fun correctInternalsOfModels(allModels: MutableMap<String, CodegenModel>) {
     allModels.values.forEach { cm ->
       cm.vendorExtensions["dartClassName"] = StringUtils.camelize(cm.getClassname())
-
       if (cm.vars != null) {
         val arraysWithDefaults = mutableListOf<CodegenProperty>()
 
@@ -465,7 +460,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
             correctingSettings = correctingSettings.items
           }
 
-          if ((cp.isArray || cp.isMap) && cp.isNullable && !cp.isInherited && cp.defaultValue != null) {
+          if ((cp.isArray || cp.isMap) && !cp.isInherited && cp.defaultValue != null) {
             arraysWithDefaults.add(cp)
           }
         }
