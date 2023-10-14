@@ -426,7 +426,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
     // this requires knowledge of inheritance
     correctInternalsOfModels(allModels)
 
-    checkForOptionalArrays(allModels)
+    filterNullableArraysByNonInheritedProperties(allModels)
 
     return originalModels
   }
@@ -436,7 +436,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       cm.vendorExtensions["dartClassName"] = StringUtils.camelize(cm.getClassname())
 
       if (cm.vars != null) {
-        val optionalArrayOrMaps = mutableListOf<CodegenProperty>()
+        val arraysWithDefaults = mutableListOf<CodegenProperty>()
 
         cm.vars.forEach { cp: CodegenProperty ->
           var correctingSettings: CodegenProperty? = cp
@@ -465,14 +465,14 @@ class DartV3ApiGenerator : DartClientCodegen() {
             correctingSettings = correctingSettings.items
           }
 
-          if ((cp.isArray || cp.isMap) && !cp.required && !cp.isInherited) {
-            optionalArrayOrMaps.add(cp)
+          if ((cp.isArray || cp.isMap) && cp.isNullable && !cp.isInherited && cp.defaultValue != null) {
+            arraysWithDefaults.add(cp)
           }
         }
 
-        if (optionalArrayOrMaps.isNotEmpty()) {
-          cm.vendorExtensions["x-opt-arrays"] = optionalArrayOrMaps
-          cm.vendorExtensions["x-has-opt-arrays"] = "true"
+        if (arraysWithDefaults.isNotEmpty()) {
+          cm.vendorExtensions["x-nullable-arrays-with-defaults"] = arraysWithDefaults
+          cm.vendorExtensions["x-has-nullable-arrays-with-defaults"] = "true"
         }
       }
     }
@@ -551,22 +551,25 @@ class DartV3ApiGenerator : DartClientCodegen() {
     }
   }
 
-  private fun checkForOptionalArrays(models: Map<String, CodegenModel>) {
+  /**
+   * This removes any inherited properties from the nullable arrays
+   */
+  private fun filterNullableArraysByNonInheritedProperties(models: Map<String, CodegenModel>) {
     for (cm in models.values) {
       val ownVars = cm.vars.filter { v -> !v.isInherited }
 
       cm.vendorExtensions["x-dart-ownVars"] = ownVars
       cm.vendorExtensions["x-dart-hasOwnVars"] = ownVars.isNotEmpty()
 
-      if (cm.vendorExtensions.containsKey("x-has-opt-arrays")) {
-        val optArrays = (cm.vendorExtensions["x-opt-arrays"] as List<CodegenProperty>)
+      if (cm.vendorExtensions.containsKey("x-has-nullable-arrays-with-defaults")) {
+        val optArrays = (cm.vendorExtensions["x-nullable-arrays-with-defaults"] as List<CodegenProperty>)
           .filter { cp -> ownVars.find { ov -> cp.name ==  ov.name } != null }
           .toList()
         if (optArrays.isEmpty()) { // none left
-          cm.vendorExtensions.remove("x-has-opt-arrays")
-          cm.vendorExtensions.remove("x-opt-arrays")
+          cm.vendorExtensions.remove("x-has-nullable-arrays-with-defaults")
+          cm.vendorExtensions.remove("x-nullable-arrays-with-defaults")
         } else {
-          cm.vendorExtensions["x-opt-arrays"] = optArrays
+          cm.vendorExtensions["x-nullable-arrays-with-defaults"] = optArrays
         }
       }
     }

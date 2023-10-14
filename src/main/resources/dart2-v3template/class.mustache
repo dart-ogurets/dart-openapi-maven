@@ -49,10 +49,10 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
     {{^-last}}, {{/-last}}
     {{/vars}} }{{/hasVars}}
 )
-{{#vendorExtensions.x-has-opt-arrays}}:{{/vendorExtensions.x-has-opt-arrays}}
-{{^vendorExtensions.x-has-opt-arrays}}{{#parent}}:{{/parent}}{{/vendorExtensions.x-has-opt-arrays}}
-{{#vendorExtensions.x-opt-arrays}}this.{{{name}}} = {{{name}}} ?? {{#isArray}}[]{{/isArray}}{{#isMap}}{}{{/isMap}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-opt-arrays}}
-{{#parent}}{{#vendorExtensions.x-has-opt-arrays}},{{/vendorExtensions.x-has-opt-arrays}} super({{#vars}}{{#isInherited}}{{name}}: {{name}}{{#defaultValue}} ?? {{{defaultValue}}}{{/defaultValue}},{{/isInherited}}{{/vars}}) {{/parent}}
+{{#vendorExtensions.x-has-nullable-arrays-with-defaults}}:{{/vendorExtensions.x-has-nullable-arrays-with-defaults}}
+{{^vendorExtensions.x-has-nullable-arrays-with-defaults}}{{#parent}}:{{/parent}}{{/vendorExtensions.x-has-nullable-arrays-with-defaults}}
+{{#vendorExtensions.x-nullable-arrays-with-defaults}}{{#defaultValue}}this.{{{name}}} = {{{name}}} ?? {{{defaultValue}}}{{/defaultValue}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-nullable-arrays-with-defaults}}
+{{#parent}}{{#vendorExtensions.x-has-nullable-arrays-with-defaults}},{{/vendorExtensions.x-has-nullable-arrays-with-defaults}} super({{#vars}}{{#isInherited}}{{name}}: {{name}}{{#defaultValue}} ?? {{{defaultValue}}}{{/defaultValue}},{{/isInherited}}{{/vars}}) {{/parent}}
 ;
 
   @override
