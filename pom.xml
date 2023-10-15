@@ -4,7 +4,7 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>8.1-RC3-SNAPSHOT</version>
+	<version>8.1-RC4-SNAPSHOT</version>
 
 	<description>
 		dart2 generator from openapi 3.x spec files.

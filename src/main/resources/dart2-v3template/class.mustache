@@ -28,7 +28,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   {{^isNullable}}late {{/isNullable}}dynamic json;
 {{/parent}}{{/hasVars}}
 {{#vars}}
-  // {{name}} required: {{required}} nullable: {{isNullable}} default: {{vendorExtensions.original-default}} inherited: {{isInherited}}
+  // {{name}} required: {{required}} nullable: {{isNullable}} default: {{vendorExtensions.original-default}} inherited: {{isInherited}} container {{isContainer}}
 {{/vars}}
 {{{classname}}}(
 {{#hasVars}}{
@@ -38,13 +38,20 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
       this.{{{name}}}{{^required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/required}}
     {{/vendorExtensions.required-owned}}
     {{^vendorExtensions.required-owned}}
-    {{#isArray}}{{{dataType}}}{{^isNullable}}{{^isInherited}}?{{/isInherited}}{{/isNullable}} {{{name}}}{{/isArray}}
-    {{#isMap}}{{{dataType}}}{{^isNullable}}{{^isInherited}}?{{/isInherited}}{{/isNullable}} {{{name}}}{{/isMap}}
-    {{^isArray}}
-      {{^isMap}}
-        {{#isInherited}}{{{dataType}}} {{/isInherited}}{{^isInherited}}this.{{/isInherited}}{{{name}}}{{^required}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}{{/required}}
-      {{/isMap}}
-    {{/isArray}}
+      {{! now we just deal with arrays and maps }}
+      {{#isContainer}}
+        {{#isInherited}}{{{dataType}}} {{{name}}}{{/isInherited}}
+        {{^isInherited}}
+          {{#defaultValue}}{{{dataType}}}{{^isNullable}}?{{/isNullable}} {{{name}}}{{/defaultValue}}
+          {{^defaultValue}}this.{{{name}}}{{/defaultValue}}
+        {{/isInherited}}
+      {{/isContainer}}
+      {{^isContainer}}
+        {{#isInherited}}{{{dataType}}} {{{name}}}{{/isInherited}}
+        {{^isInherited}}
+          this.{{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}}
+        {{/isInherited}}
+      {{/isContainer}}
     {{/vendorExtensions.required-owned}}
     {{^-last}}, {{/-last}}
     {{/vars}} }{{/hasVars}}
