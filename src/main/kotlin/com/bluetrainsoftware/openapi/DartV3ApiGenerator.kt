@@ -460,7 +460,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
             correctingSettings = correctingSettings.items
           }
 
-          if ((cp.isArray || cp.isMap) && !cp.isInherited && cp.defaultValue != null) {
+          if ((cp.isArray || cp.isMap) && !cp.required  && !cp.isInherited && cp.defaultValue != null) {
             arraysWithDefaults.add(cp)
           }
         }
