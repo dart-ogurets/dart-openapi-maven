@@ -1,36 +1,36 @@
 {{#items}}
   {{#isMap}}
-    (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_from_json}}; }(data) ))
+    (data as Map).cast<String, dynamic>().fromNull().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_from_json}}; }(data) ))
   {{/isMap}}
   {{#isArray}}
-    (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_from_json}}; }(data) ))
+    (data as Map).cast<String, dynamic>().fromNull().map((String key, dynamic data) => MapEntry<String, {{{dataType}}}>(key, (dynamic data) { return {{>_from_json}}; }(data) ))
   {{/isArray}}
   {{^items}}
     {{#isEnum}}
-      (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic>().fromNull().map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isEnum}}
     {{#isDateTime}}
-      (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic>().fromNull().map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isDateTime}}
     {{#isDate}}
-      (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic>().fromNull().map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isDate}}
     {{#isModel}}
-      (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
+      (data as Map).cast<String, dynamic>().fromNull().map((String key, dynamic data) => MapEntry<String, {{{vendorExtensions.x-innerType}}}>(key, {{>_from_json}} ))
     {{/isModel}}
     {{#isPrimitiveType}}
       {{#isNumeric}}
-        (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}.map((key, value) => MapEntry(key, (value as num).
+        (data as Map).cast<String, dynamic>().fromNull().map((key, value) => MapEntry(key, (value as num).
         {{#isInteger}}toInt(){{/isInteger}}
         {{^isInteger}}toDouble(){{/isInteger}}
         ))
       {{/isNumeric}}
       {{^isNumeric}}
-        (data as Map).cast<String, {{{dataType}}}>(){{#nullSafe}}.fromNull(){{/nullSafe}}
+        (data as Map).cast<String, {{{dataType}}}>().fromNull()
       {{/isNumeric}}
     {{/isPrimitiveType}}
     {{#isAnyType}}
-      (data as Map).cast<String, dynamic>(){{#nullSafe}}.fromNull(){{/nullSafe}}
+      (data as Map).cast<String, dynamic>().fromNull()
     {{/isAnyType}}
   {{/items}}
 {{/items}}

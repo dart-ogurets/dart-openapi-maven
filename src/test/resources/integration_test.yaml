@@ -270,6 +270,24 @@ paths:
                 $ref: "#/components/schemas/com.bluetrainsoftware.AddProps2"
 components:
   schemas:
+    ObbjectWithDeliberatelyNullableArray:
+      type: object
+      properties:
+        myNullableInt:
+          type: integer
+          nullable: true
+        myInt:
+          type: integer
+          nullable: true
+        myNullableArray:
+          type: array
+          nullable: true
+          items:
+            type: string
+        myArray:
+          type: array
+          items:
+            type: string
     GeocodedWaypoint:
       type: object
       description: GeocodedWaypoint
@@ -377,6 +395,7 @@ components:
         int64Int:
           type: integer
           format: int64
+          default: 0
         basicDouble:
           type: number
           format: double
@@ -390,6 +409,7 @@ components:
             type: integer
         doubleList:
           type: array
+          default: []
           items:
             type: number
             format: double

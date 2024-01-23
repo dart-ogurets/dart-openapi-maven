@@ -9,7 +9,7 @@ return
       DateTime.parse(json[r'{{{baseName}}}']!)
   {{/isDateTime}}
   {{#isDate}}
-      DateTime.parse(json[r'{{{baseName}}}']{{#nullSafe}}!{{/nullSafe}} + 'T00:00:00.000Z')
+      DateTime.parse(json[r'{{{baseName}}}']! + 'T00:00:00.000Z')
   {{/isDate}}
   {{#isModel}}
     {{{complexType}}}.fromJson(json[r'{{{baseName}}}'])

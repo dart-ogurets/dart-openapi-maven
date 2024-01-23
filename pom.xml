@@ -4,10 +4,10 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>7.3-SNAPSHOT</version>
+	<version>8.2-SNAPSHOT</version>
 
 	<description>
-		dart2 generator from openapi 3.x spec files. Changing to openapitools dependencies.
+		dart2 generator from openapi 3.x spec files.
 	</description>
 
 	<url>https://www.bluetrainsoftware.com</url>
@@ -34,14 +34,14 @@
 	</scm>
 
 	<properties>
-		<openapi-codegen-version>6.4.0</openapi-codegen-version>
+		<openapi-codegen-version>7.0.1</openapi-codegen-version>
     <maven.compiler.target>1.11</maven.compiler.target>
     <maven.compiler.source>1.11</maven.compiler.source>
     <kotlin.version>1.8.10</kotlin.version>
 	</properties>
 
 	<prerequisites>
-		<maven>3.5</maven>
+		<maven>3.8</maven>
 	</prerequisites>
 
 	<dependencies>

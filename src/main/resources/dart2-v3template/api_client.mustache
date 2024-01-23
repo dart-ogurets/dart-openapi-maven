@@ -3,11 +3,7 @@ part of {{pubName}}.api;
 
 
 class LocalApiClient {
-{{^nullSafe}}
-  static final _regList = RegExp(r'^List<(.*)>$');
-  static final _regMap = RegExp(r'^Map<String,(.*)>$');
-{{/nullSafe}}
-  static dynamic serialize(Object{{#nullSafe}}?{{/nullSafe}} value) {
+  static dynamic serialize(Object? value) {
     try {
       if (value == null) {
         return null;
@@ -51,7 +47,7 @@ return value.toString();
     }
   }
 
-  static dynamic deserializeFromString(String{{#nullSafe}}?{{/nullSafe}} json, String targetType) {
+  static dynamic deserializeFromString(String? json, String targetType) {
     if (json == null) { // HTTP Code 204
       return null;
     }
@@ -99,24 +95,7 @@ return value.toString();
             return {{{enumName}}}Extension.fromJson(value);
         {{/x-internal-enums}}
         default:
-{{^nullSafe}}
-  {
-            Match match;
-            if (value is List &&
-                (match = _regList.firstMatch(targetType)) != null) {
-              var newTargetType = match[1];
-              return value.map((v) => deserialize(v, newTargetType)).toList();
-            } else if (value is Map &&
-                (match = _regMap.firstMatch(targetType)) != null) {
-              var newTargetType = match[1];
-              return Map.fromIterables(value.keys,
-                  value.values.map((v) => deserialize(v, newTargetType)));
-            }
-          }
-{{/nullSafe}}
-{{#nullSafe}}
           return matchLeftovers(value, targetType, (v, t) => deserialize(v, t));
-{{/nullSafe}}
       }
     } on Exception catch (e, stack) {
       throw ApiException.withInner(500, 'Exception during deserialization.', e, stack);
@@ -124,7 +103,7 @@ return value.toString();
   }
 
    /// Format the given parameter object into string.
-  static String{{#nullSafe}}?{{/nullSafe}} parameterToString(dynamic value) {
+  static String? parameterToString(dynamic value) {
     if (value == null) {
       return null;
     } else if (value is DateTime) { // shouldn't ever be used, replaced by direct call

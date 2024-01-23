@@ -3,7 +3,7 @@
 This plugin was originally designed for use by the OpenAPi v3 Maven Plugin, but works with the
 command line generator and the Gradle plugin. it generates _excellent_ Dart code and uses Dio.
 
-NOTE: we are currently using 6.4.0 of the OpenAPI Maven Plugin. 
+NOTE: we are currently using 7.0.1 of the OpenAPI Maven Plugin. 
 
 == Sponsors
 

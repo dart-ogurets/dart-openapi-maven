@@ -8,7 +8,7 @@ part of {{pubName}}.api;
 
   class {{classname}} {
   final {{classname}}Delegate apiDelegate;
-  {{classname}}(ApiClient apiClient) : {{^nullSafe}}assert(apiClient != null), {{/nullSafe}}apiDelegate = {{classname}}Delegate(apiClient);
+  {{classname}}(ApiClient apiClient) : apiDelegate = {{classname}}Delegate(apiClient);
 
 
   {{#operation}}
@@ -26,7 +26,7 @@ part of {{pubName}}.api;
       {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
       {{/vendorExtensions.x-dart-produces-raw}}
     {{/vendorExtensions.x-dart-produces-json}}
-    {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
+    {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options? options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}? {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options? options}{{/hasOptionalParams}}) async {
 
       final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
@@ -42,7 +42,7 @@ part of {{pubName}}.api;
 
       final __body = response.body;
       if(response.statusCode >= 400) {
-      throw ApiException(response.statusCode, __body == null ? null : await decodeBodyBytes({{#nullSafe}}__body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}}));
+      throw ApiException(response.statusCode, __body == null ? null : await decodeBodyBytes(__body));
       }
 
     {{^returnType}}
@@ -58,7 +58,7 @@ part of {{pubName}}.api;
       return response;
     {{/vendorExtensions.x-dart-produces-raw}}
     {{^vendorExtensions.x-dart-produces-raw}}
-        return await apiDelegate.{{nickname}}_decode({{#nullSafe}}__body{{/nullSafe}}{{^nullSafe}}response{{/nullSafe}});
+        return await apiDelegate.{{nickname}}_decode(__body);
     {{/vendorExtensions.x-dart-produces-raw}}
     {{/returnType}}
       }
@@ -73,20 +73,11 @@ part of {{pubName}}.api;
       {{^vendorExtensions.x-dart-produces-json}}
           Future<ApiResponse>
       {{/vendorExtensions.x-dart-produces-json}}
-      {{vendorExtensions.x-dart-extension-name}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
+      {{vendorExtensions.x-dart-extension-name}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options? options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}? {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options? options}{{/hasOptionalParams}}) async {
 
         final response = await apiDelegate.{{nickname}}({{#allParams}}{{#required}}{{paramName}}, {{/required}}{{/allParams}} options: options, {{#hasOptionalParams}}{{#hasParams}}{{/hasParams}}{{#allParams}}{{^required}}{{paramName}}: {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{/hasOptionalParams}});
 
-      {{#nullSafe}}
           return ApiResponse(response.statusCode, response.headers, response.body);
-      {{/nullSafe}}
-      {{^nullSafe}}
-          return ApiResponse()
-          ..statusCode = response.statusCode
-          ..headers = response.headers
-          ..body = response.body;
-      {{/nullSafe}}
-
         }
     {{/vendorExtensions.x-dart-extension-name}}
   {{/operation}}
@@ -96,28 +87,20 @@ part of {{pubName}}.api;
     class {{classname}}Delegate {
     final ApiClient apiClient;
 
-  {{classname}}Delegate(this.apiClient){{^nullSafe}} : assert(apiClient != null){{/nullSafe}};
+  {{classname}}Delegate(this.apiClient);
 
   {{#operation}}
+    {{#allParams}}
+      // {{paramName}} required: {{required}} nullable: {{isNullable}} ext: {{{vendorExtensions}}}
+    {{/allParams}}
       Future<ApiResponse>
-    {{nickname}}({{#allParams}}{{#required}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options{{#nullSafe}}?{{/nullSafe}} options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}{{#nullSafe}}?{{/nullSafe}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options{{#nullSafe}}?{{/nullSafe}} options}{{/hasOptionalParams}}) async {
-    {{#bodyParams}}Object{{#nullSafe}}{{^required}}?{{/required}}{{/nullSafe}} postBody = {{paramName}};{{/bodyParams}}
-
-    {{^nullSafe}}
-        // verify required params are set
-      {{#allParams}}
-        {{#required}}
-            if({{paramName}} == null) {
-            throw ApiException(400, 'Missing required param: {{paramName}}');
-            }
-        {{/required}}
-      {{/allParams}}
-    {{/nullSafe}}
+    {{nickname}}({{#allParams}}{{#required}}{{{dataType}}}{{#isNullable}}?{{/isNullable}} {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}}{{#hasOptionalParams}}{Options? options{{#hasParams}}, {{/hasParams}}{{#allParams}}{{^required}}{{{dataType}}}? {{paramName}}{{^-last}}, {{/-last}}{{/required}}{{/allParams}} }{{/hasOptionalParams}}{{^hasOptionalParams}}{{#hasParams}}, {{/hasParams}}{Options? options}{{/hasOptionalParams}}) async {
+    {{#bodyParams}}Object{{#isNullable}}?{{/isNullable}} postBody = {{paramName}};{{/bodyParams}}
 
       // create path and map variables
       final __path = '{{{path}}}'{{#pathParams}}.replaceAll('{' + '{{baseName}}' + '}',
     {{#isDateTime}}openApiDateTimeParameterToString{{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}(
-        {{{paramName}}}){{#nullSafe}}{{^isDateTime}}{{^isDate}}!{{/isDate}}{{/isDateTime}}{{/nullSafe}}){{/pathParams}};
+        {{{paramName}}}){{^isDateTime}}{{^isDate}}!{{/isDate}}{{/isDateTime}}){{/pathParams}};
 
       // query params
       final queryParams = <QueryParam>[];
@@ -138,7 +121,7 @@ part of {{pubName}}.api;
       {{/required}}
         queryParams.addAll(convertParametersForCollectionFormat(
       (p) =>
-      {{#isDateTime}}openApiDateTimeParameterToString(p, false){{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString(p, false){{/isDate}}{{^isDate}}LocalApiClient.parameterToString(p){{#nullSafe}}!{{/nullSafe}}{{/isDate}}{{/isDateTime}},
+      {{#isDateTime}}openApiDateTimeParameterToString(p, false){{/isDateTime}}{{^isDateTime}}{{#isDate}}openApiDateParameterToString(p, false){{/isDate}}{{^isDate}}LocalApiClient.parameterToString(p)!{{/isDate}}{{/isDateTime}},
           '{{collectionFormat}}', '{{baseName}}', {{paramName}}));
       {{^required}}
           }
@@ -158,19 +141,12 @@ part of {{pubName}}.api;
         headerParams['Content-Type'] = contentTypes[0];
         }
       {{#bodyParam}}
-        {{^nullSafe}}
-            if (postBody != null) {
-            postBody = LocalApiClient.serialize(postBody);
-            }
-        {{/nullSafe}}
-        {{#nullSafe}}
           {{#required}}
               postBody = LocalApiClient.serialize(postBody);
           {{/required}}
           {{^required}}
               postBody = postBody == null ? null : LocalApiClient.serialize(postBody);
           {{/required}}
-        {{/nullSafe}}
       {{/bodyParam}}
     {{/vendorExtensions.x-dart-consumes-json}}
     {{#vendorExtensions.x-dart-consumes-form}}
@@ -181,13 +157,14 @@ part of {{pubName}}.api;
         final postBody = <String, dynamic>{ {{#formParams}}
           {{^isFile}}
         {{^isArray}}
-          '{{baseName}}': {{#isDateTime}}{{paramName}}?.toUtc(){{^nullSafe}}?{{/nullSafe}}.toIso8601String(){{/isDateTime}}
+          '{{baseName}}': {{#isDateTime}}{{paramName}}{{#isNullable}}?{{/isNullable}}.toUtc().toIso8601String(){{/isDateTime}}
                           {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
         {{/isArray}}
         {{#isArray}}
-            '{{baseName}}': {{paramName}}{{^required}}?{{/required}}{{#nullSafe}}.whereNotNull(){{/nullSafe}}{{^nullSafe}}.where((p) => p != null){{/nullSafe}}
-                {{^nullSafe}}?{{/nullSafe}}.map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
-          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}){{^nullSafe}}?{{/nullSafe}}.toList(),
+
+            '{{baseName}}': {{paramName}}{{#isNullable}}?{{/isNullable}}.whereNotNull()
+                .map({{#isDateTime}}{{paramName}}.toUtc().toIso8601String(){{/isDateTime}}
+          {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
         {{/isArray}}
           {{/isFile}}
         {{/formParams}} }.entries.where((me) => me.value != null).map((me) => me.key + "=" + Uri.encodeComponent(me.value)).join("&");
@@ -206,9 +183,9 @@ part of {{pubName}}.api;
                               {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}({{paramName}}){{/isDateTime}},
             {{/isArray}}
             {{#isArray}}
-                '{{baseName}}': {{paramName}}{{^required}}?{{/required}}{{#nullSafe}}.whereNotNull(){{/nullSafe}}{{^nullSafe}}.where((p) => p != null){{/nullSafe}}
-              {{^nullSafe}}?{{/nullSafe}}.map({{#isDateTime}}{{paramName}}?.toUtc().toIso8601String(){{/isDateTime}}
-              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}){{^nullSafe}}?{{/nullSafe}}.toList(),
+                '{{baseName}}': {{paramName}}{{#isNullable}}?{{/isNullable}}.whereNotNull()
+              .map({{#isDateTime}}{{paramName}}.toUtc().toIso8601String(){{/isDateTime}}
+              {{^isDateTime}}{{#isDate}}openApiDateParameterToString{{/isDate}}{{^isDate}}LocalApiClient.parameterToString{{/isDate}}{{/isDateTime}}).toList(),
             {{/isArray}}
           {{/isFile}}
           {{#isFile}}
@@ -233,17 +210,17 @@ part of {{pubName}}.api;
     {{^vendorExtensions.x-dart-produces-json}}
       {{#returnType}}Future<String> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
     {{/vendorExtensions.x-dart-produces-json}}
-    {{nickname}}_decode({{#nullSafe}}Stream<List<int>> body{{/nullSafe}}{{^nullSafe}}ApiResponse response{{/nullSafe}}) async {
+    {{nickname}}_decode(Stream<List<int>> body) async {
     {{#vendorExtensions.x-dart-produces-json}}
       {{#isArray}}
         {{#returnType}}
-            return (LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
+            return (LocalApiClient.deserializeFromString(await utf8.decodeStream(body), '{{{returnType}}}') as List).map((item) => item as {{returnBaseType}}).toList();
         {{/returnType}}
       {{/isArray}}
       {{^isArray}}
         {{#isMap}}
           {{#returnType}}
-              return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}'));
+              return {{{returnType}}}.from(LocalApiClient.deserializeFromString(await utf8.decodeStream(body), '{{{returnType}}}'));
           {{/returnType}};
         {{/isMap}}
         {{^isMap}}
@@ -252,7 +229,7 @@ part of {{pubName}}.api;
                 return response;
             {{/vendorExtensions.x-dart-produces-raw}}
             {{^vendorExtensions.x-dart-produces-raw}}
-              return LocalApiClient.deserializeFromString(await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}}), '{{{returnType}}}') as {{{returnType}}};
+              return LocalApiClient.deserializeFromString(await utf8.decodeStream(body), '{{{returnType}}}') as {{{returnType}}};
             {{/vendorExtensions.x-dart-produces-raw}}
           {{/returnType}}
         {{/isMap}}
@@ -260,7 +237,7 @@ part of {{pubName}}.api;
     {{/vendorExtensions.x-dart-produces-json}}
     {{^vendorExtensions.x-dart-produces-json}}
         {{^vendorExtensions.x-dart-produces-raw}}
-        return await utf8.decodeStream({{#nullSafe}}body{{/nullSafe}}{{^nullSafe}}response.body{{/nullSafe}});
+        return await utf8.decodeStream(body);
         {{/vendorExtensions.x-dart-produces-raw}}
     {{/vendorExtensions.x-dart-produces-json}}
       }
