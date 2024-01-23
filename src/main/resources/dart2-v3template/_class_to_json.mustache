@@ -31,12 +31,12 @@
           {{/isEnum}}
           {{#isDate}}
             {{{name}}}{{#isNullable}}?{{/isNullable}}.toUtc()
-            {{#isNullable}}?{{/isNullable}}.toIso8601String()
-            {{#isNullable}}?{{/isNullable}}.substring(0, 10)
+            .toIso8601String()
+            .substring(0, 10)
           {{/isDate}}
           {{#isDateTime}}
             {{{name}}}{{#isNullable}}?{{/isNullable}}.toUtc()
-            {{#isNullable}}?{{/isNullable}}.toIso8601String()
+            .toIso8601String()
           {{/isDateTime}}
           {{#isAnyType}}{{{name}}}{{/isAnyType}}
           ;
