@@ -1,13 +1,13 @@
 {{#items}}
   {{#isArray}}
-    (data as List<dynamic>).fromNull().map((data) { return ((dynamic data) { return {{>_from_json}};})(data); }).toList()
+    (data as List<dynamic>).fromNull().map((data) { return ((dynamic data) { return {{>_from_json}};})(data); }){{#uniqueItems}}.toSet(){{/uniqueItems}}{{^uniqueItems}}.toList(){{/uniqueItems}}
   {{/isArray}}
   {{#isMap}}
     (data as List<dynamic>).fromNull().map((data) { ((dynamic data) { return {{>_from_json}};})(data); }).toList()
   {{/isMap}}
   {{^items}}
     {{#isEnum}}
-      {{enumName}}Extension.listFromJson(data)
+      {{enumName}}Extension.{{#vendorExtensions.x-array-items-unique}}set{{/vendorExtensions.x-array-items-unique}}{{^vendorExtensions.x-array-items-unique}}list{{/vendorExtensions.x-array-items-unique}}FromJson(data)
     {{/isEnum}}
     {{#isDateTime}}
       openApiDateTimeList(data)
@@ -16,17 +16,17 @@
       openApiDateTimeList(data)
     {{/isDate}}
     {{#isModel}}
-      {{complexType}}.listFromJson(data)
+      {{complexType}}.{{#vendorExtensions.x-array-items-unique}}set{{/vendorExtensions.x-array-items-unique}}{{^vendorExtensions.x-array-items-unique}}list{{/vendorExtensions.x-array-items-unique}}FromJson(data)
     {{/isModel}}
     {{#isPrimitiveType}}
       {{#isNumeric}}
-          (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.map((n) => (n as num).
+          (data as {{#vendorExtensions.x-array-items-unique}}Set{{/vendorExtensions.x-array-items-unique}}{{^vendorExtensions.x-array-items-unique}}List{{/vendorExtensions.x-array-items-unique}}<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.map((n) => (n as num).
         {{#isInteger}}toInt(){{/isInteger}}
         {{^isInteger}}toDouble(){{/isInteger}}
           ).toList()
       {{/isNumeric}}
       {{^isNumeric}}
-          (data as List<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.cast<{{{dataType}}}>(){{#x-dart-nullable}} ?? <{{{dataType}}}>[]{{/x-dart-nullable}}
+          (data as {{#vendorExtensions.x-array-items-unique}}Set{{/vendorExtensions.x-array-items-unique}}{{^vendorExtensions.x-array-items-unique}}List{{/vendorExtensions.x-array-items-unique}}<dynamic>{{#x-dart-nullable}}?{{/x-dart-nullable}}){{#x-dart-nullable}}?{{/x-dart-nullable}}.cast<{{{dataType}}}>(){{#x-dart-nullable}} ?? <{{{dataType}}}>[]{{/x-dart-nullable}}
       {{/isNumeric}}
     {{/isPrimitiveType}}
     {{#isAnyType}}data{{/isAnyType}}

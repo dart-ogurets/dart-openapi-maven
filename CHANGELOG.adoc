@@ -1,5 +1,11 @@
 = Changelog
 
+== 9.x Series
+
+- Based on 7.23.+ of the OpenApi Maven plugin infrastructure
+- Targets Java 17+
+- Supports `uniqueItems: true` on arrays which cause `Set<X>` to be created.
+
 == 8.x Series is based on OpenAPI 7.x+
 
 - The OpenAPI base now shifts to version 7 and Java 11. 
@@ -117,3 +123,30 @@ format now serialises directly properly, but not in lists.
 - 4.1 - support for OpenAPI v5, released 2020/12/21. Next release will support null types in Dart. Please note that
 with the move to 4.1, form models are by default NOT generated, so your parameters for methods calling forms won't
 work. You need to set a global property called `skipFormModels` to false. In Maven this is in the configuration
+
+- 3.10 - support extension methods for mapping between enum names and types
+- 3.9 - support for reserved words mappings in variable names
+- 3.8 - non complex lists were not being compared in equals or hash functions correctly
+- 3.7 - resolved an issue with inline enums - thanks to Robert of https://github.com/BlackBeltTechnology
+- 3.5 - resolved an issue where class level variables were being duplicated from the parent, causing equals to fail
+- 3.4 - backed out some experimental features and exposed the serialization capabilities. fixed a NPE on the copyWith.
+- 3.3 - introduces feedback from Jpi & Brian Janssen around making all the LocalApi serializer calls static, so `toJson()`
+can be called by jsonEncode without introducing non-Dart-like complexity. Further, we introduce an experimental vendor
+extension on an operation called `x-dart-rich-operationId` - this has to be another operation id, not the same as `operationId:`
+as Dart cannot have two functions with different return types. It will give you the same method signature, but return the
+deserialized object, the headers and the status code. It does not interfere with the existing code generation and was introduced
+to allow situations where session data is being returned outside of the body. It will be documented further once accepted.
+- 3.2 - introduces support for extra elements in the pubspec, import support, arbitrary part support and a fix for arrays of date times and dates
+- 3.1 - introduces support for the Kubernetes API in terms of compilation along with a considerable degree of support for the
+complexity of that API. It also reduces the code generated when no forms are used or forms are used but not json. It also supports
+the return of non-json data by just returning the string, allowing you to decode it.
+- 2.9 - support inheritance using allOf where it exists. If the model from the generator provides a parentClass we modify the
+output to now support the correct code generation to support inheritance. Resolve issue around headers not being merged if passed
+by user. Fix issue with form data generation where fields need to be json encoded.
+- 2.8 - resolves a number of Dart Analysis issues
+- 2.6/7 - add in a new copyWith() method that allows you to make deep copies of the model and replace specific parts
+- 2.5 - fixed a dangling } issue from pedantic, fixed additionalProperties support for k8s api generation, added integration tests
+- 2.4 - fixed an issue if no authNames were being provided, a List<dynamic> was created instead of a List<String>
+- 2.3 - this is a cleanup of the move to Dio based on pedantic feedback
+- 1.5 - fixed the pubspec.yaml
+- 1.4 - added in serialization of outgoing data because Dart cannot serialize an enum using json.

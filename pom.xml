@@ -4,7 +4,7 @@
 	<artifactId>openapi-dart-generator</artifactId>
 	<packaging>jar</packaging>
 	<name>openapi-dart-generator</name>
-	<version>8.2-SNAPSHOT</version>
+	<version>9.1-SNAPSHOT</version>
 
 	<description>
 		dart2 generator from openapi 3.x spec files.
@@ -34,10 +34,10 @@
 	</scm>
 
 	<properties>
-		<openapi-codegen-version>7.0.1</openapi-codegen-version>
-    <maven.compiler.target>1.11</maven.compiler.target>
-    <maven.compiler.source>1.11</maven.compiler.source>
-    <kotlin.version>1.8.10</kotlin.version>
+    <openapi-codegen-version>7.23.0</openapi-codegen-version>
+    <kotlin.version>2.3.0</kotlin.version>
+    <maven.compiler.target>1.17</maven.compiler.target>
+    <maven.compiler.source>1.17</maven.compiler.source>
 	</properties>
 
 	<prerequisites>
@@ -86,24 +86,112 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
 	</dependencies>
 
+  <profiles>
+    <profile>
+      <!-- adtivate the sonatype profile when a release is being done -->
+      <id>sonatype</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.8.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>sonatype-staging</publishingServerId>
+              <autoPublish>true</autoPublish>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 	<build>
 		<plugins>
       <plugin>
-        <groupId>io.repaint.maven</groupId>
-        <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.23</version>
-        <extensions>true</extensions>
+        <groupId>net.stickycode.plugins</groupId>
+        <artifactId>bounds-maven-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0</version>
+        <!-- Invocation is defined by the release plugin goal set hence no executions -->
         <configuration>
-          <filtering>false</filtering>
-          <tiles>
-            <tile>cd.connect.tiles:tile-release:[1.2, 2)</tile>
-          </tiles>
+          <rules>
+            <requireMavenVersion>
+              <version>[3.3.9,)</version>
+            </requireMavenVersion>
+            <requireReleaseDeps>
+              <!--  Don't allow releases with snapshop deps or parents -->
+              <message>No Snapshots Allowed!</message>
+              <failWhenParentIsSnapshot>true</failWhenParentIsSnapshot>
+              <searchTransitive>true</searchTransitive>
+            </requireReleaseDeps>
+          </rules>
+          <fail>true</fail>
+
         </configuration>
+      </plugin>
+      <plugin> <!-- unlike with subversion, this doesn't require overriding because releases are always done from local -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <mavenExecutorId>forked-path</mavenExecutorId>
+          <arguments>-Dconnect.release</arguments>
+          <preparationGoals>clean enforcer:enforce verify</preparationGoals>
+          <goals>bounds:update enforcer:enforce deploy</goals>
+          <tagBase>${project.groupId}/</tagBase>
+          <pushChanges>false</pushChanges>
+          <localCheckout>true</localCheckout>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.2</version>
       </plugin>
       <plugin>
         <!-- if including source jars, use the no-fork goals
@@ -123,6 +211,25 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <source>17</source>
+          <detectJavaApiLink>false</detectJavaApiLink>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
         <version>${kotlin.version}</version>
@@ -136,18 +243,20 @@
               <sourceDirs>
                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
                 <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                <jvmTarget>11</jvmTarget>
+                <jvmTarget>17</jvmTarget>
               </sourceDirs>
             </configuration>
           </execution>
           <execution>
             <id>test-compile</id>
-            <goals> <goal>test-compile</goal> </goals>
+            <goals>
+              <goal>test-compile</goal>
+            </goals>
             <configuration>
               <sourceDirs>
                 <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
                 <sourceDir>${project.basedir}/src/test/java</sourceDir>
-                <jvmTarget>11</jvmTarget>
+                <jvmTarget>17</jvmTarget>
               </sourceDirs>
             </configuration>
           </execution>
@@ -155,12 +264,12 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
-          <release>11</release>
-          <source>11</source>
-          <target>11</target>
-          <executable>javac11</executable>
+          <release>17</release>
+          <source>17</source>
+          <target>17</target>
+          <executable>javac17</executable>
           <useIncrementalCompilation>false</useIncrementalCompilation>
         </configuration>
         <executions>
@@ -191,41 +300,6 @@
               <goal>testCompile</goal>
             </goals>
             <configuration />
-          </execution>
-        </executions>
-      </plugin>
-      <!-- files ending in spec or test -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M3</version>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <source>11</source>
-          <detectJavaApiLink>false</detectJavaApiLink>
-        </configuration>
-      </plugin>
-
-      <!-- ensure we know what our licenses are -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>2.0.0</version>
-        <executions>
-          <execution>
-            <id>licences</id>
-            <goals>
-              <goal>add-third-party</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

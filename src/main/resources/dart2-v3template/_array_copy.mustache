@@ -3,17 +3,17 @@ data{{#isNullable}}?{{/isNullable}}.
 {{#items}}
   {{#isArray}}
     map((data) { return (({{{dataType}}} data) {
-    return {{>_copy}};})(data); }){{#isNullable}}?{{/isNullable}}.toList()
+    return {{>_copy}};})(data); }){{#isNullable}}?{{/isNullable}}{{#uniqueItems}}.toSet(){{/uniqueItems}}{{^uniqueItems}}.toList(){{/uniqueItems}}
   {{/isArray}}
   {{#isMap}}
     map((data) { ((data) { return {{>_copy}};})(data); }){{#isNullable}}?{{/isNullable}}.toList()
   {{/isMap}}
   {{^items}}
     {{^isModel}}
-      toList()
+      {{#vendorExtensions.x-array-items-unique}}toSet(){{/vendorExtensions.x-array-items-unique}}{{^vendorExtensions.x-array-items-unique}}toList(){{/vendorExtensions.x-array-items-unique}}
     {{/isModel}}
     {{#isModel}}
-      map((data) => {{>_copy}}){{#isNullable}}?{{/isNullable}}.toList()
+      map((data) => {{>_copy}}){{#isNullable}}?{{/isNullable}}.{{#vendorExtensions.x-array-items-unique}}toSet(){{/vendorExtensions.x-array-items-unique}}{{^vendorExtensions.x-array-items-unique}}toList(){{/vendorExtensions.x-array-items-unique}}
     {{/isModel}}
   {{/items}}
 {{/items}}

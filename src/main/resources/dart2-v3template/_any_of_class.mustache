@@ -86,6 +86,10 @@ class {{classname}} {
     return json == null ? <{{classname}}>[] : json.map((value) => {{classname}}.fromJson(value)).toList();
   }
 
+  static Set<{{classname}}> setFromJson(List<dynamic>? json) {
+    return json == null ? new Set() : json.map((value) => {{classname}}.fromJson(value)).toSet();
+  }
+
   {{#innerTypes}}{{classname}} as{{classname}}() => _value as {{classname}};
   {{/innerTypes}}
 

@@ -1,3 +1,4 @@
 final _jsonData = json[r'{{{baseName}}}'];
+// zoot1
 return (_jsonData == null) ? {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}} : ((dynamic data) { return {{>_from_json}}; }(_jsonData));
 

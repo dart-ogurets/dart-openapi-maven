@@ -257,12 +257,16 @@ class DartV3ApiGenerator : DartClientCodegen() {
       false
     }
 
+    if (cp.isArray && cp.uniqueItems) { // the mustache model doesn't have access in "items" to the fact these are unique and needs to
+      cp.items.vendorExtensions["x-array-items-unique"] = "true"
+    }
+
     if (cp.allowableValues != null && cp.allowableValues["enumVars"] != null || isComposedEnum) {
       // "internal" enums
       if (cp.getMin() == null && cp.complexType == null) {
         cp.enumName = model.classname + cp.nameInCamelCase + "Enum"
         if (cp.isArray) {
-          cp.dataType = "List<" + cp.enumName + propertyListOrMapSuffix(cp.items) + ">"  + listOrMapSuffix(cp)
+          cp.dataType = listSetPrefix(cp) + cp.enumName + propertyListOrMapSuffix(cp.items) + ">"  + listOrMapSuffix(cp)
           if (cp.isNullable && cp.items != null) {
             cp.items.vendorExtensions["x-list-null"] = "true"
           }
@@ -300,7 +304,7 @@ class DartV3ApiGenerator : DartClientCodegen() {
       } else if (cp.isArray && cp.items != null) {
         val inner = nullGenChild(cp.items)
         cp.dataType =
-          "List<" + inner + ">" + listOrMapSuffix(cp)
+          listSetPrefix(cp) + inner + ">" + listOrMapSuffix(cp)
         if (cp.isNullable && cp.items != null) {
           cp.items.vendorExtensions["x-list-null"] = "true"
         }
@@ -378,11 +382,15 @@ class DartV3ApiGenerator : DartClientCodegen() {
     return isComposedEnum
   }
 
+  private fun listSetPrefix(cp: CodegenProperty): String {
+    return if (cp.uniqueItems) "Set<" else "List<"
+  }
+
   private fun nullGenChild(cp: CodegenProperty): String {
     val value: String = if (cp.isMap) {
       "Map<String, " + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else if (cp.isArray) {
-      "List<" + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
+      listSetPrefix(cp) + nullGenChild(cp.items) + ">" + listOrMapSuffix(cp)
     } else {
       cp.dataType + propertyListOrMapSuffix(cp)
     }
@@ -642,7 +650,11 @@ class DartV3ApiGenerator : DartClientCodegen() {
     return if (ModelUtils.isMapSchema(schema)) {
       schema.default?.toString()
     } else if (ModelUtils.isArraySchema(schema)) {
-      schema.default?.toString()
+      if (schema.uniqueItems == true) {
+        "Set()"
+      } else {
+        schema.default?.toString()
+      }
     } else if (schema.default != null) {
       val s = if (ModelUtils.isStringSchema(schema)) "'" + schema.default.toString()
         .replace("'", "\\'") + "'" else schema.default.toString()

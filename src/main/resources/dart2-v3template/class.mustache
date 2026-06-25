@@ -132,6 +132,10 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
     return json == null ? <{{{classname}}}>[] : json.map((value) => {{{classname}}}.fromJson(value)).toList();
   }
 
+  static Set<{{{classname}}}> setFromJson(List<dynamic>? json) {
+    return json == null ? new Set() : json.map((value) => {{{classname}}}.fromJson(value)).toSet();
+  }
+
   static Map<String, {{{classname}}}> mapFromJson(Map<String, dynamic>? json) {
     final map = <String, {{{classname}}}>{};
     if (json != null && json.isNotEmpty) {
@@ -141,7 +145,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   }
 
   @override
-  bool operator ==(Object? __other) {
+  bool operator ==(Object __other) {
     if (identical(this, __other)) {
       return true;
     }
@@ -151,7 +155,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
   {{#hasVars}}return {{#vendorExtensions.x-dart-ownVars}}
     {{#complexType}}
       {{#isArray}}
-        const ListEquality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
+        const {{#uniqueItems}}Set{{/uniqueItems}}{{^uniqueItems}}List{{/uniqueItems}}Equality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
       {{/-last}}
       {{/isArray}}
       {{^isArray}}
@@ -166,7 +170,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
       {{/isArray}}
     {{/complexType}}{{^complexType}}
     {{#isArray}}
-      const ListEquality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
+      const {{#uniqueItems}}Set{{/uniqueItems}}{{^uniqueItems}}List{{/uniqueItems}}Equality().equals({{{name}}}, __other.{{{name}}}){{^-last}} &&
     {{/-last}}
     {{/isArray}}
     {{^isArray}}
@@ -192,7 +196,7 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
           if ({{{name}}} != null) {
           {{/isNullable}}
       {{#isArray}}
-        hashCode = hashCode * 31 + const ListEquality().hash({{{name}}});
+        hashCode = hashCode * 31 + const {{#uniqueItems}}Set{{/uniqueItems}}{{^uniqueItems}}List{{/uniqueItems}}Equality().hash({{{name}}});
       {{/isArray}}
       {{#isMap}}
         hashCode = hashCode * 31 + MapEquality().hash({{{name}}});
@@ -262,6 +266,9 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 
             static List<{{{enumName}}}> listFromJson(List<dynamic>? json) =>
               json == null ? <{{{enumName}}}>[] : json.map((value) => fromJson(value)).toList().fromNull();
+
+            static Set<{{{enumName}}}> setFromJson(List<dynamic>? json) =>
+              json == null ? new Set() : json.map((value) => fromJson(value)).toSet().fromNull();
 
             static {{{enumName}}} copyWith({{{enumName}}} instance) => instance;
           }

@@ -280,7 +280,7 @@ components:
           type: integer
           nullable: true
         myNullableArray:
-          type: array
+          uniqueItems: true
           nullable: true
           items:
             type: string
