@@ -3,8 +3,10 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
 {{#vars}}
   {{^isInherited}}
     {{#description}}/* {{{description}}} */{{/description}}
+    {{#deprecated}}@deprecated{{/deprecated}}
     {{^allowableValues}}
-      {{^isNullable}}{{^required}}late {{/required}}{{/isNullable}}{{{dataType}}} {{{name}}};
+      {{^isNullable}}{{^required}}
+        late {{/required}}{{/isNullable}}{{{dataType}}} {{{name}}};
     {{/allowableValues}}
     {{#allowableValues}}
       {{#isEnum}}
@@ -18,7 +20,8 @@ class {{{classname}}}{{#parent}} extends {{parent}}{{/parent}} {
           {{{classname}}}{{nameInCamelCase}}Enum {{{name}}}{{#defaultValue}} = {{{classname}}}{{nameInCamelCase}}Enum.{{{defaultValue}}}{{/defaultValue}};
         {{/complexType}}
         {{#complexType}}
-          {{^isNullable}}{{^required}}late {{/required}}{{/isNullable}}{{{dataType}}}{{{name}}};
+          {{^isNullable}}{{^required}}
+            late {{/required}}{{/isNullable}}{{{dataType}}}{{{name}}};
         {{/complexType}}
       {{/isEnum}}
     {{/allowableValues}}

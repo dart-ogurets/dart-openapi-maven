@@ -15,6 +15,7 @@ part of {{pubName}}.api;
     /// {{summary}}
     ///
     /// {{notes}}
+    {{#isDeprecated}}@deprecated{{/isDeprecated}}
     {{#vendorExtensions.x-dart-produces-json}}
       {{#returnType}}Future<{{{returnType}}}> {{/returnType}}{{^returnType}}Future<void> {{/returnType}}
     {{/vendorExtensions.x-dart-produces-json}}

@@ -1,5 +1,10 @@
 = Changelog
 
+== 9.2
+
+- tags API calls and properties that are deprecated with `@deprecated` to encourage
+AI tools to avoid using them. Adds any descriptions to them as comments.
+
 == 9.x Series
 
 - Based on 7.23.+ of the OpenApi Maven plugin infrastructure
